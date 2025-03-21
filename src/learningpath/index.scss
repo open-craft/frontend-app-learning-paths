@@ -1,0 +1,167 @@
+@import '@edx/paragon/scss/core/core';  // Import Paragon base styles (if not globally imported)
+
+// Custom styles for the learning pathways list
+.learningpath-list {
+  margin: 2rem;  // add some outer margin/padding as needed
+}
+.learningpath-list .list-group-item {
+  // Optionally adjust item styles (font size, hover, etc.)
+  font-size: 1rem;
+}
+
+.learning-path-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+
+  .lp-image-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 0;
+    }
+  }
+
+  .lp-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    max-height: 180px;
+    border-radius: 4px;
+  }
+
+  .lp-type-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .lp-meta {
+    font-size: 0.9rem;
+    color: #555;
+  }
+}
+
+.lp-status-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.learning-path-detail-page {
+  // The overall container
+  font-family: "Open Sans", sans-serif; // or whichever font your mockup uses
+  margin: 3rem;
+
+  .hero-section {
+    padding: 2rem;            // Some spacing around the hero
+
+    // Explore link
+    .explore-link {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-wrap: wrap;        // Support responsiveness
+      margin-bottom: 2rem;    // Space below the row of heading + image
+
+      .hero-text {
+        flex: 1 1 0;
+        min-width: 300px;     // Ensures it doesn't collapse too much
+        margin-right: 1rem;
+
+        h1 {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+        }
+
+        .subtitle {
+          color: #666;
+          font-size: 1rem;
+          max-width: 80%;
+          margin-bottom: 1.5rem;
+        }
+
+        .hero-button {
+          margin-bottom: 1rem;
+        }
+      }
+
+      .hero-image {
+        flex: 0 0 300px;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+          max-height: 250px;
+          width: 100%;
+          object-fit: cover;
+          border-radius: 4px;
+        }
+      }
+    }
+
+    .hero-info-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      .info-col {
+        flex: 0 0 calc(25% - 1rem); // 4 columns with some spacing
+        margin-bottom: 1rem;
+        h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+        .info-subtext {
+          color: #666;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+
+  // The tab bar
+  .lp-tabs {
+    background-color: #f2f0ef;
+    border-bottom: 1px solid #ddd;
+    padding: 0 2rem; // horizontal padding
+    display: flex;
+    align-items: center;
+
+    .nav {
+      // remove default bottom border on the nav
+      border-bottom: 0;
+
+      .nav-link {
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+      }
+    }
+
+    .tab-button {
+      margin-left: auto;
+    }
+  }
+
+  // The main content area
+  .lp-info {
+    margin-top: 3rem;
+    margin-left: 10rem;
+    margin-right: 10rem;
+    section {
+      margin-bottom: 2rem;
+      h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}
