@@ -32,21 +32,42 @@
     border-radius: 4px;
   }
 
-  .lp-type-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
   .lp-meta {
     font-size: 0.9rem;
     color: #555;
   }
 }
 
+.lp-type-label {
+  background-color: #821122;
+  border-radius: 5px;
+  display: inline-flex;
+  color: white;
+  padding-left: 2px;
+  padding-right: 5px;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .lp-status-badge {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+}
+
+.course-type-label {
+  background-color: #8C8179;
+  border-radius: 5px;
+  display: inline-flex;
+  color: white;
+  padding-left: 2px;
+  padding-right: 5px;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .learning-path-detail-page {
@@ -151,7 +172,6 @@
     }
   }
 
-  // The main content area
   .lp-info {
     margin-top: 3rem;
     margin-left: 10rem;

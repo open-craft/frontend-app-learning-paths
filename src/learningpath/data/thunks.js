@@ -22,10 +22,26 @@ export const fetchLearningPathways = () => async (dispatch) => {
         } else if (lpprogress.progress >= lpprogress.required_completion) {
           status = "Completed";
         }
+        let maxDate = null;
+        const num_courses = lpdetail.steps.length;
+        for (const course of lpdetail.steps) {
+          if (course.due_date) {
+            const dueDateObj = new Date(course.due_date);
+            if (!maxDate || dueDateObj > maxDate) {
+              maxDate = dueDateObj;
+            }
+          }
+        }
+        // Convert maxDate to an ISO string for serialization
+        if (maxDate) {
+          maxDate = maxDate.toISOString();
+        }
         return {
           ...lp,
           ...lpdetail,
+          num_courses,
           status,
+          maxDate,
         };
       })
     );

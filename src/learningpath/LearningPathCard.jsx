@@ -27,10 +27,11 @@ const LearningPathCard = ({ learningPath }) => {
     duration,
     num_courses,
     status,
+    maxDate,
   } = learningPath;
 
-  let statusVariant = 'dark';   // default
-  let statusIcon = 'fa-circle'; // default icon
+  let statusVariant = 'dark';
+  let statusIcon = 'fa-circle';
   switch (status?.toLowerCase()) {
     case 'completed':
       statusVariant = 'success';
@@ -45,11 +46,16 @@ const LearningPathCard = ({ learningPath }) => {
       statusIcon = Timelapse;
       break;
     default:
-      // fallback if unknown
       statusVariant = 'dark';
       statusIcon = 'fa-circle';
       break;
   }
+
+  const currentDate = new Date();
+  const accessDateObj = new Date(maxDate);
+  const accessText = currentDate > accessDateObj
+    ? "Access ended"
+    : `Access until ${accessDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   const subtitleLine = subtitle && duration
     ? `${subtitle} • ${duration} days`
@@ -74,7 +80,7 @@ const LearningPathCard = ({ learningPath }) => {
           )}
         </Col>
         <Col xs={12} md={8}>
-          <div className="d-flex lp-type-label text-uppercase text-danger mb-2">
+          <div className="lp-type-label text-uppercase mb-2">
             <Icon src={FormatListBulleted} className="mr-1" />
             <span>Learning Path</span>
           </div>
@@ -84,22 +90,21 @@ const LearningPathCard = ({ learningPath }) => {
               {subtitleLine}
             </p>
           )}
-          <div className="lp-meta d-flex flex-wrap mb-2">
-            {num_courses && (
-              <div className="mr-3 d-flex align-items-center">
-                <Icon src={FormatListBulleted} className="mr-1" />
-                {num_courses} courses
-              </div>
-            )}
-
-            {/* Access expiry */}
-            
-            <div className="mr-3 d-flex align-items-center">
-              <Icon src={AccessTime} className="mr-1" />
-              Access until
+          <Card.Footer className="p-3 d-flex align-items-center">
+            <div className="lp-meta d-flex flex-wrap mr-auto mb-2">
+              {num_courses && (
+                <div className="mr-3 d-flex align-items-center">
+                  <Icon src={FormatListBulleted} className="mr-1" />
+                  {num_courses} courses
+                </div>
+              )}
+              {maxDate && (
+                <div className="mr-6 d-flex align-items-center">
+                  <Icon src={AccessTime} className="mr-1" />
+                  {accessText}
+                </div>
+              )}
             </div>
-          </div>
-          <Card.Footer className="p-0 mt-3">
             <Link to={`/learningpath/${uuid}`}>
               <Button variant="outline-primary">View</Button>
             </Link>

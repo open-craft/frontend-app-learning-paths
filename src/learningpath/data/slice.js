@@ -4,9 +4,6 @@ const initialLearningPathState = () => ({
   fetching: false,
   learningPathways: [],
   errors: [],
-  detailFetching: false,
-  detailError: null,
-  detailItem: null,
 });
 
 const initialCoursesState = () => ({

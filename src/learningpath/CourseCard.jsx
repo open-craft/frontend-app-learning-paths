@@ -65,7 +65,7 @@ const CourseCard = ({ course }) => {
                 )}
                 </Col>
                 <Col xs={12} md={8}>
-                    <div className="d-flex lp-type-label text-uppercase text-muted mb-2">
+                    <div className="course-type-label text-uppercase mb-2">
                         <Icon src={LmsBook} className="mr-1" />
                         <span>Course</span>
                     </div>

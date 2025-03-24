@@ -6,11 +6,11 @@ import { buildAssetUrl } from '../util/assetUrl';
 import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
 import CourseCard from './CourseCard';
 import {
-  LmsCompletionSolid,
-  CheckCircle,
-  Timelapse,
+  Person,
+  Award,
+  Calendar,
   FormatListBulleted,
-  AccessTime,
+  AccessTimeFilled,
 } from '@openedx/paragon/icons';
 
 export default function LearningPathDetailPage() {
@@ -60,6 +60,19 @@ export default function LearningPathDetailPage() {
     loadCourses();
   }, [courseIds]);
 
+  const accessUntilDate = useMemo(() => {
+    let maxDate = null;
+    for (const c of coursesForPath) {
+      if (c.end_date) {
+        const endDateObj = new Date(c.end_date);
+        if (!maxDate || endDateObj > maxDate) {
+          maxDate = endDateObj;
+        }
+      }
+    }
+    return maxDate;
+  }, [coursesForPath]);
+
   let content;
   if (loading) {
     content = <Spinner animation="border" variant="primary" />;
@@ -71,9 +84,6 @@ export default function LearningPathDetailPage() {
       </div>
     );
   } else {
-    console.log("checking item");
-    console.log(detail);
-
     const {
       display_name,
       image_url,
@@ -100,7 +110,7 @@ export default function LearningPathDetailPage() {
           </div>
           <Row>
               <Col xs={12} md={8}>
-                <div className="d-flex lp-type-label text-uppercase text-danger mb-2">
+                <div className="lp-type-label text-uppercase mb-2">
                   <Icon src={FormatListBulleted} className="mr-1" />
                   <span>Learning Path</span>
                 </div>
@@ -122,26 +132,48 @@ export default function LearningPathDetailPage() {
               </Col>
           </Row>
           <Row className="mt-4">
+            {accessUntilDate && (
               <Col xs={6} md={3} className="mb-3">
-                  <p className="mb-1 font-weight-bold">
-                      {'February 28, 2024'}
-                  </p>
-                  <p className="text-muted">Access ends</p>
+                <div className="d-flex align-items-center">
+                  <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
+                  <div>
+                    <p className="mb-0 font-weight-bold">
+                      {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <p className="text-muted mb-0">Access ends</p>
+                  </div>
+                </div>
               </Col>
-              <Col xs={6} md={3} className="mb-3">
+            )}
+            <Col xs={6} md={3} className="mb-3">
+              <div className="d-flex align-items-center">
+                <Icon src={Award} className="mr-4 mb-4" />
+                <div>
                   <p className="mb-1 font-weight-bold">Earn a certificate</p>
                   <p className="text-muted">Some subtext</p>
-              </Col>
-              <Col xs={6} md={3} className="mb-3">
+                </div>
+              </div>
+            </Col>
+            <Col xs={6} md={3} className="mb-3">
+              <div className="d-flex align-items-center">
+                <Icon src={Calendar} className="mr-4 mb-4" />
+                <div>
                   <p className="mb-1 font-weight-bold">
                       {durationText || '6 months'}
                   </p>
                   <p className="text-muted">Duration</p>
-              </Col>
-              <Col xs={6} md={3} className="mb-3">
+                </div>
+              </div>
+            </Col>
+            <Col xs={6} md={3} className="mb-3">
+              <div className="d-flex align-items-center">
+                <Icon src={Person} className="mr-4 mb-4" />
+                <div>
                   <p className="mb-1 font-weight-bold">Self-paced</p>
                   <p className="text-muted">Some subtext</p>
-              </Col>
+                </div>
+              </div>
+            </Col>
           </Row>
         </div>
         <div className="lp-tabs d-flex align-items-center px-4">

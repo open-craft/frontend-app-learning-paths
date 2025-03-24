@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spinner, Alert, Row, Col } from '@edx/paragon';
+import { Spinner, Row, Col } from '@edx/paragon';
 import { fetchLearningPathways, fetchCourses } from './data/thunks';
 import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
