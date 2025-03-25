@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Button, Row, Col, Icon, Badge } from '@edx/paragon';
 import { buildAssetUrl } from '../util/assetUrl';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@openedx/paragon/icons';
 
 const CourseCard = ({ course }) => {
+    const course_key = "course-v1:"+ course.org + "+" + course.course_id + "+" + course.run
     const {
         name,
         org,
@@ -78,9 +80,9 @@ const CourseCard = ({ course }) => {
                         </div>
                     )}
                     <Card.Footer className="p-0">
-                    <Button variant="outline-primary" href={`#`}>
-                        View
-                    </Button>
+                        <Link to={`/course/${course_key}`}>
+                            <Button variant="outline-primary">View</Button>
+                        </Link>
                     </Card.Footer>
                 </Col>
             </Row>

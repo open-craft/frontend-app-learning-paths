@@ -14,6 +14,7 @@ import messages from './i18n';
 import store from './store';
 import LearningPathList from './learningpath/LearningPathList';
 import LearningPathDetailPage from './learningpath/LearningPathDetails';
+import CourseDetailPage from './learningpath/CourseDetails';
 
 import './index.scss';
 
@@ -29,6 +30,10 @@ subscribe(APP_READY, () => {
         <Route 
           path="/learningpath/:uuid" 
           element={<LearningPathDetailPage />} 
+        />
+        <Route
+          path="/course/:courseKey"
+          element={<CourseDetailPage />}
         />
       </Routes>
       <FooterSlot />

@@ -1,11 +1,10 @@
-@import '@edx/paragon/scss/core/core';  // Import Paragon base styles (if not globally imported)
+@import '@edx/paragon/scss/core/core';
 
-// Custom styles for the learning pathways list
+
 .learningpath-list {
-  margin: 2rem;  // add some outer margin/padding as needed
+  margin: 2rem;
 }
 .learningpath-list .list-group-item {
-  // Optionally adjust item styles (font size, hover, etc.)
   font-size: 1rem;
 }
 
@@ -71,14 +70,12 @@
 }
 
 .learning-path-detail-page {
-  // The overall container
-  font-family: "Open Sans", sans-serif; // or whichever font your mockup uses
-  margin: 3rem;
+  font-family: "Open Sans", sans-serif;
+  margin: 6rem;
 
   .hero-section {
-    padding: 2rem;            // Some spacing around the hero
+    padding: 2rem;
 
-    // Explore link
     .explore-link {
       font-weight: 600;
       margin-bottom: 1rem;
@@ -87,12 +84,12 @@
 
     .hero-content {
       display: flex;
-      flex-wrap: wrap;        // Support responsiveness
-      margin-bottom: 2rem;    // Space below the row of heading + image
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
 
       .hero-text {
         flex: 1 1 0;
-        min-width: 300px;     // Ensures it doesn't collapse too much
+        min-width: 300px;
         margin-right: 1rem;
 
         h1 {
@@ -134,7 +131,7 @@
       justify-content: space-between;
 
       .info-col {
-        flex: 0 0 calc(25% - 1rem); // 4 columns with some spacing
+        flex: 0 0 calc(25% - 1rem);
         margin-bottom: 1rem;
         h3 {
           font-size: 1rem;
@@ -149,29 +146,6 @@
     }
   }
 
-  // The tab bar
-  .lp-tabs {
-    background-color: #f2f0ef;
-    border-bottom: 1px solid #ddd;
-    padding: 0 2rem; // horizontal padding
-    display: flex;
-    align-items: center;
-
-    .nav {
-      // remove default bottom border on the nav
-      border-bottom: 0;
-
-      .nav-link {
-        font-weight: 600;
-        padding: 1rem 1.5rem;
-      }
-    }
-
-    .tab-button {
-      margin-left: auto;
-    }
-  }
-
   .lp-info {
     margin-top: 3rem;
     margin-left: 10rem;
@@ -183,5 +157,78 @@
         margin-bottom: 1rem;
       }
     }
+  }
+}
+
+.lp-tabs {
+  background-color: #f2f0ef;
+  border-bottom: 1px solid #ddd;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+
+  .nav {
+    border-bottom: 0;
+
+    .nav-link {
+      font-weight: 600;
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  .tab-button {
+    margin-left: auto;
+  }
+}
+
+.course-detail-page {
+  font-family: "Open Sans", sans-serif;
+  margin: 6rem;
+}
+
+.course-card-image {
+  flex: 0 0 300px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    max-height: 250px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+}
+
+.instructor-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  background-color: #fff;
+  text-align: center;
+
+  .instructor-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+  }
+  .instructor-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .instructor-title {
+    color: #555;
+    font-weight: 500;
+  }
+  .instructor-org {
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+  .instructor-bio {
+    font-size: 0.9rem;
   }
 }
