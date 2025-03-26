@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { getConfig } from '@edx/frontend-platform';
 import {
   Spinner,
   Card,
   Row,
   Col,
   Nav,
-  Button,
   Icon,
-  Modal
+  ModalCloseButton,
+  Button
 } from '@edx/paragon';
 import { fetchCoursesByIds } from './data/api';
 import {
@@ -17,10 +18,11 @@ import {
   Award,
   Calendar,
   Person,
+  Close,
 } from '@openedx/paragon/icons';
 import { buildAssetUrl } from '../util/assetUrl';
 
-export default function CourseDetailPage() {
+export default function CourseDetailPage({ isModalView = false, onClose }) {
   const { courseKey } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,12 +63,16 @@ export default function CourseDetailPage() {
 
   return (
     <div className="course-detail-page">
-      <CourseDetailContent course={course} />
+      {isModalView ? (
+        <CourseDetailContent course={course} isModalView onClose={onClose}/>
+      ) : (
+        <CourseDetailContent course={course} />
+      )}
     </div>
   );
 }
 
-function CourseDetailContent({course}) {
+function CourseDetailContent({course, isModalView, onClose}) {
   const {
     name,
     short_description,
@@ -93,13 +99,32 @@ function CourseDetailContent({course}) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+  const navigate = useNavigate();
+  const handleClose = onClose || (() => navigate(-1));
+  const { courseKey } = useParams();
+  const learningMfeBase = getConfig().LEARNING_BASE_URL;
+  const buildCourseHomeUrl = (key) => {
+    return `${learningMfeBase}/learning/course/${key}/home`;
+  };
+  const handleViewClick = () => {
+    window.location.href = buildCourseHomeUrl(courseKey);
+  };
 
   return (
     <>
       <div className="hero-section p-4">
-        <div className="mb-3">
-          <Link to="/" style={{ fontWeight: 600 }}>Explore</Link>
-        </div>
+        {!isModalView && (
+          <div className="mb-3">
+            <Link to="/" style={{ fontWeight: 600 }}>Explore</Link>
+          </div>
+        )}
+        {isModalView && (
+          <div className="pgn__modal-close-container">
+            <ModalCloseButton variant="tertiary" onClick={handleClose}>
+              <Icon src={Close} />
+            </ModalCloseButton>
+          </div>
+        )}
         <Row>
           <Col xs={12} md={8}>
             <div className="course-type-label text-uppercase mb-2">
@@ -179,6 +204,13 @@ function CourseDetailContent({course}) {
             <Nav.Link eventKey="instructors">Instructors</Nav.Link>
           </Nav.Item>
         </Nav>
+        <Button
+          variant="primary"
+          className="ml-auto"
+          onClick={handleViewClick}
+        >
+          View
+        </Button>
       </div>
 
       <div className="p-4">

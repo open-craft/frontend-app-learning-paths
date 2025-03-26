@@ -1,10 +1,11 @@
 // src/learningpath/LearningPathDetailPage.jsx
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Button, Row, Col, Spinner, Nav, Icon } from '@edx/paragon';
+import { useParams, Link, useNavigate, Routes, Route } from 'react-router-dom';
+import { Button, Row, Col, Spinner, Nav, Icon, ModalLayer } from '@edx/paragon';
 import { buildAssetUrl } from '../util/assetUrl';
 import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
 import CourseCard from './CourseCard';
+import CourseDetailPage from './CourseDetails';
 import {
   Person,
   Award,
@@ -15,6 +16,7 @@ import {
 
 export default function LearningPathDetailPage() {
   const { uuid } = useParams();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -209,7 +211,7 @@ export default function LearningPathDetailPage() {
             {!loadingCourses && !coursesError && coursesForPath.length > 0 && (
               coursesForPath.map(course => (
                 <div key={course.course_id} className="mb-3">
-                  <CourseCard course={course} />
+                  <CourseCard course={course} parentPath={`/learningpath/${uuid}`} />
                 </div>
               ))
             )}
@@ -227,5 +229,26 @@ export default function LearningPathDetailPage() {
     );
   }
 
-  return content;
+  return (
+    <>
+      {content}
+      <Routes>
+        <Route
+          path="course/:courseKey"
+          element={
+            <ModalLayer
+              isOpen={true}
+              onClose={() => navigate(`/learningpath/${uuid}`)}
+              className="lp-course-modal-layer"
+            >
+              <CourseDetailPage
+                isModalView
+                onClose={() => navigate(`/learningpath/${uuid}`)}
+              />
+            </ModalLayer>
+          }
+        />
+      </Routes>
+    </>
+  );
 }

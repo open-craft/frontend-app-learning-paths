@@ -10,7 +10,7 @@ import {
     Timelapse,
 } from '@openedx/paragon/icons';
 
-const CourseCard = ({ course }) => {
+const CourseCard = ({ course, parentPath }) => {
     const course_key = "course-v1:"+ course.org + "+" + course.course_id + "+" + course.run
     const {
         name,
@@ -19,6 +19,9 @@ const CourseCard = ({ course }) => {
         end_date,
         status,
     } = course;
+    const linkTo = parentPath
+        ? `${parentPath}/course/${encodeURIComponent(course_key)}`
+        : `/course/${encodeURIComponent(course_key)}`;
 
     let statusVariant = 'dark';   // default
     let statusIcon = 'fa-circle'; // default icon
@@ -36,7 +39,6 @@ const CourseCard = ({ course }) => {
         statusIcon = Timelapse;
         break;
     default:
-        // fallback if unknown
         statusVariant = 'dark';
         statusIcon = 'fa-circle';
         break;
@@ -73,14 +75,16 @@ const CourseCard = ({ course }) => {
                     </div>
                     <Card.Header className="p-0 mb-2" title={name} />
                     {org && <p className="card-subtitle text-muted mb-2">{org}</p>}
-                    {endDateFormatted && (
-                        <div className="mr-3 d-flex align-items-center">
-                            <Icon src={AccessTime} className="mr-1" />
-                            Access until {endDateFormatted}
+                    <Card.Footer className="p-0 d-flex align-items-center">
+                        <div className="d-flex flex-wrap mr-auto mb-2">
+                            {endDateFormatted && (
+                                <div className="mr-3 d-flex align-items-center">
+                                    <Icon src={AccessTime} className="mr-1" />
+                                    Access until {endDateFormatted}
+                                </div>
+                            )}
                         </div>
-                    )}
-                    <Card.Footer className="p-0">
-                        <Link to={`/course/${course_key}`}>
+                        <Link to={linkTo}>
                             <Button variant="outline-primary">View</Button>
                         </Link>
                     </Card.Footer>

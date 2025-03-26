@@ -28,7 +28,7 @@ subscribe(APP_READY, () => {
           element={<LearningPathList />} 
         />
         <Route 
-          path="/learningpath/:uuid" 
+          path="/learningpath/:uuid/*"
           element={<LearningPathDetailPage />} 
         />
         <Route
