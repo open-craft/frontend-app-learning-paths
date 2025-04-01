@@ -242,3 +242,40 @@
     padding-top: 2rem;
   }
 }
+
+.main-content {
+  transition: margin-left 0.3s ease;
+  button {
+    margin-top: 1rem;
+    margin-bottom: 20px;
+  }
+}
+.main-content.shifted {
+  margin-left: 350px;
+}
+
+.filter-panel.sidebar {
+  position: fixed;
+  top: 4rem;
+  left: -350px;
+  width: 350px;
+  height: 100vh;
+  background-color: #fff;
+  z-index: 999;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.15);
+  transition: left 0.3s ease-in-out;
+  overflow-y: auto;
+}
+
+.filter-panel.sidebar.open {
+  left: 0;
+}
+
+.status-options {
+  display: flex;
+  flex-direction: column;
+
+  .pgn__form-checkbox {
+    margin-bottom: 0.75rem;
+  }
+}

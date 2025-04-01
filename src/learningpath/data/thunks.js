@@ -11,6 +11,7 @@ import {
 export const fetchLearningPathways = () => async (dispatch) => {
   try {
     dispatch(fetchLearningPathwaysRequest());
+    const type = "learning_path";
     const pathwaylist = await api.fetchLearningPaths();
     const pathways = await Promise.all(
       pathwaylist.map(async (lp) => {
@@ -51,6 +52,7 @@ export const fetchLearningPathways = () => async (dispatch) => {
           status,
           maxDate,
           percent,
+          type,
         };
       })
     );
@@ -64,21 +66,23 @@ export const fetchLearningPathways = () => async (dispatch) => {
 export const fetchCourses = () => async (dispatch) => {
   try {
     dispatch(fetchCoursesRequest());
+    const type = "course";
     const courses = await api.fetchAllCourseDetails();
     const coursesWithStatus = await Promise.all(
       courses.map(async (course) => {
         const course_key = "course-v1:"+ course.org + "+" + course.course_id + "+" + course.run
         const percent = await api.fetchCourseCompletion(course_key);
-        let status = 'In progress';
+        let status = "In progress";
         if (percent === 0.0) {
-          status = 'Not started';
+          status = "Not started";
         } else if (percent === 100.0) {
-          status = 'Completed';
+          status = "Completed";
         }
         return {
           ...course,
           status,
           percent,
+          type,
         };
       })
     );
