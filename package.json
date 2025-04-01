@@ -1,10 +1,10 @@
 {
-  "name": "@open-craft/frontend-app-learning-path",
+  "name": "@open-craft/frontend-app-learning-paths",
   "version": "0.1.0",
   "description": "Frontend application template",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-craft/frontend-app-learning-path.git"
+    "url": "git+https://github.com/open-craft/frontend-app-learning-paths.git"
   },
   "browserslist": [
     "extends @edx/browserslist-config"
@@ -26,12 +26,12 @@
   },
   "author": "edX",
   "license": "AGPL-3.0",
-  "homepage": "https://github.com/open-craft/frontend-app-learning-path#readme",
+  "homepage": "https://github.com/open-craft/frontend-app-learning-paths#readme",
   "publishConfig": {
     "access": "public"
   },
   "bugs": {
-    "url": "https://github.com/open-craft/frontend-app-learning-path/issues"
+    "url": "https://github.com/open-craft/frontend-app-learning-paths/issues"
   },
   "dependencies": {
     "@edx/brand": "npm:@openedx/brand-openedx@^1.2.2",
