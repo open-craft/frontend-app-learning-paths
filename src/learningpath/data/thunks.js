@@ -22,6 +22,14 @@ export const fetchLearningPathways = () => async (dispatch) => {
         } else if (lpprogress.progress >= lpprogress.required_completion) {
           status = "Completed";
         }
+        let percent = 0;
+        if (lpprogress.required_completion) {
+          percent = lpprogress.required_completion > 0
+          ? Math.round((lpprogress.progress / lpprogress.required_completion) * 100)
+          : 0;
+        } else {
+          percent = lpprogress.percent;
+        }
         let maxDate = null;
         const num_courses = lpdetail.steps.length;
         for (const course of lpdetail.steps) {
@@ -42,6 +50,7 @@ export const fetchLearningPathways = () => async (dispatch) => {
           num_courses,
           status,
           maxDate,
+          percent,
         };
       })
     );
@@ -69,6 +78,7 @@ export const fetchCourses = () => async (dispatch) => {
         return {
           ...course,
           status,
+          percent,
         };
       })
     );

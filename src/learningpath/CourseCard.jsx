@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Button, Row, Col, Icon, Badge } from '@edx/paragon';
+import { Card, Button, Row, Col, Icon, Badge, ProgressBar } from '@edx/paragon';
 import { buildAssetUrl } from '../util/assetUrl';
 import {
     LmsBook,
@@ -18,6 +18,7 @@ const CourseCard = ({ course, parentPath }) => {
         course_image_asset_path,
         end_date,
         status,
+        percent,
     } = course;
     const linkTo = parentPath
         ? `${parentPath}/course/${encodeURIComponent(course_key)}`
@@ -75,6 +76,14 @@ const CourseCard = ({ course, parentPath }) => {
                     </div>
                     <Card.Header className="p-0 mb-2" title={name} />
                     {org && <p className="card-subtitle text-muted mb-2">{org}</p>}
+                    {status == 'In progress' && (
+                        <ProgressBar.Annotated
+                            now={Math.round(percent)}
+                            label={`${Math.round(percent)}%`}
+                            variant="dark"
+                            className="mb-2"
+                        />
+                    )}
                     <Card.Footer className="p-0 d-flex align-items-center">
                         <div className="d-flex flex-wrap mr-auto mb-2">
                             {endDateFormatted && (

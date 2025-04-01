@@ -6,7 +6,8 @@ import {
   Row,
   Col,
   Badge,
-  Icon, 
+  Icon,
+  ProgressBar
 } from '@edx/paragon';
 import {
   LmsCompletionSolid,
@@ -28,6 +29,7 @@ const LearningPathCard = ({ learningPath }) => {
     num_courses,
     status,
     maxDate,
+    percent,
   } = learningPath;
 
   let statusVariant = 'dark';
@@ -89,6 +91,14 @@ const LearningPathCard = ({ learningPath }) => {
             <p className="card-subtitle text-muted mb-2">
               {subtitleLine}
             </p>
+          )}
+          {status === 'In progress' && (
+            <ProgressBar.Annotated
+              now={Math.round(percent)}
+              label={`${Math.round(percent)}%`}
+              variant="dark"
+              className="mb-2"
+            />
           )}
           <Card.Footer className="p-3 d-flex align-items-center">
             <div className="lp-meta d-flex flex-wrap mr-auto mb-2">
