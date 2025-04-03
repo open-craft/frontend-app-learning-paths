@@ -1,5 +1,6 @@
 // src/learningpath/components/FilterPanel.js
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Button, ButtonGroup, Form, Icon,
 } from '@openedx/paragon';
@@ -78,5 +79,13 @@ const FilterPanel = ({
     </div>
   </div>
 );
+
+FilterPanel.propTypes = {
+  selectedContentType: PropTypes.oneOf(['All', 'course', 'learning_path']).isRequired,
+  onSelectContentType: PropTypes.func.isRequired,
+  selectedStatuses: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChangeStatus: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default FilterPanel;

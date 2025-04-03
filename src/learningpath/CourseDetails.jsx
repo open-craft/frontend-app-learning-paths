@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getConfig } from '@edx/frontend-platform';
 import {
@@ -23,7 +24,7 @@ import {
 import { fetchCoursesByIds } from './data/api';
 import { buildAssetUrl } from '../util/assetUrl';
 
-export default function CourseDetailPage({ isModalView = false, onClose }) {
+const CourseDetailPage = ({ isModalView = false, onClose }) => {
   const { courseKey } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,7 +73,17 @@ export default function CourseDetailPage({ isModalView = false, onClose }) {
       )}
     </div>
   );
-}
+};
+
+CourseDetailPage.propTypes = {
+  isModalView: PropTypes.bool,
+  onClose: PropTypes.func,
+};
+
+CourseDetailPage.defaultProps = {
+  isModalView: false,
+  onClose: undefined,
+};
 
 const CourseDetailContent = ({ course, isModalView, onClose }) => {
   const {
@@ -263,3 +274,33 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
     </>
   );
 };
+
+CourseDetailContent.propTypes = {
+  course: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    shortDescription: PropTypes.string,
+    endDate: PropTypes.string,
+    duration: PropTypes.string,
+    selfPaced: PropTypes.bool,
+    courseImageAssetPath: PropTypes.string,
+    description: PropTypes.string,
+    learningInfo: PropTypes.arrayOf(PropTypes.string).isRequired,
+    instructorInfo: PropTypes.shape({
+      instructors: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        title: PropTypes.string,
+        organization: PropTypes.string,
+        image: PropTypes.string,
+      })).isRequired,
+    }).isRequired,
+  }).isRequired,
+  isModalView: PropTypes.bool,
+  onClose: PropTypes.func,
+};
+
+CourseDetailContent.defaultProps = {
+  isModalView: false,
+  onClose: undefined,
+};
+
+export default CourseDetailPage;

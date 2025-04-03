@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
   Card, Button, Row, Col, Icon, Badge, ProgressBar,
@@ -103,6 +104,24 @@ const CourseCard = ({ course, parentPath }) => {
       </Row>
     </Card>
   );
+};
+
+CourseCard.propTypes = {
+  course: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    org: PropTypes.string,
+    courseId: PropTypes.string.isRequired,
+    run: PropTypes.string.isRequired,
+    courseImageAssetPath: PropTypes.string,
+    endDate: PropTypes.string,
+    status: PropTypes.string.isRequired,
+    percent: PropTypes.number,
+  }).isRequired,
+  parentPath: PropTypes.string,
+};
+
+CourseCard.defaultProps = {
+  parentPath: undefined,
 };
 
 export default CourseCard;

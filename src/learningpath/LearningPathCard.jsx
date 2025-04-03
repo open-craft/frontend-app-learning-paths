@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
   Card,
@@ -122,6 +123,20 @@ const LearningPathCard = ({ learningPath }) => {
       </Row>
     </Card>
   );
+};
+
+LearningPathCard.propTypes = {
+  learningPath: PropTypes.shape({
+    key: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string,
+    displayName: PropTypes.string.isRequired,
+    subtitle: PropTypes.string,
+    duration: PropTypes.string,
+    numCourses: PropTypes.number,
+    status: PropTypes.string.isRequired,
+    maxDate: PropTypes.string,
+    percent: PropTypes.number,
+  }).isRequired,
 };
 
 export default LearningPathCard;
