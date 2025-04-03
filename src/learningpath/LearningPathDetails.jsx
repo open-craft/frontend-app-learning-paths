@@ -1,11 +1,11 @@
 // src/learningpath/LearningPathDetailPage.jsx
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, Link, useNavigate, Routes, Route } from 'react-router-dom';
-import { Row, Col, Spinner, Nav, Icon, ModalLayer } from '@openedx/paragon';
-import { buildAssetUrl } from '../util/assetUrl';
-import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
-import CourseCard from './CourseCard';
-import CourseDetailPage from './CourseDetails';
+import {
+  useParams, Link, useNavigate, Routes, Route,
+} from 'react-router-dom';
+import {
+  Row, Col, Spinner, Nav, Icon, ModalLayer,
+} from '@openedx/paragon';
 import {
   Person,
   Award,
@@ -13,6 +13,10 @@ import {
   FormatListBulleted,
   AccessTimeFilled,
 } from '@openedx/paragon/icons';
+import { buildAssetUrl } from '../util/assetUrl';
+import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
+import CourseCard from './CourseCard';
+import CourseDetailPage from './CourseDetails';
 
 export default function LearningPathDetailPage() {
   const { key } = useParams();
@@ -31,7 +35,8 @@ export default function LearningPathDetailPage() {
         const data = await fetchLearningPathDetail(key);
         setDetail(data);
       } catch (err) {
-        console.error('Failed to fetch learning path detail:', err);
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch learning path details:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -40,12 +45,10 @@ export default function LearningPathDetailPage() {
     loadDetail();
   }, [key]);
 
-  const courseIds = useMemo(() => {
-    return detail && detail.steps ? detail.steps.map(step => step.course_key) : [];
-  }, [detail]);
+  const courseIds = useMemo(() => (detail && detail.steps ? detail.steps.map(step => step.course_key) : []), [detail]);
 
   useEffect(() => {
-    if (courseIds.length === 0) return;
+    if (courseIds.length === 0) { return; }
     async function loadCourses() {
       try {
         setLoadingCourses(true);
@@ -53,6 +56,7 @@ export default function LearningPathDetailPage() {
         const courses = await fetchCoursesByIds(courseIds);
         setCoursesForPath(courses);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Failed to fetch courses:', err);
         setCoursesError(err.message);
       } finally {
@@ -106,32 +110,34 @@ export default function LearningPathDetailPage() {
       <div className="learning-path-detail-page">
         <div className="hero-section p-4">
           <div className="mb-3">
-              <Link to="/" style={{ fontWeight: 600 }}>
-                  Explore
-              </Link>
+            <Link to="/" style={{ fontWeight: 600 }}>
+              Explore
+            </Link>
           </div>
           <Row>
-              <Col xs={12} md={8}>
-                <div className="lp-type-label text-uppercase mb-2">
-                  <Icon src={FormatListBulleted} className="mr-1" />
-                  <span>Learning Path</span>
-                </div>
-                <h1 className="mb-3">{display_name}</h1>
-                {subtitle && (
+            <Col xs={12} md={8}>
+              <div className="lp-type-label text-uppercase mb-2">
+                <Icon src={FormatListBulleted} className="mr-1" />
+                <span>Learning Path</span>
+              </div>
+              <h1 className="mb-3">{display_name}</h1>
+              {subtitle && (
                 <p className="text-muted mb-4" style={{ maxWidth: '80%' }}>
                     {subtitle}
                 </p>
-                )}
-              </Col>
-              <Col xs={12} md={4} className="d-flex align-items-center justify-content-center">
-                  {image_url && (
-                  <img
-                      src={buildAssetUrl(image_url)}
-                      alt={display_name}
-                      style={{ width: '100%', borderRadius: '4px', maxHeight: '250px', objectFit: 'cover' }}
-                  />
-                  )}
-              </Col>
+              )}
+            </Col>
+            <Col xs={12} md={4} className="d-flex align-items-center justify-content-center">
+              {image_url && (
+              <img
+                src={buildAssetUrl(image_url)}
+                alt={display_name}
+                style={{
+                  width: '100%', borderRadius: '4px', maxHeight: '250px', objectFit: 'cover',
+                }}
+              />
+              )}
+            </Col>
           </Row>
           <Row className="mt-4">
             {accessUntilDate && (
@@ -161,7 +167,7 @@ export default function LearningPathDetailPage() {
                 <Icon src={Calendar} className="mr-4 mb-4" />
                 <div>
                   <p className="mb-1 font-weight-bold">
-                      {durationText || '6 months'}
+                    {durationText || '6 months'}
                   </p>
                   <p className="text-muted">Duration</p>
                 </div>
@@ -235,9 +241,9 @@ export default function LearningPathDetailPage() {
       <Routes>
         <Route
           path="course/:courseKey"
-          element={
+          element={(
             <ModalLayer
-              isOpen={true}
+              isOpen
               onClose={() => navigate(`/learningpath/${key}`)}
               className="lp-course-modal-layer"
             >
@@ -246,7 +252,7 @@ export default function LearningPathDetailPage() {
                 onClose={() => navigate(`/learningpath/${key}`)}
               />
             </ModalLayer>
-          }
+          )}
         />
       </Routes>
     </>

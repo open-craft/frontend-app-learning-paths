@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialLearningPathState = () => ({
@@ -52,10 +53,10 @@ const learningPathSlice = createSlice({
   },
 });
 
-export const { 
-  fetchLearningPathwaysRequest, 
-  fetchLearningPathwaysSuccess, 
-  fetchLearningPathwaysFailure, 
+export const {
+  fetchLearningPathwaysRequest,
+  fetchLearningPathwaysSuccess,
+  fetchLearningPathwaysFailure,
 } = learningPathSlice.actions;
 
 export const {

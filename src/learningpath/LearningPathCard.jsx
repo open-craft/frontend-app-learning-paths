@@ -7,7 +7,7 @@ import {
   Col,
   Badge,
   Icon,
-  ProgressBar
+  ProgressBar,
 } from '@openedx/paragon';
 import {
   LmsCompletionSolid,
@@ -17,7 +17,6 @@ import {
   AccessTime,
 } from '@openedx/paragon/icons';
 import { buildAssetUrl } from '../util/assetUrl';
-
 
 const LearningPathCard = ({ learningPath }) => {
   const {
@@ -56,7 +55,7 @@ const LearningPathCard = ({ learningPath }) => {
   const currentDate = new Date();
   const accessDateObj = new Date(maxDate);
   const accessText = currentDate > accessDateObj
-    ? "Access ended"
+    ? 'Access ended'
     : `Access until ${accessDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   const subtitleLine = subtitle && duration

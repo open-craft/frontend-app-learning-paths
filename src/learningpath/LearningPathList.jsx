@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spinner, Row, Col, Button } from '@openedx/paragon';
+import {
+  Spinner, Row, Col, Button,
+} from '@openedx/paragon';
 import { fetchLearningPathways, fetchCourses } from './data/thunks';
 import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
@@ -28,12 +30,11 @@ export default function LearningPathList() {
 
   const allErrors = [].concat(lpErrors || [], coursesErrors || []);
   if (allErrors.length > 0) {
-    console.error('Error loading learning pathways:', allErrors);
+    // eslint-disable-next-line no-console
+    console.error('Error loading learning paths:', allErrors);
   }
 
-  const items = useMemo(() => {
-    return [...courses, ...learningPathways];
-  }, [courses, learningPathways]);
+  const items = useMemo(() => [...courses, ...learningPathways], [courses, learningPathways]);
 
   const [showFilters, setShowFilters] = useState(false);
   const [selectedContentType, setSelectedContentType] = useState('All');
@@ -43,23 +44,18 @@ export default function LearningPathList() {
     setSelectedStatuses(prev => {
       if (isChecked) {
         return [...prev, status];
-      } else {
-        return prev.filter(s => s !== status);
       }
+      return prev.filter(s => s !== status);
     });
   };
 
-  const filteredItems = useMemo(() => {
-    return items.filter(item => {
-      const typeMatch =
-        selectedContentType === 'All' ||
-        (selectedContentType === 'course' && item.type === 'course') ||
-        (selectedContentType === 'learning_path' && item.type === 'learning_path');
-      const statusMatch =
-        selectedStatuses.length === 0 || selectedStatuses.includes(item.status);
-      return typeMatch && statusMatch;
-    });
-  }, [items, selectedContentType, selectedStatuses]);
+  const filteredItems = useMemo(() => items.filter(item => {
+    const typeMatch = selectedContentType === 'All'
+        || (selectedContentType === 'course' && item.type === 'course')
+        || (selectedContentType === 'learning_path' && item.type === 'learning_path');
+    const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(item.status);
+    return typeMatch && statusMatch;
+  }), [items, selectedContentType, selectedStatuses]);
 
   return (
     <div className="learningpath-list">
@@ -86,17 +82,15 @@ export default function LearningPathList() {
               </Button>
             )}
             <Row>
-              {filteredItems.map(item =>
-                item.type == 'course' ? (
-                  <Col key={item.id} xs={12} lg={8} className="mb-4 ml-6">
-                    <CourseCard course={item} />
-                  </Col>
-                ) : (
-                  <Col key={item.key} xs={12} lg={8} className="mb-4 ml-6">
-                    <LearningPathCard learningPath={item} />
-                  </Col>
-                )
-              )}
+              {filteredItems.map(item => (item.type === 'course' ? (
+                <Col key={item.id} xs={12} lg={8} className="mb-4 ml-6">
+                  <CourseCard course={item} />
+                </Col>
+              ) : (
+                <Col key={item.key} xs={12} lg={8} className="mb-4 ml-6">
+                  <LearningPathCard learningPath={item} />
+                </Col>
+              )))}
             </Row>
           </div>
         </>

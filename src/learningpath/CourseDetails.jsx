@@ -9,9 +9,8 @@ import {
   Nav,
   Icon,
   ModalCloseButton,
-  Button
+  Button,
 } from '@openedx/paragon';
-import { fetchCoursesByIds } from './data/api';
 import {
   LmsBook,
   AccessTimeFilled,
@@ -20,6 +19,7 @@ import {
   Person,
   Close,
 } from '@openedx/paragon/icons';
+import { fetchCoursesByIds } from './data/api';
 import { buildAssetUrl } from '../util/assetUrl';
 
 export default function CourseDetailPage({ isModalView = false, onClose }) {
@@ -35,7 +35,8 @@ export default function CourseDetailPage({ isModalView = false, onClose }) {
         const data = await fetchCoursesByIds([courseKey]);
         setCourse(data[0]);
       } catch (err) {
-        console.error('Failed to load course detail:', err);
+        // eslint-disable-next-line no-console
+        console.error('Failed to load course details:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -64,7 +65,7 @@ export default function CourseDetailPage({ isModalView = false, onClose }) {
   return (
     <div className="course-detail-page">
       {isModalView ? (
-        <CourseDetailContent course={course} isModalView onClose={onClose}/>
+        <CourseDetailContent course={course} isModalView onClose={onClose} />
       ) : (
         <CourseDetailContent course={course} />
       )}
@@ -72,7 +73,7 @@ export default function CourseDetailPage({ isModalView = false, onClose }) {
   );
 }
 
-function CourseDetailContent({course, isModalView, onClose}) {
+const CourseDetailContent = ({ course, isModalView, onClose }) => {
   const {
     name,
     short_description,
@@ -87,10 +88,10 @@ function CourseDetailContent({course, isModalView, onClose}) {
 
   const dateDisplay = end_date
     ? new Date(end_date).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
     : null;
 
   const handleTabSelect = (selectedKey) => {
@@ -103,9 +104,7 @@ function CourseDetailContent({course, isModalView, onClose}) {
   const handleClose = onClose || (() => navigate(-1));
   const { courseKey } = useParams();
   const learningMfeBase = getConfig().LEARNING_BASE_URL;
-  const buildCourseHomeUrl = (key) => {
-    return `${learningMfeBase}/learning/course/${key}/home`;
-  };
+  const buildCourseHomeUrl = (key) => `${learningMfeBase}/learning/course/${key}/home`;
   const handleViewClick = () => {
     window.location.href = buildCourseHomeUrl(courseKey);
   };
@@ -128,8 +127,8 @@ function CourseDetailContent({course, isModalView, onClose}) {
         <Row>
           <Col xs={12} md={8}>
             <div className="course-type-label text-uppercase mb-2">
-                <Icon src={LmsBook} className="mr-1" />
-                <span>Course</span>
+              <Icon src={LmsBook} className="mr-1" />
+              <span>Course</span>
             </div>
             <h1 className="mb-2">{name}</h1>
             {short_description && (
@@ -138,55 +137,55 @@ function CourseDetailContent({course, isModalView, onClose}) {
           </Col>
           <Col xs={12} md={4}>
             {course_image_asset_path && (
-                <Card.ImageCap
-                    src={buildAssetUrl(course_image_asset_path)}
-                    alt={name}
-                    className="course-card-image"
-                />
+            <Card.ImageCap
+              src={buildAssetUrl(course_image_asset_path)}
+              alt={name}
+              className="course-card-image"
+            />
             )}
           </Col>
         </Row>
         <Row className="mt-4">
-            {dateDisplay && (
-                <Col xs={6} md={3} className="mb-3">
-                    <div className="d-flex align-items-center">
-                        <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
-                        <div>
-                            <p className="mb-1 font-weight-bold">{dateDisplay}</p>
-                            <p className="text-muted">Access ends</p>
-                        </div>
-                    </div>
-                </Col>
-            )}
+          {dateDisplay && (
             <Col xs={6} md={3} className="mb-3">
-                <div className="d-flex align-items-center">
-                    <Icon src={Award} className="mr-4 mb-4" />
-                    <div>
-                        <p className="mb-1 font-weight-bold">Earn a certificate</p>
-                        <p className="text-muted">Courses include certification</p>
-                    </div>
+              <div className="d-flex align-items-center">
+                <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
+                <div>
+                  <p className="mb-1 font-weight-bold">{dateDisplay}</p>
+                  <p className="text-muted">Access ends</p>
                 </div>
-            </Col>
-          {duration && (
-            <Col xs={6} md={3} className="mb-3">
-                <div className="d-flex align-items-center">
-                    <Icon src={Calendar} className="mr-4 mb-4" />
-                    <div>
-                        <p className="mb-1 font-weight-bold">{duration}</p>
-                        <p className="text-muted">Approx. duration</p>
-                    </div>
-                </div>
+              </div>
             </Col>
           )}
-          {self_paced == true && (
+          <Col xs={6} md={3} className="mb-3">
+            <div className="d-flex align-items-center">
+              <Icon src={Award} className="mr-4 mb-4" />
+              <div>
+                <p className="mb-1 font-weight-bold">Earn a certificate</p>
+                <p className="text-muted">Courses include certification</p>
+              </div>
+            </div>
+          </Col>
+          {duration && (
             <Col xs={6} md={3} className="mb-3">
-                <div className="d-flex align-items-center">
-                    <Icon src={Person} className="mr-4 mb-4" />
-                    <div>
-                        <p className="mb-1 font-weight-bold">Self-paced</p>
-                        <p className="text-muted">Learn at your own speed</p>
-                    </div>
+              <div className="d-flex align-items-center">
+                <Icon src={Calendar} className="mr-4 mb-4" />
+                <div>
+                  <p className="mb-1 font-weight-bold">{duration}</p>
+                  <p className="text-muted">Approx. duration</p>
                 </div>
+              </div>
+            </Col>
+          )}
+          {self_paced === true && (
+            <Col xs={6} md={3} className="mb-3">
+              <div className="d-flex align-items-center">
+                <Icon src={Person} className="mr-4 mb-4" />
+                <div>
+                  <p className="mb-1 font-weight-bold">Self-paced</p>
+                  <p className="text-muted">Learn at your own speed</p>
+                </div>
+              </div>
             </Col>
           )}
         </Row>
@@ -262,4 +261,4 @@ function CourseDetailContent({course, isModalView, onClose}) {
       </div>
     </>
   );
-}
+};
