@@ -94,6 +94,7 @@ export async function fetchCoursesByIds(courseIds) {
       return {
         ...combinedInfo,
         status,
+        percent,
       };
     }),
   );
