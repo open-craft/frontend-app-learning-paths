@@ -83,7 +83,7 @@ export default function LearningPathList() {
             )}
             <Row>
               {filteredItems.map(item => (item.type === 'course' ? (
-                <Col key={item.id} xs={12} lg={8} className="mb-4 ml-6">
+                <Col key={`course-v1:${item.org}+${item.course_id}+${item.run}`} xs={12} lg={8} className="mb-4 ml-6">
                   <CourseCard course={item} />
                 </Col>
               ) : (
