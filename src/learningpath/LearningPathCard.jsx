@@ -8,7 +8,7 @@ import {
   Badge,
   Icon,
   ProgressBar
-} from '@edx/paragon';
+} from '@openedx/paragon';
 import {
   LmsCompletionSolid,
   CheckCircle,
@@ -118,7 +118,7 @@ const LearningPathCard = ({ learningPath }) => {
             <Link to={`/learningpath/${uuid}`}>
               <Button variant="outline-primary">View</Button>
             </Link>
-          </Card.Footer>  
+          </Card.Footer>
         </Col>
       </Row>
     </Card>

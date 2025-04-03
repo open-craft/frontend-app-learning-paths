@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Button, Row, Col, Icon, Badge, ProgressBar } from '@edx/paragon';
+import { Card, Button, Row, Col, Icon, Badge, ProgressBar } from '@openedx/paragon';
 import { buildAssetUrl } from '../util/assetUrl';
 import {
     LmsBook,
@@ -62,7 +62,7 @@ const CourseCard = ({ course, parentPath }) => {
             <Row>
                 <Col xs={12} md={4} className="course-card-image-col">
                 {course_image_asset_path && (
-                    <Card.ImageCap 
+                    <Card.ImageCap
                         src={buildAssetUrl(course_image_asset_path)}
                         alt={name}
                         style={{ maxHeight: '150px', objectFit: 'cover' }}

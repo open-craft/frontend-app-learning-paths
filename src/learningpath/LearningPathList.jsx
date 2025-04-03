@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spinner, Row, Col, Button } from '@edx/paragon';
+import { Spinner, Row, Col, Button } from '@openedx/paragon';
 import { fetchLearningPathways, fetchCourses } from './data/thunks';
 import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
@@ -8,7 +8,7 @@ import FilterPanel from './FilterPanel';
 
 export default function LearningPathList() {
   const dispatch = useDispatch();
-  const { 
+  const {
     fetching: lpFetching,
     learningPathways,
     errors: lpErrors,

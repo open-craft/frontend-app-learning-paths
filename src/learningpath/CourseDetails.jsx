@@ -10,7 +10,7 @@ import {
   Icon,
   ModalCloseButton,
   Button
-} from '@edx/paragon';
+} from '@openedx/paragon';
 import { fetchCoursesByIds } from './data/api';
 import {
   LmsBook,
@@ -92,7 +92,7 @@ function CourseDetailContent({course, isModalView, onClose}) {
         year: 'numeric',
       })
     : null;
-  
+
   const handleTabSelect = (selectedKey) => {
     const el = document.getElementById(selectedKey);
     if (el) {
@@ -138,7 +138,7 @@ function CourseDetailContent({course, isModalView, onClose}) {
           </Col>
           <Col xs={12} md={4}>
             {course_image_asset_path && (
-                <Card.ImageCap 
+                <Card.ImageCap
                     src={buildAssetUrl(course_image_asset_path)}
                     alt={name}
                     className="course-card-image"

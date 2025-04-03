@@ -1,14 +1,14 @@
 // src/learningpath/components/FilterPanel.js
 import React from 'react';
-import { Button, ButtonGroup, Form, Icon } from '@edx/paragon';
+import { Button, ButtonGroup, Form, Icon } from '@openedx/paragon';
 import { FilterList } from '@openedx/paragon/icons';
 
-function FilterPanel({ 
-  selectedContentType, 
+function FilterPanel({
+  selectedContentType,
   onSelectContentType,
-  selectedStatuses, 
+  selectedStatuses,
   onChangeStatus,
-  onClose 
+  onClose
 }) {
   return (
     <div className="p-3">
@@ -22,22 +22,22 @@ function FilterPanel({
       {/* Content Type Tabs */}
       <div className="my-3">
         <ButtonGroup>
-          <Button 
-            variant={selectedContentType === 'All' ? 'primary' : 'outline-secondary'} 
+          <Button
+            variant={selectedContentType === 'All' ? 'primary' : 'outline-secondary'}
             onClick={() => onSelectContentType('All')}
             active={selectedContentType === 'All'}
           >
             All
           </Button>
-          <Button 
-            variant={selectedContentType === 'course' ? 'primary' : 'outline-secondary'} 
+          <Button
+            variant={selectedContentType === 'course' ? 'primary' : 'outline-secondary'}
             onClick={() => onSelectContentType('course')}
             active={selectedContentType === 'course'}
           >
             Courses
           </Button>
-          <Button 
-            variant={selectedContentType === 'learning_path' ? 'primary' : 'outline-secondary'} 
+          <Button
+            variant={selectedContentType === 'learning_path' ? 'primary' : 'outline-secondary'}
             onClick={() => onSelectContentType('learning_path')}
             active={selectedContentType === 'learning_path'}
           >
@@ -58,14 +58,14 @@ function FilterPanel({
                 >
                     In progress
                 </Form.Checkbox>
-                <Form.Checkbox 
+                <Form.Checkbox
                     value="Not started"
                     checked={selectedStatuses.includes('Not started')}
                     onChange={e => onChangeStatus('Not started', e.target.checked)}
                 >
                     Not started
                 </Form.Checkbox>
-                <Form.Checkbox 
+                <Form.Checkbox
                     value="Completed"
                     checked={selectedStatuses.includes('Completed')}
                     onChange={e => onChangeStatus('Completed', e.target.checked)}

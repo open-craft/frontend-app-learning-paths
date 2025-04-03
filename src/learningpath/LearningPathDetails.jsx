@@ -1,7 +1,7 @@
 // src/learningpath/LearningPathDetailPage.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate, Routes, Route } from 'react-router-dom';
-import { Button, Row, Col, Spinner, Nav, Icon, ModalLayer } from '@edx/paragon';
+import { Row, Col, Spinner, Nav, Icon, ModalLayer } from '@openedx/paragon';
 import { buildAssetUrl } from '../util/assetUrl';
 import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
 import CourseCard from './CourseCard';
