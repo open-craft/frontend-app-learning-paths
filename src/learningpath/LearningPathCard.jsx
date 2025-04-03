@@ -21,11 +21,11 @@ import { buildAssetUrl } from '../util/assetUrl';
 const LearningPathCard = ({ learningPath }) => {
   const {
     key,
-    image_url,
-    display_name,
+    imageUrl,
+    displayName,
     subtitle,
     duration,
-    num_courses,
+    numCourses,
     status,
     maxDate,
     percent,
@@ -72,10 +72,10 @@ const LearningPathCard = ({ learningPath }) => {
       </div>
       <Row>
         <Col xs={12} md={4} className="lp-card-image-col">
-          {image_url && (
+          {imageUrl && (
             <Card.ImageCap
-              src={buildAssetUrl(image_url)}
-              alt={display_name}
+              src={buildAssetUrl(imageUrl)}
+              alt={displayName}
               className="lp-card-image"
             />
           )}
@@ -85,7 +85,7 @@ const LearningPathCard = ({ learningPath }) => {
             <Icon src={FormatListBulleted} className="mr-1" />
             <span>Learning Path</span>
           </div>
-          <Card.Header className="p-0 mb-2" title={display_name} />
+          <Card.Header className="p-0 mb-2" title={displayName} />
           {subtitleLine && (
             <p className="card-subtitle text-muted mb-2">
               {subtitleLine}
@@ -101,10 +101,10 @@ const LearningPathCard = ({ learningPath }) => {
           )}
           <Card.Footer className="p-3 d-flex align-items-center">
             <div className="lp-meta d-flex flex-wrap mr-auto mb-2">
-              {num_courses && (
+              {numCourses && (
                 <div className="mr-3 d-flex align-items-center">
                   <Icon src={FormatListBulleted} className="mr-1" />
-                  {num_courses} courses
+                  {numCourses} courses
                 </div>
               )}
               {maxDate && (

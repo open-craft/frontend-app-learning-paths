@@ -20,22 +20,22 @@ export const fetchLearningPathways = () => async (dispatch) => {
         let status = 'In Progress';
         if (lpprogress.progress === 0.0) {
           status = 'Not started';
-        } else if (lpprogress.progress >= lpprogress.required_completion) {
+        } else if (lpprogress.progress >= lpprogress.requiredCompletion) {
           status = 'Completed';
         }
         let percent = 0;
-        if (lpprogress.required_completion) {
-          percent = lpprogress.required_completion > 0
-            ? Math.round((lpprogress.progress / lpprogress.required_completion) * 100)
+        if (lpprogress.requiredCompletion) {
+          percent = lpprogress.requiredCompletion > 0
+            ? Math.round((lpprogress.progress / lpprogress.requiredCompletion) * 100)
             : 0;
         } else {
           percent = lpprogress.percent;
         }
         let maxDate = null;
-        const num_courses = lpdetail.steps.length;
+        const numCourses = lpdetail.steps.length;
         for (const course of lpdetail.steps) {
-          if (course.due_date) {
-            const dueDateObj = new Date(course.due_date);
+          if (course.dueDate) {
+            const dueDateObj = new Date(course.dueDate);
             if (!maxDate || dueDateObj > maxDate) {
               maxDate = dueDateObj;
             }
@@ -48,7 +48,7 @@ export const fetchLearningPathways = () => async (dispatch) => {
         return {
           ...lp,
           ...lpdetail,
-          num_courses,
+          numCourses,
           status,
           maxDate,
           percent,
@@ -71,8 +71,8 @@ export const fetchCourses = () => async (dispatch) => {
     const courses = await api.fetchAllCourseDetails();
     const coursesWithStatus = await Promise.all(
       courses.map(async (course) => {
-        const course_key = `course-v1:${course.org}+${course.course_id}+${course.run}`;
-        const percent = await api.fetchCourseCompletion(course_key);
+        const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
+        const percent = await api.fetchCourseCompletion(courseKey);
         let status = 'In progress';
         if (percent === 0.0) {
           status = 'Not started';

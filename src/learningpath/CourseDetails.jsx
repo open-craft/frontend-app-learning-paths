@@ -10,6 +10,7 @@ import {
   Icon,
   ModalCloseButton,
   Button,
+  Alert,
 } from '@openedx/paragon';
 import {
   LmsBook,
@@ -76,18 +77,18 @@ export default function CourseDetailPage({ isModalView = false, onClose }) {
 const CourseDetailContent = ({ course, isModalView, onClose }) => {
   const {
     name,
-    short_description,
-    end_date,
+    shortDescription,
+    endDate,
     duration,
-    self_paced,
-    course_image_asset_path,
+    selfPaced,
+    courseImageAssetPath,
     description,
-    learning_info,
-    instructor_info,
+    learningInfo,
+    instructorInfo,
   } = course;
 
-  const dateDisplay = end_date
-    ? new Date(end_date).toLocaleDateString('en-US', {
+  const dateDisplay = endDate
+    ? new Date(endDate).toLocaleDateString('en-US', {
       month: 'long',
       day: 'numeric',
       year: 'numeric',
@@ -131,14 +132,14 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
               <span>Course</span>
             </div>
             <h1 className="mb-2">{name}</h1>
-            {short_description && (
-              <p className="text-muted mb-4">{short_description}</p>
+            {shortDescription && (
+              <p className="text-muted mb-4">{shortDescription}</p>
             )}
           </Col>
           <Col xs={12} md={4}>
-            {course_image_asset_path && (
+            {courseImageAssetPath && (
             <Card.ImageCap
-              src={buildAssetUrl(course_image_asset_path)}
+              src={buildAssetUrl(courseImageAssetPath)}
               alt={name}
               className="course-card-image"
             />
@@ -177,7 +178,7 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
               </div>
             </Col>
           )}
-          {self_paced === true && (
+          {selfPaced === true && (
             <Col xs={6} md={3} className="mb-3">
               <div className="d-flex align-items-center">
                 <Icon src={Person} className="mr-4 mb-4" />
@@ -197,7 +198,7 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
             <Nav.Link eventKey="about">About</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="learning">What you’ll learn</Nav.Link>
+            <Nav.Link eventKey="learning">What you'll learn</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link eventKey="instructors">Instructors</Nav.Link>
@@ -216,13 +217,13 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
         <section id="about" className="mb-6">
           <h2>About</h2>
           <p>
-            {description || short_description}
+            {description || shortDescription}
           </p>
         </section>
 
         <section id="learning" className="mb-6">
           <h2>What you'll learn</h2>
-          {learning_info.map((learning) => (
+          {learningInfo.map((learning) => (
             <p key={learning}>
               * {learning}
             </p>
@@ -232,8 +233,8 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
         <section id="instructors" className="mb-6">
           <h2>Instructors</h2>
           <Row>
-            {instructor_info && instructor_info.instructors.length > 0 ? (
-              instructor_info.instructors.map((inst, index) => (
+            {instructorInfo && instructorInfo.instructors.length > 0 ? (
+              instructorInfo.instructors.map((inst, index) => (
                 <Col xs={12} md={6} lg={3} key={index} className="mb-4">
                   <div className="instructor-card">
                     <img

@@ -13,18 +13,18 @@ import {
 import { buildAssetUrl } from '../util/assetUrl';
 
 const CourseCard = ({ course, parentPath }) => {
-  const course_key = `course-v1:${course.org}+${course.course_id}+${course.run}`;
+  const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
   const {
     name,
     org,
-    course_image_asset_path,
-    end_date,
+    courseImageAssetPath,
+    endDate,
     status,
     percent,
   } = course;
   const linkTo = parentPath
-    ? `${parentPath}/course/${encodeURIComponent(course_key)}`
-    : `/course/${encodeURIComponent(course_key)}`;
+    ? `${parentPath}/course/${encodeURIComponent(courseKey)}`
+    : `/course/${encodeURIComponent(courseKey)}`;
 
   let statusVariant = 'dark'; // default
   let statusIcon = 'fa-circle'; // default icon
@@ -46,8 +46,8 @@ const CourseCard = ({ course, parentPath }) => {
       statusIcon = 'fa-circle';
       break;
   }
-  const endDateFormatted = end_date
-    ? new Date(end_date).toLocaleDateString('en-US', {
+  const endDateFormatted = endDate
+    ? new Date(endDate).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -63,9 +63,9 @@ const CourseCard = ({ course, parentPath }) => {
       </div>
       <Row>
         <Col xs={12} md={4} className="course-card-image-col">
-          {course_image_asset_path && (
+          {courseImageAssetPath && (
           <Card.ImageCap
-            src={buildAssetUrl(course_image_asset_path)}
+            src={buildAssetUrl(courseImageAssetPath)}
             alt={name}
             style={{ maxHeight: '150px', objectFit: 'cover' }}
           />

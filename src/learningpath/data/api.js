@@ -1,22 +1,23 @@
 import { getAuthenticatedHttpClient, getAuthenticatedUser } from '@edx/frontend-platform/auth';
-import { getConfig } from '@edx/frontend-platform';
+import { getConfig, camelCaseObject } from '@edx/frontend-platform';
 
 export async function fetchLearningPaths() {
   const client = getAuthenticatedHttpClient();
   const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/learning-paths/`);
-  return response.data.results || response.data;
+  const data = response.data.results || response.data;
+  return camelCaseObject(data);
 }
 
 export async function fetchLearningPathDetail(key) {
   const client = getAuthenticatedHttpClient();
   const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/learning-paths/${key}/`);
-  return response.data;
+  return camelCaseObject(response.data);
 }
 
 export async function fetchLearningPathProgress(key) {
   const client = getAuthenticatedHttpClient();
   const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/${key}/progress/`);
-  return response.data;
+  return camelCaseObject(response.data);
 }
 
 export async function fetchCourses(courseId) {
@@ -30,15 +31,15 @@ export async function fetchCourses(courseId) {
   const response = await client.get(url);
   if (courseId) {
     const course = response.data;
-    return {
+    return camelCaseObject({
       course_id: course.course_id,
       name: course.name,
-    };
+    });
   }
-  return (response.data.results || []).map(course => ({
+  return camelCaseObject((response.data.results || []).map(course => ({
     course_id: course.course_id,
     name: course.name,
-  }));
+  })));
 }
 
 export async function fetchCourseDetails(courseId) {
@@ -46,18 +47,18 @@ export async function fetchCourseDetails(courseId) {
   const response = await client.get(
     `${getConfig().STUDIO_BASE_URL}/api/contentstore/v1/course_details/${encodeURIComponent(courseId)}`,
   );
-  return response.data;
+  return camelCaseObject(response.data);
 }
 
 export async function fetchAllCourseDetails() {
   const courses = await fetchCourses();
   const details = await Promise.all(
-    courses.map(course => fetchCourseDetails(course.course_id).then(detail => ({
+    courses.map(course => fetchCourseDetails(course.courseId).then(detail => ({
       ...detail,
       name: course.name,
     }))),
   );
-  return details;
+  return camelCaseObject(details);
 }
 
 export async function fetchCourseCompletion(courseId) {
@@ -75,10 +76,10 @@ export async function fetchCourseCompletion(courseId) {
 export async function fetchCombinedCourseInfo(courseId) {
   const basicInfo = await fetchCourses(courseId);
   const details = await fetchCourseDetails(courseId);
-  return {
+  return camelCaseObject({
     ...basicInfo,
     ...details,
-  };
+  });
 }
 
 export async function fetchCoursesByIds(courseIds) {
@@ -92,11 +93,11 @@ export async function fetchCoursesByIds(courseIds) {
       } else if (percent === 100.0) {
         status = 'Completed';
       }
-      return {
+      return camelCaseObject({
         ...combinedInfo,
         status,
         percent,
-      };
+      });
     }),
   );
   return combined;

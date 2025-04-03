@@ -18,7 +18,7 @@ import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
 import CourseCard from './CourseCard';
 import CourseDetailPage from './CourseDetails';
 
-export default function LearningPathDetailPage() {
+const LearningPathDetailPage = () => {
   const { key } = useParams();
   const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
@@ -45,7 +45,7 @@ export default function LearningPathDetailPage() {
     loadDetail();
   }, [key]);
 
-  const courseIds = useMemo(() => (detail && detail.steps ? detail.steps.map(step => step.course_key) : []), [detail]);
+  const courseIds = useMemo(() => (detail && detail.steps ? detail.steps.map(step => step.courseKey) : []), [detail]);
 
   useEffect(() => {
     if (courseIds.length === 0) { return; }
@@ -69,8 +69,8 @@ export default function LearningPathDetailPage() {
   const accessUntilDate = useMemo(() => {
     let maxDate = null;
     for (const c of coursesForPath) {
-      if (c.end_date) {
-        const endDateObj = new Date(c.end_date);
+      if (c.endDate) {
+        const endDateObj = new Date(c.endDate);
         if (!maxDate || endDateObj > maxDate) {
           maxDate = endDateObj;
         }
@@ -91,15 +91,15 @@ export default function LearningPathDetailPage() {
     );
   } else {
     const {
-      display_name,
-      image_url,
+      displayName,
+      imageUrl,
       subtitle,
-      duration_in_days,
-      required_skills,
+      durationInDays,
+      requiredSkills,
       description,
     } = detail;
 
-    const durationText = duration_in_days ? `${duration_in_days} days` : null;
+    const durationText = durationInDays ? `${durationInDays} days` : null;
     const handleTabSelect = (selectedKey) => {
       const el = document.getElementById(selectedKey);
       if (el) {
@@ -120,7 +120,7 @@ export default function LearningPathDetailPage() {
                 <Icon src={FormatListBulleted} className="mr-1" />
                 <span>Learning Path</span>
               </div>
-              <h1 className="mb-3">{display_name}</h1>
+              <h1 className="mb-3">{displayName}</h1>
               {subtitle && (
                 <p className="text-muted mb-4" style={{ maxWidth: '80%' }}>
                     {subtitle}
@@ -128,10 +128,10 @@ export default function LearningPathDetailPage() {
               )}
             </Col>
             <Col xs={12} md={4} className="d-flex align-items-center justify-content-center">
-              {image_url && (
+              {imageUrl && (
               <img
-                src={buildAssetUrl(image_url)}
-                alt={display_name}
+                src={buildAssetUrl(imageUrl)}
+                alt={displayName}
                 style={{
                   width: '100%', borderRadius: '4px', maxHeight: '250px', objectFit: 'cover',
                 }}
@@ -216,7 +216,7 @@ export default function LearningPathDetailPage() {
             )}
             {!loadingCourses && !coursesError && coursesForPath.length > 0 && (
               coursesForPath.map(course => (
-                <div key={course.course_id} className="mb-3">
+                <div key={course.courseId} className="mb-3">
                   <CourseCard course={course} parentPath={`/learningpath/${key}`} />
                 </div>
               ))
@@ -224,7 +224,7 @@ export default function LearningPathDetailPage() {
           </section>
           <section id="requirements" className="mb-6">
             <h2>Requirements</h2>
-            {required_skills.map(skill => (
+            {requiredSkills.map(skill => (
               <p>
                 {skill}
               </p>
@@ -257,4 +257,6 @@ export default function LearningPathDetailPage() {
       </Routes>
     </>
   );
-}
+};
+
+export default LearningPathDetailPage;
