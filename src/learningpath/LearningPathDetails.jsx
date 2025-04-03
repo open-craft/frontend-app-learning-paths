@@ -15,7 +15,7 @@ import {
 } from '@openedx/paragon/icons';
 
 export default function LearningPathDetailPage() {
-  const { uuid } = useParams();
+  const { key } = useParams();
   const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function LearningPathDetailPage() {
     async function loadDetail() {
       try {
         setLoading(true);
-        const data = await fetchLearningPathDetail(uuid);
+        const data = await fetchLearningPathDetail(key);
         setDetail(data);
       } catch (err) {
         console.error('Failed to fetch learning path detail:', err);
@@ -38,7 +38,7 @@ export default function LearningPathDetailPage() {
       }
     }
     loadDetail();
-  }, [uuid]);
+  }, [key]);
 
   const courseIds = useMemo(() => {
     return detail && detail.steps ? detail.steps.map(step => step.course_key) : [];
@@ -211,7 +211,7 @@ export default function LearningPathDetailPage() {
             {!loadingCourses && !coursesError && coursesForPath.length > 0 && (
               coursesForPath.map(course => (
                 <div key={course.course_id} className="mb-3">
-                  <CourseCard course={course} parentPath={`/learningpath/${uuid}`} />
+                  <CourseCard course={course} parentPath={`/learningpath/${key}`} />
                 </div>
               ))
             )}
@@ -238,12 +238,12 @@ export default function LearningPathDetailPage() {
           element={
             <ModalLayer
               isOpen={true}
-              onClose={() => navigate(`/learningpath/${uuid}`)}
+              onClose={() => navigate(`/learningpath/${key}`)}
               className="lp-course-modal-layer"
             >
               <CourseDetailPage
                 isModalView
-                onClose={() => navigate(`/learningpath/${uuid}`)}
+                onClose={() => navigate(`/learningpath/${key}`)}
               />
             </ModalLayer>
           }

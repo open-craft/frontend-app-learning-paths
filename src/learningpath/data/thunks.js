@@ -1,7 +1,7 @@
 import * as api from './api';
-import { 
-  fetchLearningPathwaysRequest, 
-  fetchLearningPathwaysSuccess, 
+import {
+  fetchLearningPathwaysRequest,
+  fetchLearningPathwaysSuccess,
   fetchLearningPathwaysFailure,
   fetchCoursesRequest,
   fetchCoursesSuccess,
@@ -15,8 +15,8 @@ export const fetchLearningPathways = () => async (dispatch) => {
     const pathwaylist = await api.fetchLearningPaths();
     const pathways = await Promise.all(
       pathwaylist.map(async (lp) => {
-        const lpdetail = await api.fetchLearningPathDetail(lp.uuid);
-        const lpprogress = await api.fetchLearningPathProgress(lp.uuid);
+        const lpdetail = await api.fetchLearningPathDetail(lp.key);
+        const lpprogress = await api.fetchLearningPathProgress(lp.key);
         let status = "In Progress";
         if (lpprogress.progress == 0.0){
           status = "Not started";

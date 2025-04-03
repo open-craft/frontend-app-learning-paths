@@ -21,7 +21,7 @@ import { buildAssetUrl } from '../util/assetUrl';
 
 const LearningPathCard = ({ learningPath }) => {
   const {
-    uuid,
+    key,
     image_url,
     display_name,
     subtitle,
@@ -115,7 +115,7 @@ const LearningPathCard = ({ learningPath }) => {
                 </div>
               )}
             </div>
-            <Link to={`/learningpath/${uuid}`}>
+            <Link to={`/learningpath/${key}`}>
               <Button variant="outline-primary">View</Button>
             </Link>
           </Card.Footer>

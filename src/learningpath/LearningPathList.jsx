@@ -92,7 +92,7 @@ export default function LearningPathList() {
                     <CourseCard course={item} />
                   </Col>
                 ) : (
-                  <Col key={item.uuid} xs={12} lg={8} className="mb-4 ml-6">
+                  <Col key={item.key} xs={12} lg={8} className="mb-4 ml-6">
                     <LearningPathCard learningPath={item} />
                   </Col>
                 )

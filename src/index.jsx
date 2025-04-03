@@ -23,13 +23,13 @@ subscribe(APP_READY, () => {
     <AppProvider store={store}>
       <Header />
       <Routes>
-        <Route 
-          path="/" 
-          element={<LearningPathList />} 
+        <Route
+          path="/"
+          element={<LearningPathList />}
         />
-        <Route 
-          path="/learningpath/:uuid/*"
-          element={<LearningPathDetailPage />} 
+        <Route
+          path="/learningpath/:key/*"
+          element={<LearningPathDetailPage />}
         />
         <Route
           path="/course/:courseKey"

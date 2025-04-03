@@ -3,19 +3,19 @@ import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 
 export async function fetchLearningPaths() {
     const client = getAuthenticatedHttpClient();
-    const response = await client.get(`${process.env.LMS_BASE_URL}/api/v1/learning-paths/`);
+    const response = await client.get(`${process.env.LMS_BASE_URL}/api/learning_paths/v1/learning-paths/`);
     return response.data.results || response.data;
 }
 
-export async function fetchLearningPathDetail(uuid) {
+export async function fetchLearningPathDetail(key) {
     const client = getAuthenticatedHttpClient();
-    const response = await client.get(`${process.env.LMS_BASE_URL}/api/v1/learning-paths/${uuid}/`);
+    const response = await client.get(`${process.env.LMS_BASE_URL}/api/learning_paths/v1/learning-paths/${key}/`);
     return response.data;
 }
 
-export async function fetchLearningPathProgress(uuid) {
+export async function fetchLearningPathProgress(key) {
     const client = getAuthenticatedHttpClient();
-    const response = await client.get(`${process.env.LMS_BASE_URL}/api/v1/learning-paths/${uuid}/progress/`);
+    const response = await client.get(`${process.env.LMS_BASE_URL}/api/learning_paths/v1/${key}/progress/`);
     return response.data;
 }
 
@@ -44,7 +44,7 @@ export async function fetchCourses(courseId) {
 export async function fetchCourseDetails(courseId) {
     const client = getAuthenticatedHttpClient();
     const response = await client.get(
-      `${process.env.CMS_BASE_URL}/api/contentstore/v1/course_details/${encodeURIComponent(courseId)}`
+      `${process.env.STUDIO_BASE_URL}/api/contentstore/v1/course_details/${encodeURIComponent(courseId)}`
     );
     return response.data;
 }
