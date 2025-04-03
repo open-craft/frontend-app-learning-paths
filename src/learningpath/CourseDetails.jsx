@@ -24,67 +24,6 @@ import {
 import { fetchCoursesByIds } from './data/api';
 import { buildAssetUrl } from '../util/assetUrl';
 
-const CourseDetailPage = ({ isModalView = false, onClose }) => {
-  const { courseKey } = useParams();
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function loadCourse() {
-      try {
-        setLoading(true);
-        const data = await fetchCoursesByIds([courseKey]);
-        setCourse(data[0]);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load course details:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadCourse();
-  }, [courseKey]);
-
-  if (loading) {
-    return <Spinner animation="border" variant="primary" />;
-  }
-
-  if (error) {
-    return (
-      <div className="p-4">
-        <Alert variant="danger">Failed to load course detail: {error}</Alert>
-        <Link to="/">Back</Link>
-      </div>
-    );
-  }
-
-  if (!course) {
-    return <Spinner animation="border" variant="primary" />;
-  }
-
-  return (
-    <div className="course-detail-page">
-      {isModalView ? (
-        <CourseDetailContent course={course} isModalView onClose={onClose} />
-      ) : (
-        <CourseDetailContent course={course} />
-      )}
-    </div>
-  );
-};
-
-CourseDetailPage.propTypes = {
-  isModalView: PropTypes.bool,
-  onClose: PropTypes.func,
-};
-
-CourseDetailPage.defaultProps = {
-  isModalView: false,
-  onClose: undefined,
-};
-
 const CourseDetailContent = ({ course, isModalView, onClose }) => {
   const {
     name,
@@ -209,7 +148,7 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
             <Nav.Link eventKey="about">About</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="learning">What you'll learn</Nav.Link>
+            <Nav.Link eventKey="learning">What you&apos;ll learn</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link eventKey="instructors">Instructors</Nav.Link>
@@ -233,7 +172,7 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
         </section>
 
         <section id="learning" className="mb-6">
-          <h2>What you'll learn</h2>
+          <h2>What you&apos;ll learn</h2>
           {learningInfo.map((learning) => (
             <p key={learning}>
               * {learning}
@@ -245,20 +184,20 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
           <h2>Instructors</h2>
           <Row>
             {instructorInfo && instructorInfo.instructors.length > 0 ? (
-              instructorInfo.instructors.map((inst, index) => (
-                <Col xs={12} md={6} lg={3} key={index} className="mb-4">
+              instructorInfo.instructors.map((instructor) => (
+                <Col xs={12} md={6} lg={3} key={instructor.name} className="mb-4">
                   <div className="instructor-card">
                     <img
-                      src={inst.image || 'placeholder.jpg'}
-                      alt={inst.name}
+                      src={instructor.image || 'placeholder.jpg'}
+                      alt={instructor.name}
                       className="instructor-image"
                     />
                     <p className="instructor-name mt-2 mb-1 font-weight-bold">
-                      {inst.name}
+                      {instructor.name}
                     </p>
-                    {inst.title && <p className="instructor-title mb-1">{inst.title}</p>}
-                    {inst.organization && (
-                      <p className="instructor-org text-muted mb-1">{inst.organization}</p>
+                    {instructor.title && <p className="instructor-title mb-1">{instructor.title}</p>}
+                    {instructor.organization && (
+                      <p className="instructor-org text-muted mb-1">{instructor.organization}</p>
                     )}
                   </div>
                 </Col>
@@ -299,6 +238,67 @@ CourseDetailContent.propTypes = {
 };
 
 CourseDetailContent.defaultProps = {
+  isModalView: false,
+  onClose: undefined,
+};
+
+const CourseDetailPage = ({ isModalView = false, onClose }) => {
+  const { courseKey } = useParams();
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadCourse() {
+      try {
+        setLoading(true);
+        const data = await fetchCoursesByIds([courseKey]);
+        setCourse(data[0]);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load course details:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCourse();
+  }, [courseKey]);
+
+  if (loading) {
+    return <Spinner animation="border" variant="primary" />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <Alert variant="danger">Failed to load course detail: {error}</Alert>
+        <Link to="/">Back</Link>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return <Spinner animation="border" variant="primary" />;
+  }
+
+  return (
+    <div className="course-detail-page">
+      {isModalView ? (
+        <CourseDetailContent course={course} isModalView onClose={onClose} />
+      ) : (
+        <CourseDetailContent course={course} />
+      )}
+    </div>
+  );
+};
+
+CourseDetailPage.propTypes = {
+  isModalView: PropTypes.bool,
+  onClose: PropTypes.func,
+};
+
+CourseDetailPage.defaultProps = {
   isModalView: false,
   onClose: undefined,
 };
