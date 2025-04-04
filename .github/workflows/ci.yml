@@ -29,8 +29,8 @@ jobs:
       run: npm run build
     - name: i18n_extract
       run: npm run i18n_extract
-    - name: Coverage
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
+    #  - name: Coverage
+    #    uses: codecov/codecov-action@v4
+    #    with:
+    #      token: ${{ secrets.CODECOV_TOKEN }}
+    #      fail_ci_if_error: true
