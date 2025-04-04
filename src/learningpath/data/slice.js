@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialLearningPathState = () => ({
   fetching: false,
-  learningPathways: [],
+  learningPaths: [],
   errors: [],
 });
 
@@ -37,16 +37,16 @@ const learningPathSlice = createSlice({
   name: 'learningPath',
   initialState: initialLearningPathState(),
   reducers: {
-    fetchLearningPathwaysRequest(state) {
+    fetchLearningPathsRequest(state) {
       state.fetching = true;
       state.errors = [];
-      state.learningPathways = [];
+      state.learningPaths = [];
     },
-    fetchLearningPathwaysSuccess(state, action) {
+    fetchLearningPathsSuccess(state, action) {
       state.fetching = false;
-      state.learningPathways = action.payload.pathways;
+      state.learningPaths = action.payload.learningPaths;
     },
-    fetchLearningPathwaysFailure(state, action) {
+    fetchLearningPathsFailure(state, action) {
       state.fetching = false;
       state.errors = action.payload.errors;
     },
@@ -54,9 +54,9 @@ const learningPathSlice = createSlice({
 });
 
 export const {
-  fetchLearningPathwaysRequest,
-  fetchLearningPathwaysSuccess,
-  fetchLearningPathwaysFailure,
+  fetchLearningPathsRequest,
+  fetchLearningPathsSuccess,
+  fetchLearningPathsFailure,
 } = learningPathSlice.actions;
 
 export const {

@@ -1,39 +1,39 @@
 import * as api from './api';
 import {
-  fetchLearningPathwaysRequest,
-  fetchLearningPathwaysSuccess,
-  fetchLearningPathwaysFailure,
+  fetchLearningPathsRequest,
+  fetchLearningPathsSuccess,
+  fetchLearningPathsFailure,
   fetchCoursesRequest,
   fetchCoursesSuccess,
   fetchCoursesFailure,
 } from './slice';
 
-export const fetchLearningPathways = () => async (dispatch) => {
+export const fetchLearningPaths = () => async (dispatch) => {
   try {
-    dispatch(fetchLearningPathwaysRequest());
+    dispatch(fetchLearningPathsRequest());
     const type = 'learning_path';
-    const pathwaylist = await api.fetchLearningPaths();
-    const pathways = await Promise.all(
-      pathwaylist.map(async (lp) => {
-        const lpdetail = await api.fetchLearningPathDetail(lp.key);
-        const lpprogress = await api.fetchLearningPathProgress(lp.key);
+    const learningPathList = await api.fetchLearningPaths();
+    const learningPaths = await Promise.all(
+      learningPathList.map(async (lp) => {
+        const lpDetail = await api.fetchLearningPathDetail(lp.key);
+        const lpProgress = await api.fetchLearningPathProgress(lp.key);
         let status = 'In Progress';
-        if (lpprogress.progress === 0.0) {
+        if (lpProgress.progress === 0.0) {
           status = 'Not started';
-        } else if (lpprogress.progress >= lpprogress.requiredCompletion) {
+        } else if (lpProgress.progress >= lpProgress.requiredCompletion) {
           status = 'Completed';
         }
         let percent = 0;
-        if (lpprogress.requiredCompletion) {
-          percent = lpprogress.requiredCompletion > 0
-            ? Math.round((lpprogress.progress / lpprogress.requiredCompletion) * 100)
+        if (lpProgress.requiredCompletion) {
+          percent = lpProgress.requiredCompletion > 0
+            ? Math.round((lpProgress.progress / lpProgress.requiredCompletion) * 100)
             : 0;
         } else {
-          percent = lpprogress.percent;
+          percent = lpProgress.percent;
         }
         let maxDate = null;
-        const numCourses = lpdetail.steps.length;
-        for (const course of lpdetail.steps) {
+        const numCourses = lpDetail.steps.length;
+        for (const course of lpDetail.steps) {
           if (course.dueDate) {
             const dueDateObj = new Date(course.dueDate);
             if (!maxDate || dueDateObj > maxDate) {
@@ -47,7 +47,7 @@ export const fetchLearningPathways = () => async (dispatch) => {
         }
         return {
           ...lp,
-          ...lpdetail,
+          ...lpDetail,
           numCourses,
           status,
           maxDate,
@@ -56,11 +56,11 @@ export const fetchLearningPathways = () => async (dispatch) => {
         };
       }),
     );
-    dispatch(fetchLearningPathwaysSuccess({ pathways }));
+    dispatch(fetchLearningPathsSuccess({ learningPaths }));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to fetch learning paths:', error);
-    dispatch(fetchLearningPathwaysFailure({ errors: [String(error)] }));
+    dispatch(fetchLearningPathsFailure({ errors: [String(error)] }));
   }
 };
 

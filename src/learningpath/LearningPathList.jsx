@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Spinner, Row, Col, Button,
 } from '@openedx/paragon';
-import { fetchLearningPathways, fetchCourses } from './data/thunks';
+import { fetchLearningPaths, fetchCourses } from './data/thunks';
 import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
 import FilterPanel from './FilterPanel';
@@ -12,7 +12,7 @@ const LearningPathList = () => {
   const dispatch = useDispatch();
   const {
     fetching: lpFetching,
-    learningPathways,
+    learningPaths,
     errors: lpErrors,
   } = useSelector(state => state.learningPath);
   const {
@@ -22,7 +22,7 @@ const LearningPathList = () => {
   } = useSelector(state => state.courses);
 
   useEffect(() => {
-    dispatch(fetchLearningPathways());
+    dispatch(fetchLearningPaths());
     dispatch(fetchCourses());
   }, [dispatch]);
 
@@ -34,7 +34,7 @@ const LearningPathList = () => {
     console.error('Error loading learning paths:', allErrors);
   }
 
-  const items = useMemo(() => [...courses, ...learningPathways], [courses, learningPathways]);
+  const items = useMemo(() => [...courses, ...learningPaths], [courses, learningPaths]);
 
   const [showFilters, setShowFilters] = useState(false);
   const [selectedContentType, setSelectedContentType] = useState('All');
