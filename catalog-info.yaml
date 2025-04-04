@@ -4,10 +4,10 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "frontend-app-learning-path"
+  name: "frontend-app-learning-paths"
   description: "The edX learning platform's frontend for learning paths."
   links:
-    - url: "https://github.com/open-craft/frontend-app-learning-path/blob/master/README.rst"
+    - url: "https://github.com/open-craft/frontend-app-learning-paths/blob/master/README.rst"
       title: "README"
       icon: "Article"
   annotations:
