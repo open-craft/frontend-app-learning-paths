@@ -3,6 +3,7 @@ import { getConfig, camelCaseObject } from '@edx/frontend-platform';
 
 export async function fetchLearningPaths() {
   const client = getAuthenticatedHttpClient();
+  // FIXME: This API has pagination.
   const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/learning-paths/`);
   const data = response.data.results || response.data;
   return camelCaseObject(data);
@@ -24,8 +25,10 @@ export async function fetchCourses(courseId) {
   const client = getAuthenticatedHttpClient();
   let url;
   if (courseId) {
+    // FIXME: This returns 404 when `COURSE_CATALOG_VISIBILITY_PERMISSION` is not set to `about` or `both` for a course.
     url = `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/`;
   } else {
+    // FIXME: This API has pagination.
     url = `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/`;
   }
   const response = await client.get(url);
