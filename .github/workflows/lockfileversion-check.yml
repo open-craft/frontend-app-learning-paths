@@ -4,8 +4,7 @@ name: Lockfile Version check
 
 on:
   push:
-    branches:
-    - master
+    branches: [main]
   pull_request:
 
 jobs:
