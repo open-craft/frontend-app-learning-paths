@@ -1,11 +1,9 @@
-@import '@openedx/paragon/scss/core/core';
-
-
 .learningpath-list {
   margin: 2rem;
-}
-.learningpath-list .list-group-item {
-  font-size: 1rem;
+
+  .list-group-item {
+    font-size: 1rem;
+  }
 }
 
 .learning-path-card {
@@ -133,11 +131,13 @@
       .info-col {
         flex: 0 0 calc(25% - 1rem);
         margin-bottom: 1rem;
+
         h3 {
           font-size: 1rem;
           font-weight: 600;
           margin-bottom: 0.25rem;
         }
+
         .info-subtext {
           color: #666;
           font-size: 0.875rem;
@@ -150,8 +150,10 @@
     margin-top: 3rem;
     margin-left: 10rem;
     margin-right: 10rem;
+
     section {
       margin-bottom: 2rem;
+
       h2 {
         font-size: 1.5rem;
         margin-bottom: 1rem;
@@ -216,18 +218,22 @@
     display: block;
     margin: 0 auto;
   }
+
   .instructor-name {
     font-size: 1.1rem;
     font-weight: 600;
   }
+
   .instructor-title {
     color: #555;
     font-weight: 500;
   }
+
   .instructor-org {
     color: #888;
     margin-bottom: 0.5rem;
   }
+
   .instructor-bio {
     font-size: 0.9rem;
   }
@@ -244,11 +250,13 @@
 
 .main-content {
   transition: margin-left 0.3s ease;
+
   button {
     margin-top: 1rem;
     margin-bottom: 20px;
   }
 }
+
 .main-content.shifted {
   margin-left: 350px;
 }
