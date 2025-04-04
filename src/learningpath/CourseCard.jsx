@@ -109,13 +109,13 @@ const CourseCard = ({ course, parentPath }) => {
 CourseCard.propTypes = {
   course: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    org: PropTypes.string,
+    org: PropTypes.string.isRequired,
     courseId: PropTypes.string.isRequired,
     run: PropTypes.string.isRequired,
     courseImageAssetPath: PropTypes.string,
     endDate: PropTypes.string,
     status: PropTypes.string.isRequired,
-    percent: PropTypes.number,
+    percent: PropTypes.number.isRequired,
   }).isRequired,
   parentPath: PropTypes.string,
 };
