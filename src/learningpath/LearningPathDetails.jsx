@@ -1,4 +1,3 @@
-// src/learningpath/LearningPathDetailPage.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   useParams, Link, useNavigate, Routes, Route,
