@@ -47,6 +47,7 @@ export async function fetchCourses(courseId) {
 
 export async function fetchCourseDetails(courseId) {
   const client = getAuthenticatedHttpClient();
+  // FIXME: Non-staff users cannot use this API.
   const response = await client.get(
     `${getConfig().STUDIO_BASE_URL}/api/contentstore/v1/course_details/${encodeURIComponent(courseId)}`,
   );
