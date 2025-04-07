@@ -8,7 +8,7 @@ import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
 import FilterPanel from './FilterPanel';
 
-const LearningPathList = () => {
+const Dashboard = () => {
   const dispatch = useDispatch();
   const {
     fetching: lpFetching,
@@ -99,4 +99,4 @@ const LearningPathList = () => {
   );
 };
 
-export default LearningPathList;
+export default Dashboard;

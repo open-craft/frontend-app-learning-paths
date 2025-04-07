@@ -12,7 +12,7 @@ import Header from '@edx/frontend-component-header';
 import FooterSlot from '@openedx/frontend-slot-footer';
 import messages from './i18n';
 import store from './store';
-import LearningPathList from './learningpath/LearningPathList';
+import Dashboard from './learningpath/Dashboard';
 import LearningPathDetailPage from './learningpath/LearningPathDetails';
 import CourseDetailPage from './learningpath/CourseDetails';
 
@@ -25,7 +25,7 @@ subscribe(APP_READY, () => {
       <Routes>
         <Route
           path="/"
-          element={<LearningPathList />}
+          element={<Dashboard />}
         />
         <Route
           path="/learningpath/:key/*"
