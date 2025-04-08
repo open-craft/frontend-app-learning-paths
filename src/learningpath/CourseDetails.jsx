@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getConfig } from '@edx/frontend-platform';
@@ -21,7 +21,7 @@ import {
   Person,
   Close,
 } from '@openedx/paragon/icons';
-import { fetchCoursesByIds } from './data/api';
+import { useCourseDetail } from './data/queries';
 import { buildAssetUrl } from '../util/assetUrl';
 
 const CourseDetailContent = ({ course, isModalView, onClose }) => {
@@ -167,29 +167,33 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
         <section id="about" className="mb-6">
           <h2>About</h2>
           <p>
-            {description || shortDescription}
+            {description || shortDescription || 'No description available.'}
           </p>
         </section>
 
         <section id="learning" className="mb-6">
           <h2>What you&apos;ll learn</h2>
-          {learningInfo.map((learning) => (
-            <p key={learning}>
-              * {learning}
-            </p>
-          ))}
+          {learningInfo && learningInfo.length > 0 ? (
+            learningInfo.map((learning) => (
+              <p key={`learning-${learning.replace(/\s+/g, '-').substring(0, 40)}`}>
+                * {learning}
+              </p>
+            ))
+          ) : (
+            <p>No learning objectives listed for this course.</p>
+          )}
         </section>
 
         <section id="instructors" className="mb-6">
           <h2>Instructors</h2>
           <Row>
-            {instructorInfo && instructorInfo.instructors.length > 0 ? (
+            {instructorInfo && instructorInfo.instructors && instructorInfo.instructors.length > 0 ? (
               instructorInfo.instructors.map((instructor) => (
-                <Col xs={12} md={6} lg={3} key={instructor.name} className="mb-4">
+                <Col xs={12} md={6} lg={3} key={`instructor-${instructor.name.replace(/\s+/g, '-')}`} className="mb-4">
                   <div className="instructor-card">
                     <img
                       src={instructor.image || 'placeholder.jpg'}
-                      alt={instructor.name}
+                      alt={instructor.name || 'Instructor'}
                       className="instructor-image"
                     />
                     <p className="instructor-name mt-2 mb-1 font-weight-bold">
@@ -244,51 +248,48 @@ CourseDetailContent.defaultProps = {
 
 const CourseDetailPage = ({ isModalView = false, onClose }) => {
   const { courseKey } = useParams();
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function loadCourse() {
-      try {
-        setLoading(true);
-        const data = await fetchCoursesByIds([courseKey]);
-        setCourse(data[0]);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load course details:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadCourse();
-  }, [courseKey]);
+  const {
+    data: course,
+    isLoading,
+    error,
+  } = useCourseDetail(courseKey);
 
-  if (loading) {
+  if (isLoading) {
     return <Spinner animation="border" variant="primary" />;
   }
 
   if (error) {
     return (
-      <div className="p-4">
-        <Alert variant="danger">Failed to load course detail: {error}</Alert>
-        <Link to="/">Back</Link>
-      </div>
+      <Alert variant="danger">
+        <Alert.Heading>Error loading course</Alert.Heading>
+        <p>{error.message}</p>
+        <Link to="/">Return to dashboard</Link>
+      </Alert>
     );
   }
 
   if (!course) {
-    return <Spinner animation="border" variant="primary" />;
+    return (
+      <Alert variant="info">
+        <Alert.Heading>Course not found</Alert.Heading>
+        <p>We couldn&apos;t find the requested course.</p>
+        <Link to="/">Return to dashboard</Link>
+      </Alert>
+    );
   }
+
+  const courseWithFallbacks = {
+    ...course,
+    shortDescription: course.shortDescription || '',
+    description: course.description || course.shortDescription || '',
+    duration: course.duration || '',
+    selfPaced: course.selfPaced !== undefined ? course.selfPaced : true,
+  };
 
   return (
     <div className="course-detail-page">
-      {isModalView ? (
-        <CourseDetailContent course={course} isModalView onClose={onClose} />
-      ) : (
-        <CourseDetailContent course={course} />
-      )}
+      <CourseDetailContent course={courseWithFallbacks} isModalView={isModalView} onClose={onClose} />
     </div>
   );
 };

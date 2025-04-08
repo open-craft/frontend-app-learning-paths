@@ -18,6 +18,7 @@ import {
   AccessTime,
 } from '@openedx/paragon/icons';
 import { buildAssetUrl } from '../util/assetUrl';
+import { usePrefetchLearningPathDetail } from './data/queries';
 
 const LearningPathCard = ({ learningPath }) => {
   const {
@@ -31,6 +32,12 @@ const LearningPathCard = ({ learningPath }) => {
     maxDate,
     percent,
   } = learningPath;
+
+  // Prefetch the learning path detail when the user hovers over the card.
+  const prefetchLearningPathDetail = usePrefetchLearningPathDetail();
+  const handleMouseEnter = () => {
+    prefetchLearningPathDetail(key);
+  };
 
   let statusVariant = 'dark';
   let statusIcon = 'fa-circle';
@@ -64,7 +71,7 @@ const LearningPathCard = ({ learningPath }) => {
     : subtitle || duration || '';
 
   return (
-    <Card className="learning-path-card p-3 position-relative">
+    <Card className="learning-path-card p-3 position-relative" onMouseEnter={handleMouseEnter}>
       <div className="lp-status-badge">
         <Badge variant={statusVariant} className="d-flex align-items-center">
           <Icon src={statusIcon} className="mr-1" />

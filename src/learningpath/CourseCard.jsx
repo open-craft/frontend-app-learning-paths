@@ -12,6 +12,7 @@ import {
   Timelapse,
 } from '@openedx/paragon/icons';
 import { buildAssetUrl } from '../util/assetUrl';
+import { usePrefetchCourseDetail } from './data/queries';
 
 const CourseCard = ({ course, parentPath }) => {
   const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
@@ -23,6 +24,12 @@ const CourseCard = ({ course, parentPath }) => {
     status,
     percent,
   } = course;
+
+  // Prefetch the course detail when the user hovers over the card.
+  const prefetchCourseDetail = usePrefetchCourseDetail(courseKey);
+  const handleMouseEnter = () => {
+    prefetchCourseDetail();
+  };
 
   const progressBarPercent = useMemo(() => Math.round(percent * 100), [percent]);
 
@@ -58,7 +65,7 @@ const CourseCard = ({ course, parentPath }) => {
     })
     : null;
   return (
-    <Card className="course-card p-3">
+    <Card className="course-card p-3" onMouseEnter={handleMouseEnter}>
       <div className="lp-status-badge">
         <Badge variant={statusVariant} className="d-flex align-items-center">
           <Icon src={statusIcon} className="mr-1" />

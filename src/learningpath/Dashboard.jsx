@@ -1,43 +1,34 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useMemo } from 'react';
 import {
   Spinner, Row, Col, Button,
 } from '@openedx/paragon';
-import { fetchLearningPaths, fetchCourses, fetchCompletions } from './data/thunks';
+import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
 import FilterPanel from './FilterPanel';
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
   const {
-    fetching: lpFetching,
-    learningPaths,
-    errors: lpErrors,
-  } = useSelector(state => state.learningPath);
+    data: learningPaths,
+    isLoading: isLoadingPaths,
+    error: pathsError,
+  } = useLearningPaths();
+
   const {
-    fetching: coursesFetching,
-    courses,
-    error: coursesErrors,
-  } = useSelector(state => state.courses);
-  const { fetching: completionsFetching } = useSelector(state => state.completions);
+    data: courses,
+    isLoading: isLoadingCourses,
+    error: coursesError,
+  } = useCourses();
 
-  useEffect(() => {
-    dispatch(fetchCompletions()).then(() => {
-      dispatch(fetchLearningPaths());
-      dispatch(fetchCourses());
-    });
-  }, [dispatch]);
+  const isLoading = isLoadingPaths || isLoadingCourses;
+  const error = pathsError || coursesError;
 
-  const isLoading = lpFetching || coursesFetching || completionsFetching;
-
-  const allErrors = [].concat(lpErrors || [], coursesErrors || []);
-  if (allErrors.length > 0) {
+  if (error) {
     // eslint-disable-next-line no-console
-    console.error('Error loading learning paths:', allErrors);
+    console.error('Error loading data:', error);
   }
 
-  const items = useMemo(() => [...courses, ...learningPaths], [courses, learningPaths]);
+  const items = useMemo(() => [...(courses || []), ...(learningPaths || [])], [courses, learningPaths]);
 
   const [showFilters, setShowFilters] = useState(false);
   const [selectedContentType, setSelectedContentType] = useState('All');

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   useParams, Link, useNavigate, Routes, Route,
 } from 'react-router-dom';
@@ -12,71 +12,34 @@ import {
   FormatListBulleted,
   AccessTimeFilled,
 } from '@openedx/paragon/icons';
-import { useSelector, useDispatch } from 'react-redux';
 import { buildAssetUrl } from '../util/assetUrl';
-import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
-import { fetchCompletions } from './data/thunks';
+import { useLearningPathDetail, useCoursesByIds } from './data/queries';
 import CourseCard from './CourseCard';
 import CourseDetailPage from './CourseDetails';
 
 const LearningPathDetailPage = () => {
   const { key } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [detail, setDetail] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [coursesForPath, setCoursesForPath] = useState([]);
-  const [loadingCourses, setLoadingCourses] = useState(false);
-  const [coursesError, setCoursesError] = useState(null);
 
-  const { completions, fetching: fetchingCompletions } = useSelector((state) => state.completions);
-
-  useEffect(() => {
-    if (!fetchingCompletions && Object.keys(completions).length === 0) {
-      dispatch(fetchCompletions());
-    }
-  }, [dispatch, completions, fetchingCompletions]);
-
-  useEffect(() => {
-    async function loadDetail() {
-      try {
-        setLoading(true);
-        const data = await fetchLearningPathDetail(key);
-        setDetail(data);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to fetch learning path details:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDetail();
-  }, [key]);
+  const {
+    data: detail,
+    isLoading: loadingDetail,
+    error: detailError,
+  } = useLearningPathDetail(key);
 
   const courseIds = useMemo(() => (detail && detail.steps ? detail.steps.map(step => step.courseKey) : []), [detail]);
 
-  useEffect(() => {
-    if (courseIds.length === 0) { return; }
-    async function loadCourses() {
-      try {
-        setLoadingCourses(true);
-        setCoursesError(null);
-        const courses = await fetchCoursesByIds(courseIds, completions);
-        setCoursesForPath(courses);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to fetch courses:', err);
-        setCoursesError(err.message);
-      } finally {
-        setLoadingCourses(false);
-      }
-    }
-    loadCourses();
-  }, [courseIds, completions]);
+  const {
+    data: coursesForPath,
+    isLoading: loadingCourses,
+    error: coursesError,
+  } = useCoursesByIds(courseIds);
 
   const accessUntilDate = useMemo(() => {
+    if (!coursesForPath) {
+      return null;
+    }
+
     let maxDate = null;
     for (const c of coursesForPath) {
       if (c.endDate) {
@@ -90,9 +53,9 @@ const LearningPathDetailPage = () => {
   }, [coursesForPath]);
 
   let content;
-  if (loading) {
+  if (loadingDetail || loadingCourses) {
     content = <Spinner animation="border" variant="primary" />;
-  } else if (error) {
+  } else if (detailError || !detail) {
     content = (
       <div className="p-4">
         <p>Failed to load detail</p>
@@ -221,10 +184,10 @@ const LearningPathDetailPage = () => {
           <section id="courses" className="mb-6">
             <h2>Courses</h2>
             {loadingCourses && <Spinner animation="border" variant="primary" />}
-            {!loadingCourses && !coursesError && coursesForPath.length === 0 && (
+            {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
               <p>No sub-courses found in this learning path.</p>
             )}
-            {!loadingCourses && !coursesError && coursesForPath.length > 0 && (
+            {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
               coursesForPath.map(course => (
                 <div key={course.courseId} className="mb-3">
                   <CourseCard course={course} parentPath={`/learningpath/${key}`} />
@@ -234,8 +197,8 @@ const LearningPathDetailPage = () => {
           </section>
           <section id="requirements" className="mb-6">
             <h2>Requirements</h2>
-            {requiredSkills.map(skill => (
-              <p>
+            {requiredSkills && requiredSkills.map((skill) => (
+              <p key={`requirement-${skill.replace(/\s+/g, '-').substring(0, 40)}`}>
                 {skill}
               </p>
             ))}
@@ -259,7 +222,6 @@ const LearningPathDetailPage = () => {
             >
               <CourseDetailPage
                 isModalView
-                onClose={() => navigate(`/learningpath/${key}`)}
               />
             </ModalLayer>
           )}
