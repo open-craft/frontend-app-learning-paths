@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Spinner, Row, Col, Button,
 } from '@openedx/paragon';
-import { fetchLearningPaths, fetchCourses } from './data/thunks';
+import { fetchLearningPaths, fetchCourses, fetchCompletions } from './data/thunks';
 import LearningPathCard from './LearningPathCard';
 import CourseCard from './CourseCard';
 import FilterPanel from './FilterPanel';
@@ -20,13 +20,16 @@ const Dashboard = () => {
     courses,
     error: coursesErrors,
   } = useSelector(state => state.courses);
+  const { fetching: completionsFetching } = useSelector(state => state.completions);
 
   useEffect(() => {
-    dispatch(fetchLearningPaths());
-    dispatch(fetchCourses());
+    dispatch(fetchCompletions()).then(() => {
+      dispatch(fetchLearningPaths());
+      dispatch(fetchCourses());
+    });
   }, [dispatch]);
 
-  const isLoading = lpFetching || coursesFetching;
+  const isLoading = lpFetching || coursesFetching || completionsFetching;
 
   const allErrors = [].concat(lpErrors || [], coursesErrors || []);
   if (allErrors.length > 0) {

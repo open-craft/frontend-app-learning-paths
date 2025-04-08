@@ -13,6 +13,12 @@ const initialCoursesState = () => ({
   errors: [],
 });
 
+const initialCompletionsState = () => ({
+  fetching: false,
+  completions: {},
+  errors: [],
+});
+
 const coursesSlice = createSlice({
   name: 'courses',
   initialState: initialCoursesState(),
@@ -27,6 +33,29 @@ const coursesSlice = createSlice({
       state.courses = action.payload.courses;
     },
     fetchCoursesFailure(state, action) {
+      state.fetching = false;
+      state.errors = action.payload.errors;
+    },
+  },
+});
+
+const completionsSlice = createSlice({
+  name: 'completions',
+  initialState: initialCompletionsState(),
+  reducers: {
+    fetchCompletionsRequest(state) {
+      state.fetching = true;
+      state.errors = [];
+    },
+    fetchCompletionsSuccess(state, action) {
+      state.fetching = false;
+      const completionsMap = {};
+      action.payload.completions.forEach(completion => {
+        completionsMap[completion.courseKey] = completion.completion;
+      });
+      state.completions = completionsMap;
+    },
+    fetchCompletionsFailure(state, action) {
       state.fetching = false;
       state.errors = action.payload.errors;
     },
@@ -65,5 +94,12 @@ export const {
   fetchCoursesFailure,
 } = coursesSlice.actions;
 
+export const {
+  fetchCompletionsRequest,
+  fetchCompletionsSuccess,
+  fetchCompletionsFailure,
+} = completionsSlice.actions;
+
 export const learningPathReducer = learningPathSlice.reducer;
 export const coursesReducer = coursesSlice.reducer;
+export const completionsReducer = completionsSlice.reducer;

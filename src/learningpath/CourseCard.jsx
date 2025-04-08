@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
@@ -23,6 +23,9 @@ const CourseCard = ({ course, parentPath }) => {
     status,
     percent,
   } = course;
+
+  const progressBarPercent = useMemo(() => Math.round(percent * 100), [percent]);
+
   const linkTo = parentPath
     ? `${parentPath}/course/${encodeURIComponent(courseKey)}`
     : `/course/${encodeURIComponent(courseKey)}`;
@@ -81,8 +84,8 @@ const CourseCard = ({ course, parentPath }) => {
           {org && <p className="card-subtitle text-muted mb-2">{org}</p>}
           {status === 'In progress' && (
             <ProgressBar.Annotated
-              now={Math.round(percent)}
-              label={`${Math.round(percent)}%`}
+              now={progressBarPercent}
+              label={`${progressBarPercent}%`}
               variant="dark"
               className="mb-2"
             />

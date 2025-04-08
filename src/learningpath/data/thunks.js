@@ -6,11 +6,39 @@ import {
   fetchCoursesRequest,
   fetchCoursesSuccess,
   fetchCoursesFailure,
+  fetchCompletionsRequest,
+  fetchCompletionsSuccess,
+  fetchCompletionsFailure,
 } from './slice';
+
+const shouldFetchCompletions = (state) => {
+  const { fetching, completions, errors } = state.completions;
+  return !fetching && (Object.keys(completions).length === 0 || errors.length > 0);
+};
+
+export const fetchCompletions = () => async (dispatch, getState) => {
+  if (!shouldFetchCompletions(getState())) {
+    const { completions: { completions } } = getState();
+    return Promise.resolve(completions);
+  }
+
+  try {
+    dispatch(fetchCompletionsRequest());
+    const completions = await api.fetchAllCourseCompletions();
+    dispatch(fetchCompletionsSuccess({ completions }));
+    return completions;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch course completions:', error);
+    dispatch(fetchCompletionsFailure({ errors: [String(error)] }));
+    return [];
+  }
+};
 
 export const fetchLearningPaths = () => async (dispatch) => {
   try {
     dispatch(fetchLearningPathsRequest());
+    await dispatch(fetchCompletions());
     const type = 'learning_path';
     const learningPathList = await api.fetchLearningPaths();
     const learningPaths = await Promise.all(
@@ -62,29 +90,33 @@ export const fetchLearningPaths = () => async (dispatch) => {
   }
 };
 
-export const fetchCourses = () => async (dispatch) => {
+export const fetchCourses = () => async (dispatch, getState) => {
   try {
     dispatch(fetchCoursesRequest());
+    await dispatch(fetchCompletions());
     const type = 'course';
     const courses = await api.fetchAllCourseDetails();
-    const coursesWithStatus = await Promise.all(
-      courses.map(async (course) => {
-        const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
-        const percent = await api.fetchCourseCompletion(courseKey);
-        let status = 'In progress';
-        if (percent === 0.0) {
-          status = 'Not started';
-        } else if (percent === 100.0) {
-          status = 'Completed';
-        }
-        return {
-          ...course,
-          status,
-          percent,
-          type,
-        };
-      }),
-    );
+    const { completions } = getState().completions;
+
+    const coursesWithStatus = courses.map(course => {
+      const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
+      const completion = completions[courseKey]?.percent || 0;
+
+      let status = 'In progress';
+      if (completion <= 0.0) {
+        status = 'Not started';
+      } else if (completion >= 1.0) {
+        status = 'Completed';
+      }
+
+      return {
+        ...course,
+        status,
+        percent: completion,
+        type,
+      };
+    });
+
     dispatch(fetchCoursesSuccess({ courses: coursesWithStatus }));
   } catch (error) {
     // eslint-disable-next-line no-console

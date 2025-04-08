@@ -12,20 +12,31 @@ import {
   FormatListBulleted,
   AccessTimeFilled,
 } from '@openedx/paragon/icons';
+import { useSelector, useDispatch } from 'react-redux';
 import { buildAssetUrl } from '../util/assetUrl';
 import { fetchCoursesByIds, fetchLearningPathDetail } from './data/api';
+import { fetchCompletions } from './data/thunks';
 import CourseCard from './CourseCard';
 import CourseDetailPage from './CourseDetails';
 
 const LearningPathDetailPage = () => {
   const { key } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [coursesForPath, setCoursesForPath] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [coursesError, setCoursesError] = useState(null);
+
+  const { completions, fetching: fetchingCompletions } = useSelector((state) => state.completions);
+
+  useEffect(() => {
+    if (!fetchingCompletions && Object.keys(completions).length === 0) {
+      dispatch(fetchCompletions());
+    }
+  }, [dispatch, completions, fetchingCompletions]);
 
   useEffect(() => {
     async function loadDetail() {
@@ -52,7 +63,7 @@ const LearningPathDetailPage = () => {
       try {
         setLoadingCourses(true);
         setCoursesError(null);
-        const courses = await fetchCoursesByIds(courseIds);
+        const courses = await fetchCoursesByIds(courseIds, completions);
         setCoursesForPath(courses);
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -63,7 +74,7 @@ const LearningPathDetailPage = () => {
       }
     }
     loadCourses();
-  }, [courseIds]);
+  }, [courseIds, completions]);
 
   const accessUntilDate = useMemo(() => {
     let maxDate = null;

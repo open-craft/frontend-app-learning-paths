@@ -77,6 +77,28 @@ export async function fetchCourseCompletion(courseId) {
   return 0.0;
 }
 
+export async function fetchAllCourseCompletions() {
+  const client = getAuthenticatedHttpClient();
+
+  let allResults = [];
+  let nextUrl = `${getConfig().LMS_BASE_URL}/completion-aggregator/v1/course/?page_size=10000`;
+
+  while (nextUrl) {
+    // eslint-disable-next-line no-await-in-loop
+    const response = await client.get(nextUrl);
+    const results = response.data.results || [];
+
+    allResults = [...allResults, ...results];
+
+    nextUrl = response.data.pagination?.next ? response.data.pagination.next : null;
+  }
+
+  return camelCaseObject(allResults.map(item => ({
+    course_key: item.course_key,
+    completion: item.completion,
+  })));
+}
+
 export async function fetchCombinedCourseInfo(courseId) {
   const basicInfo = await fetchCourses(courseId);
   const details = await fetchCourseDetails(courseId);
@@ -86,17 +108,25 @@ export async function fetchCombinedCourseInfo(courseId) {
   });
 }
 
-export async function fetchCoursesByIds(courseIds) {
+export async function fetchCoursesByIds(courseIds, completions = {}) {
   const combined = await Promise.all(
     courseIds.map(async (courseId) => {
       const combinedInfo = await fetchCombinedCourseInfo(courseId);
-      const percent = await fetchCourseCompletion(courseId);
+
+      let percent = 0;
+      if (completions[courseId]?.percent !== undefined) {
+        percent = completions[courseId].percent;
+      } else {
+        percent = await fetchCourseCompletion(courseId);
+      }
+
       let status = 'In progress';
-      if (percent === 0.0) {
+      if (percent <= 0.0) {
         status = 'Not started';
-      } else if (percent === 100.0) {
+      } else if (percent >= 1.0) {
         status = 'Completed';
       }
+
       return camelCaseObject({
         ...combinedInfo,
         status,
