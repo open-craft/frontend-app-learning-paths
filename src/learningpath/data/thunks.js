@@ -15,7 +15,6 @@ export const fetchLearningPaths = () => async (dispatch) => {
     const learningPathList = await api.fetchLearningPaths();
     const learningPaths = await Promise.all(
       learningPathList.map(async (lp) => {
-        const lpDetail = await api.fetchLearningPathDetail(lp.key);
         const lpProgress = await api.fetchLearningPathProgress(lp.key);
         let status = 'In Progress';
         if (lpProgress.progress === 0.0) {
@@ -32,8 +31,8 @@ export const fetchLearningPaths = () => async (dispatch) => {
           percent = lpProgress.percent;
         }
         let maxDate = null;
-        const numCourses = lpDetail.steps.length;
-        for (const course of lpDetail.steps) {
+        const numCourses = lp.steps.length;
+        for (const course of lp.steps) {
           if (course.dueDate) {
             const dueDateObj = new Date(course.dueDate);
             if (!maxDate || dueDateObj > maxDate) {
@@ -47,7 +46,6 @@ export const fetchLearningPaths = () => async (dispatch) => {
         }
         return {
           ...lp,
-          ...lpDetail,
           numCourses,
           status,
           maxDate,
