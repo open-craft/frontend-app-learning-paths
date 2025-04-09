@@ -26,20 +26,22 @@ subscribe(APP_READY, () => {
     <AppProvider store={null}>
       <QueryClientProvider client={queryClient}>
         <Header />
-        <Routes>
-          <Route
-            path="/"
-            element={<Dashboard />}
-          />
-          <Route
-            path="/learningpath/:key/*"
-            element={<LearningPathDetailPage />}
-          />
-          <Route
-            path="/course/:courseKey"
-            element={<CourseDetailPage />}
-          />
-        </Routes>
+        <main id="main-content">
+          <Routes>
+            <Route
+              path="/"
+              element={<Dashboard />}
+            />
+            <Route
+              path="/learningpath/:key/*"
+              element={<LearningPathDetailPage />}
+            />
+            <Route
+              path="/course/:courseKey"
+              element={<CourseDetailPage />}
+            />
+          </Routes>
+        </main>
         <FooterSlot />
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
       </QueryClientProvider>
