@@ -99,7 +99,7 @@ const LearningPathCard = ({ learningPath }) => {
               {subtitleLine}
             </p>
           )}
-          {status === 'In progress' && (
+          {status.toLowerCase() === 'in progress' && (
             <ProgressBar.Annotated
               now={Math.round(percent)}
               label={`${Math.round(percent)}%`}

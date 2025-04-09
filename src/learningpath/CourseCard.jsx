@@ -89,7 +89,7 @@ const CourseCard = ({ course, parentPath }) => {
           </div>
           <Card.Header className="p-0 mb-2" title={name} />
           {org && <p className="card-subtitle text-muted mb-2">{org}</p>}
-          {status === 'In progress' && (
+          {status.toLowerCase() === 'in progress' && (
             <ProgressBar.Annotated
               now={progressBarPercent}
               label={`${progressBarPercent}%`}
