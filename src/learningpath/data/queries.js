@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import * as api from './api';
+import { addCompletionStatus, createCompletionsMap } from './dataUtils';
 
 // Query keys
 export const QUERY_KEYS = {
@@ -128,13 +129,6 @@ export const usePrefetchLearningPathDetail = () => {
                 staleTime: STALE_TIMES.COURSE_DETAIL,
               });
             });
-
-            // Fetch the combined course data.
-            queryClient.fetchQuery({
-              queryKey: ['coursesByIds', ...courseIds],
-              queryFn: () => api.fetchCoursesByIds(courseIds, completionsMap),
-              staleTime: STALE_TIMES.COURSE_DETAIL,
-            });
           })
           .catch(error => {
             // eslint-disable-next-line no-console
@@ -161,29 +155,14 @@ export const useCourses = () => {
       });
 
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
-      const completionsMap = {};
-
-      completions.forEach?.(item => {
-        completionsMap[item.courseKey] = item.completion;
-      });
+      const completionsMap = createCompletionsMap(completions);
 
       const courses = await api.fetchAllCourseDetails();
 
       return courses.map(course => {
         const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
-        const completion = completionsMap[courseKey]?.percent || 0;
-
-        let status = 'In progress';
-        if (completion === 0.0) {
-          status = 'Not started';
-        } else if (completion === 1.0) {
-          status = 'Completed';
-        }
-
         return {
-          ...course,
-          status,
-          percent: completion,
+          ...addCompletionStatus(course, completionsMap, courseKey),
           type: 'course',
         };
       });
@@ -211,10 +190,7 @@ export const useCoursesByIds = (courseIds) => {
         });
       }
 
-      const completionsMap = {};
-      completionsData?.forEach?.(item => {
-        completionsMap[item.courseKey] = item.completion;
-      });
+      const completionsMap = createCompletionsMap(completionsData);
 
       const results = await Promise.all(
         courseIds.map(async (courseId) => {
@@ -224,27 +200,23 @@ export const useCoursesByIds = (courseIds) => {
           const cachedCourseDetail = simpleId
             ? queryClient.getQueryData(['courseDetail', simpleId]) : null;
           if (cachedCourseDetail) {
-            const completion = completionsMap[courseId]?.percent || 0;
-
-            let status = 'In progress';
-            if (completion <= 0.0) {
-              status = 'Not started';
-            } else if (completion >= 1.0) {
-              status = 'Completed';
-            }
-
             const basicCoursesData = queryClient.getQueryData(['basicCoursesData']) || [];
             const basicData = basicCoursesData.find(c => c.courseId === simpleId) || {};
-
             return {
-              ...basicData,
-              ...cachedCourseDetail,
-              status,
-              percent: completion,
+              ...addCompletionStatus(
+                { ...basicData, ...cachedCourseDetail },
+                completionsMap,
+                courseId,
+              ),
+              type: 'course',
             };
           }
 
-          return api.fetchCoursesByIds([courseId], completionsMap).then(data => data[0]);
+          const detail = await api.fetchCourseDetails(courseId);
+          return {
+            ...addCompletionStatus(detail, completionsMap, courseId),
+            type: 'course',
+          };
         }),
       );
 
@@ -266,14 +238,13 @@ export const useCourseDetail = (courseKey) => {
       });
 
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
-      const completionsMap = {};
+      const completionsMap = createCompletionsMap(completions);
 
-      completions.forEach?.(item => {
-        completionsMap[item.courseKey] = item.completion;
-      });
-
-      const courses = await api.fetchCoursesByIds([courseKey], completionsMap);
-      return courses && courses.length > 0 ? courses[0] : null;
+      const detail = await api.fetchCourseDetails(courseKey);
+      return {
+        ...addCompletionStatus(detail, completionsMap, courseKey),
+        type: 'course',
+      };
     },
     enabled: !!courseKey,
   });

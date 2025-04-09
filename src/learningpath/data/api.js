@@ -98,32 +98,3 @@ export async function fetchAllCourseCompletions() {
     completion: item.completion,
   })));
 }
-
-export async function fetchCoursesByIds(courseIds, completions = {}) {
-  const combined = await Promise.all(
-    courseIds.map(async (courseId) => {
-      const combinedInfo = await fetchCourseDetails(courseId);
-
-      let percent = 0;
-      if (completions[courseId]?.percent !== undefined) {
-        percent = completions[courseId].percent;
-      } else {
-        percent = await fetchCourseCompletion(courseId);
-      }
-
-      let status = 'In progress';
-      if (percent <= 0.0) {
-        status = 'Not started';
-      } else if (percent >= 1.0) {
-        status = 'Completed';
-      }
-
-      return camelCaseObject({
-        ...combinedInfo,
-        status,
-        percent,
-      });
-    }),
-  );
-  return combined;
-}
