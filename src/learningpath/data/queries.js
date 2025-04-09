@@ -26,33 +26,60 @@ export const STALE_TIMES = {
 };
 
 // Learning Paths Queries
-export const useLearningPaths = () => useQuery({
-  queryKey: QUERY_KEYS.ALL_LEARNING_PATHS,
-  queryFn: async () => {
-    const learningPathList = await api.fetchLearningPaths();
+export const useLearningPaths = () => {
+  const queryClient = useQueryClient();
 
-    const processedPaths = await Promise.all(
-      learningPathList.map(async (lp) => {
-        const lpProgress = await api.fetchLearningPathProgress(lp.key);
+  return useQuery({
+    queryKey: QUERY_KEYS.ALL_LEARNING_PATHS,
+    queryFn: async () => {
+      await queryClient.prefetchQuery({
+        queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
+        queryFn: api.fetchAllCourseCompletions,
+      });
+
+      const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
+      const completionsMap = createCompletionsMap(completions);
+
+      const learningPathList = await api.fetchLearningPaths();
+
+      return learningPathList.map(lp => {
+        // Calculate progress based on course completions
+        const totalCourses = lp.steps.length;
+
+        if (totalCourses === 0) {
+          return {
+            ...lp,
+            numCourses: 0,
+            status: 'Not started',
+            maxDate: null,
+            percent: 0,
+            type: 'learning_path',
+          };
+        }
+
+        const totalCompletion = lp.steps.reduce((sum, step) => {
+          const completion = completionsMap[step.courseKey];
+          return sum + (completion?.percent ?? 0);
+        }, 0);
+
+        const progress = totalCompletion / totalCourses;
+        const requiredCompletion = lp.requiredCompletion || 0;
 
         let status = 'In Progress';
-        if (lpProgress.progress === 0.0) {
+        if (progress === 0) {
           status = 'Not started';
-        } else if (lpProgress.progress >= lpProgress.requiredCompletion) {
+        } else if (progress >= requiredCompletion) {
           status = 'Completed';
         }
 
         let percent = 0;
-        if (lpProgress.requiredCompletion) {
-          percent = lpProgress.requiredCompletion > 0
-            ? Math.round((lpProgress.progress / lpProgress.requiredCompletion) * 100)
-            : 0;
+        if (requiredCompletion > 0) {
+          percent = Math.round((progress / requiredCompletion) * 100);
         } else {
-          percent = lpProgress.percent;
+          percent = Math.round(progress * 100);
         }
 
         let maxDate = null;
-        const numCourses = lp.steps.length;
         for (const course of lp.steps) {
           if (course.dueDate) {
             const dueDateObj = new Date(course.dueDate);
@@ -65,18 +92,16 @@ export const useLearningPaths = () => useQuery({
 
         return {
           ...lp,
-          numCourses,
+          numCourses: totalCourses,
           status,
           maxDate: isoMaxDate,
           percent,
           type: 'learning_path',
         };
-      }),
-    );
-
-    return processedPaths;
-  },
-});
+      });
+    },
+  });
+};
 
 export const useLearningPathDetail = (key) => useQuery({
   queryKey: QUERY_KEYS.LEARNING_PATH_DETAIL(key),

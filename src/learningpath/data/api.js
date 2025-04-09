@@ -15,12 +15,6 @@ export async function fetchLearningPathDetail(key) {
   return camelCaseObject(response.data);
 }
 
-export async function fetchLearningPathProgress(key) {
-  const client = getAuthenticatedHttpClient();
-  const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/${key}/progress/`);
-  return camelCaseObject(response.data);
-}
-
 export async function fetchCourses() {
   const response = await getAuthenticatedHttpClient().get(`${getConfig().LMS_BASE_URL}/api/learner_home/init/`);
   const courses = response.data.courses || [];
