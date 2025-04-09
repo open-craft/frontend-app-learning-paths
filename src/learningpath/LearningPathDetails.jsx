@@ -1,7 +1,5 @@
-import React, { useMemo } from 'react';
-import {
-  useParams, Link, useNavigate, Routes, Route,
-} from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import {
   Row, Col, Spinner, Nav, Icon, ModalLayer,
 } from '@openedx/paragon';
@@ -19,7 +17,7 @@ import CourseDetailPage from './CourseDetails';
 
 const LearningPathDetailPage = () => {
   const { key } = useParams();
-  const navigate = useNavigate();
+  const [selectedCourseKey, setSelectedCourseKey] = useState(null);
 
   const {
     data: detail,
@@ -51,6 +49,14 @@ const LearningPathDetailPage = () => {
     }
     return maxDate;
   }, [coursesForPath]);
+
+  const handleOpenCourseModal = (courseKey) => {
+    setSelectedCourseKey(courseKey);
+  };
+
+  const handleCloseCourseModal = () => {
+    setSelectedCourseKey(null);
+  };
 
   let content;
   if (loadingDetail || loadingCourses) {
@@ -190,7 +196,11 @@ const LearningPathDetailPage = () => {
             {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
               coursesForPath.map(course => (
                 <div key={course.courseId} className="mb-3">
-                  <CourseCard course={course} parentPath={`/learningpath/${key}`} />
+                  <CourseCard
+                    course={course}
+                    parentPath=""
+                    onClick={() => handleOpenCourseModal(course.courseId ? `course-v1:${course.org}+${course.courseId}+${course.run}` : null)}
+                  />
                 </div>
               ))
             )}
@@ -211,22 +221,20 @@ const LearningPathDetailPage = () => {
   return (
     <>
       {content}
-      <Routes>
-        <Route
-          path="course/:courseKey"
-          element={(
-            <ModalLayer
-              isOpen
-              onClose={() => navigate(`/learningpath/${key}`)}
-              className="lp-course-modal-layer"
-            >
-              <CourseDetailPage
-                isModalView
-              />
-            </ModalLayer>
-          )}
-        />
-      </Routes>
+
+      {selectedCourseKey && (
+        <ModalLayer
+          isOpen
+          onClose={handleCloseCourseModal}
+          className="lp-course-modal-layer"
+        >
+          <CourseDetailPage
+            isModalView
+            courseKey={selectedCourseKey}
+            onClose={handleCloseCourseModal}
+          />
+        </ModalLayer>
+      )}
     </>
   );
 };

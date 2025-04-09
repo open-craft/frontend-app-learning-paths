@@ -51,11 +51,12 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
   };
   const navigate = useNavigate();
   const handleClose = onClose || (() => navigate(-1));
-  const { courseKey } = useParams();
+  const { courseKey: urlCourseKey } = useParams();
+  const activeCourseKey = course.id || urlCourseKey;
   const learningMfeBase = getConfig().LEARNING_BASE_URL;
   const buildCourseHomeUrl = (key) => `${learningMfeBase}/learning/course/${key}/home`;
   const handleViewClick = () => {
-    window.location.href = buildCourseHomeUrl(courseKey);
+    window.location.href = buildCourseHomeUrl(activeCourseKey);
   };
 
   return (
@@ -167,6 +168,7 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
 
 CourseDetailContent.propTypes = {
   course: PropTypes.shape({
+    id: PropTypes.string,
     name: PropTypes.string.isRequired,
     shortDescription: PropTypes.string,
     endDate: PropTypes.string,
@@ -184,8 +186,9 @@ CourseDetailContent.defaultProps = {
   onClose: undefined,
 };
 
-const CourseDetailPage = ({ isModalView = false, onClose }) => {
-  const { courseKey } = useParams();
+const CourseDetailPage = ({ isModalView = false, onClose, courseKey: propCourseKey }) => {
+  const { courseKey: urlCourseKey } = useParams();
+  const courseKey = propCourseKey || urlCourseKey;
 
   const {
     data: course,
@@ -235,11 +238,13 @@ const CourseDetailPage = ({ isModalView = false, onClose }) => {
 CourseDetailPage.propTypes = {
   isModalView: PropTypes.bool,
   onClose: PropTypes.func,
+  courseKey: PropTypes.string,
 };
 
 CourseDetailPage.defaultProps = {
   isModalView: false,
   onClose: undefined,
+  courseKey: undefined,
 };
 
 export default CourseDetailPage;

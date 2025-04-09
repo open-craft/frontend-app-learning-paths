@@ -14,7 +14,7 @@ import {
 import { buildAssetUrl } from '../util/assetUrl';
 import { usePrefetchCourseDetail } from './data/queries';
 
-const CourseCard = ({ course, parentPath }) => {
+const CourseCard = ({ course, parentPath, onClick }) => {
   const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
   const {
     name,
@@ -36,6 +36,13 @@ const CourseCard = ({ course, parentPath }) => {
   const linkTo = parentPath
     ? `${parentPath}/course/${encodeURIComponent(courseKey)}`
     : `/course/${encodeURIComponent(courseKey)}`;
+
+  const handleViewClick = (e) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(courseKey);
+    }
+  };
 
   let statusVariant = 'dark'; // default
   let statusIcon = 'fa-circle'; // default icon
@@ -106,9 +113,13 @@ const CourseCard = ({ course, parentPath }) => {
                 </div>
               )}
             </div>
-            <Link to={linkTo}>
-              <Button variant="outline-primary">View</Button>
-            </Link>
+            {onClick ? (
+              <Button variant="outline-primary" onClick={handleViewClick}>View</Button>
+            ) : (
+              <Link to={linkTo}>
+                <Button variant="outline-primary">View</Button>
+              </Link>
+            )}
           </Card.Footer>
         </Col>
       </Row>
@@ -128,10 +139,12 @@ CourseCard.propTypes = {
     percent: PropTypes.number.isRequired,
   }).isRequired,
   parentPath: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 CourseCard.defaultProps = {
   parentPath: undefined,
+  onClick: undefined,
 };
 
 export default CourseCard;
