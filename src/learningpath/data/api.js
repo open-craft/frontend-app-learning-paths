@@ -22,13 +22,25 @@ export async function fetchLearningPathProgress(key) {
 }
 
 export async function fetchCourses() {
-  const client = getAuthenticatedHttpClient();
-  // FIXME: This returns only the courses that are visible in the catalog (`COURSE_CATALOG_VISIBILITY_PERMISSION`).
-  const response = await client.get(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/`);
-  return camelCaseObject((response.data.results || []).map(course => ({
-    course_id: course.course_id,
-    name: course.name,
-  })));
+  const response = await getAuthenticatedHttpClient().get(`${getConfig().LMS_BASE_URL}/api/learner_home/init/`);
+  const courses = response.data.courses || [];
+
+  return camelCaseObject(courses.map(course => {
+    const { courseRun, course: courseInfo } = course;
+
+    return {
+      courseId: courseRun.courseId.split(':')[1].split('+')[1], // FIXME: We should use `course_id` instead of `number`.
+      org: courseRun.courseId.split(':')[1].split('+')[0],
+      run: courseRun.courseId.split(':')[1].split('+')[2],
+      name: courseInfo.courseName,
+      shortDescription: null,
+      endDate: courseRun.endDate,
+      startDate: courseRun.startDate,
+      courseImageAssetPath: courseInfo.bannerImgSrc,
+      isStarted: courseRun.isStarted,
+      isArchived: courseRun.isArchived,
+    };
+  }));
 }
 
 export async function fetchCourseDetails(courseId) {
@@ -52,17 +64,6 @@ export async function fetchCourseDetails(courseId) {
     selfPaced: data.pacing === 'self',
     duration: data.effort,
   });
-}
-
-export async function fetchAllCourseDetails() {
-  const courses = await fetchCourses();
-  const details = await Promise.all(
-    courses.map(course => fetchCourseDetails(course.courseId).then(detail => ({
-      ...detail,
-      name: course.name,
-    }))),
-  );
-  return camelCaseObject(details);
 }
 
 export async function fetchCourseCompletion(courseId) {

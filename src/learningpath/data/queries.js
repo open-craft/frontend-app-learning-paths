@@ -116,12 +116,6 @@ export const usePrefetchLearningPathDetail = () => {
               completionsMap[item.courseKey] = item.completion;
             });
 
-            queryClient.fetchQuery({
-              queryKey: QUERY_KEYS.ALL_COURSES,
-              queryFn: () => api.fetchCourses(),
-              staleTime: STALE_TIMES.COURSES,
-            });
-
             courseIds.forEach(courseId => {
               queryClient.fetchQuery({
                 queryKey: QUERY_KEYS.COURSE_DETAILS(courseId),
@@ -157,7 +151,7 @@ export const useCourses = () => {
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
-      const courses = await api.fetchAllCourseDetails();
+      const courses = await api.fetchCourses();
 
       return courses.map(course => {
         const courseKey = `course-v1:${course.org}+${course.courseId}+${course.run}`;
