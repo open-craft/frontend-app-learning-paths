@@ -213,25 +213,21 @@ export const useCoursesByIds = (courseIds) => {
 
       const results = await Promise.all(
         courseIds.map(async (courseId) => {
-          const courseIdParts = courseId.split(':')[1]?.split('+');
-          const simpleId = courseIdParts?.[1];
-
-          const cachedCourseDetail = simpleId
-            ? queryClient.getQueryData(['courseDetail', simpleId]) : null;
+          const cachedCourseDetail = queryClient.getQueryData(QUERY_KEYS.COURSE_DETAILS(courseId));
           if (cachedCourseDetail) {
-            const basicCoursesData = queryClient.getQueryData(['basicCoursesData']) || [];
-            const basicData = basicCoursesData.find(c => c.courseId === simpleId) || {};
             return {
-              ...addCompletionStatus(
-                { ...basicData, ...cachedCourseDetail },
-                completionsMap,
-                courseId,
-              ),
+              ...cachedCourseDetail,
+              ...addCompletionStatus(cachedCourseDetail, completionsMap, courseId),
               type: 'course',
             };
           }
 
           const detail = await api.fetchCourseDetails(courseId);
+          queryClient.setQueryData(QUERY_KEYS.COURSE_DETAILS(courseId), {
+            ...detail,
+            type: 'course',
+          });
+
           return {
             ...addCompletionStatus(detail, completionsMap, courseId),
             type: 'course',
