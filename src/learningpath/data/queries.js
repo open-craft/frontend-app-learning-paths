@@ -124,7 +124,7 @@ export const usePrefetchLearningPathDetail = () => {
             courseIds.forEach(courseId => {
               queryClient.fetchQuery({
                 queryKey: QUERY_KEYS.COURSE_DETAILS(courseId),
-                queryFn: () => api.fetchCombinedCourseInfo(courseId),
+                queryFn: () => api.fetchCourseDetails(courseId),
                 staleTime: STALE_TIMES.COURSE_DETAIL,
               });
             });
@@ -288,7 +288,7 @@ export const usePrefetchCourseDetail = (courseId) => {
       try {
         queryClient.fetchQuery({
           queryKey: QUERY_KEYS.COURSE_DETAILS(courseId),
-          queryFn: () => api.fetchCombinedCourseInfo(courseId),
+          queryFn: () => api.fetchCourseDetails(courseId),
           staleTime: STALE_TIMES.COURSE_DETAIL,
         });
 

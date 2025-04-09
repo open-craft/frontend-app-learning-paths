@@ -21,24 +21,10 @@ export async function fetchLearningPathProgress(key) {
   return camelCaseObject(response.data);
 }
 
-export async function fetchCourses(courseId) {
+export async function fetchCourses() {
   const client = getAuthenticatedHttpClient();
-  let url;
-  if (courseId) {
-    // FIXME: This returns 404 when `COURSE_CATALOG_VISIBILITY_PERMISSION` is not set to `about` or `both` for a course.
-    url = `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/`;
-  } else {
-    // FIXME: This API has pagination.
-    url = `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/`;
-  }
-  const response = await client.get(url);
-  if (courseId) {
-    const course = response.data;
-    return camelCaseObject({
-      course_id: course.course_id,
-      name: course.name,
-    });
-  }
+  // FIXME: This returns only the courses that are visible in the catalog (`COURSE_CATALOG_VISIBILITY_PERMISSION`).
+  const response = await client.get(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/`);
   return camelCaseObject((response.data.results || []).map(course => ({
     course_id: course.course_id,
     name: course.name,
@@ -46,12 +32,26 @@ export async function fetchCourses(courseId) {
 }
 
 export async function fetchCourseDetails(courseId) {
-  const client = getAuthenticatedHttpClient();
-  // FIXME: Non-staff users cannot use this API.
-  const response = await client.get(
-    `${getConfig().STUDIO_BASE_URL}/api/contentstore/v1/course_details/${encodeURIComponent(courseId)}`,
+  const response = await getAuthenticatedHttpClient().get(
+    `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/`,
   );
-  return camelCaseObject(response.data);
+  const { data } = response;
+
+  return camelCaseObject({
+    id: data.course_id,
+    courseId: data.number, // FIXME: We should use `course_id` instead of `number`.
+    number: data.number,
+    org: data.org,
+    run: data.id.split(':')[1].split('+')[2],
+    name: data.name,
+    shortDescription: data.short_description,
+    endDate: data.end,
+    startDate: data.start,
+    courseImageAssetPath: data.media.course_image.uri,
+    description: data.overview,
+    selfPaced: data.pacing === 'self',
+    duration: data.effort,
+  });
 }
 
 export async function fetchAllCourseDetails() {
@@ -99,19 +99,10 @@ export async function fetchAllCourseCompletions() {
   })));
 }
 
-export async function fetchCombinedCourseInfo(courseId) {
-  const basicInfo = await fetchCourses(courseId);
-  const details = await fetchCourseDetails(courseId);
-  return camelCaseObject({
-    ...basicInfo,
-    ...details,
-  });
-}
-
 export async function fetchCoursesByIds(courseIds, completions = {}) {
   const combined = await Promise.all(
     courseIds.map(async (courseId) => {
-      const combinedInfo = await fetchCombinedCourseInfo(courseId);
+      const combinedInfo = await fetchCourseDetails(courseId);
 
       let percent = 0;
       if (completions[courseId]?.percent !== undefined) {

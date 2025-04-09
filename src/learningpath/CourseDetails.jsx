@@ -33,8 +33,6 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
     selfPaced,
     courseImageAssetPath,
     description,
-    learningInfo,
-    instructorInfo,
   } = course;
 
   const dateDisplay = endDate
@@ -147,12 +145,6 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
           <Nav.Item>
             <Nav.Link eventKey="about">About</Nav.Link>
           </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="learning">What you&apos;ll learn</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="instructors">Instructors</Nav.Link>
-          </Nav.Item>
         </Nav>
         <Button
           variant="primary"
@@ -165,53 +157,8 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
 
       <div className="p-4">
         <section id="about" className="mb-6">
-          <h2>About</h2>
-          <p>
-            {description || shortDescription || 'No description available.'}
-          </p>
-        </section>
-
-        <section id="learning" className="mb-6">
-          <h2>What you&apos;ll learn</h2>
-          {learningInfo && learningInfo.length > 0 ? (
-            learningInfo.map((learning) => (
-              <p key={`learning-${learning.replace(/\s+/g, '-').substring(0, 40)}`}>
-                * {learning}
-              </p>
-            ))
-          ) : (
-            <p>No learning objectives listed for this course.</p>
-          )}
-        </section>
-
-        <section id="instructors" className="mb-6">
-          <h2>Instructors</h2>
-          <Row>
-            {instructorInfo && instructorInfo.instructors && instructorInfo.instructors.length > 0 ? (
-              instructorInfo.instructors.map((instructor) => (
-                <Col xs={12} md={6} lg={3} key={`instructor-${instructor.name.replace(/\s+/g, '-')}`} className="mb-4">
-                  <div className="instructor-card">
-                    <img
-                      src={instructor.image || 'placeholder.jpg'}
-                      alt={instructor.name || 'Instructor'}
-                      className="instructor-image"
-                    />
-                    <p className="instructor-name mt-2 mb-1 font-weight-bold">
-                      {instructor.name}
-                    </p>
-                    {instructor.title && <p className="instructor-title mb-1">{instructor.title}</p>}
-                    {instructor.organization && (
-                      <p className="instructor-org text-muted mb-1">{instructor.organization}</p>
-                    )}
-                  </div>
-                </Col>
-              ))
-            ) : (
-              <Col>
-                <p>No instructors listed for this course.</p>
-              </Col>
-            )}
-          </Row>
+          {/* eslint-disable-next-line react/no-danger */}
+          <div dangerouslySetInnerHTML={{ __html: description || shortDescription || 'No description available.' }} />
         </section>
       </div>
     </>
@@ -227,15 +174,6 @@ CourseDetailContent.propTypes = {
     selfPaced: PropTypes.bool,
     courseImageAssetPath: PropTypes.string,
     description: PropTypes.string,
-    learningInfo: PropTypes.arrayOf(PropTypes.string).isRequired,
-    instructorInfo: PropTypes.shape({
-      instructors: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        title: PropTypes.string,
-        organization: PropTypes.string,
-        image: PropTypes.string,
-      })).isRequired,
-    }).isRequired,
   }).isRequired,
   isModalView: PropTypes.bool,
   onClose: PropTypes.func,
