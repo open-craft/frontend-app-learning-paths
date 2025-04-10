@@ -54,7 +54,13 @@ const CourseDetailContent = ({ course, isModalView, onClose }) => {
   const { courseKey: urlCourseKey } = useParams();
   const activeCourseKey = course.id || urlCourseKey;
   const learningMfeBase = getConfig().LEARNING_BASE_URL;
-  const buildCourseHomeUrl = (key) => `${learningMfeBase}/learning/course/${key}/home`;
+  const buildCourseHomeUrl = (key) => {
+    const trimmedBase = learningMfeBase.replace(/\/$/, "");
+    const sanitizedBase = trimmedBase.endsWith('/learning')
+      ? trimmedBase
+      : `${trimmedBase}/learning`;
+    return `${sanitizedBase}/course/${key}/home`;
+  }
   const handleViewClick = () => {
     window.location.href = buildCourseHomeUrl(activeCourseKey);
   };
