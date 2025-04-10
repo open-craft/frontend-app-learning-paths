@@ -207,11 +207,13 @@ const LearningPathDetailPage = () => {
           </section>
           <section id="requirements" className="mb-6">
             <h2>Requirements</h2>
-            {requiredSkills && requiredSkills.map((skill) => (
-              <p key={`requirement-${skill.replace(/\s+/g, '-').substring(0, 40)}`}>
-                {skill}
-              </p>
-            ))}
+            {requiredSkills && requiredSkills.map((skillObj) => {
+              return (
+                <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
+                  {skillObj.skill.displayName}
+                </p>
+              );
+            })}
           </section>
         </div>
       </div>
