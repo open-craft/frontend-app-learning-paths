@@ -3,7 +3,26 @@
 @import "@openedx/paragon/scss/core/core.scss";
 @import "@edx/brand/paragon/overrides.scss";
 
-@import './example/index.scss';
+@import 'learningpath/index.css';
 
 @import "~@edx/frontend-component-header/dist/index";
 @import "~@edx/frontend-component-footer/dist/footer";
+
+// Make the footer stick to the bottom when there is not enough content.
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+#main-content {
+  flex: 1 0 auto;
+}
+
+.footer {
+  flex-shrink: 0;
+}
