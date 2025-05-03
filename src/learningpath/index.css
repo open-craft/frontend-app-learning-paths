@@ -2,8 +2,8 @@
   --crimson: #821122;
 }
 
-/* Make the footer stick to the bottom when there is not enough content. */
 #root {
+  /* Make the footer stick to the bottom when there is not enough content. */
   height: 100%;
   margin: 0;
   display: flex;
@@ -21,6 +21,11 @@
 
   footer {
     flex-shrink: 0;
+  }
+
+  /* Add border to the header. */
+  .site-header-desktop {
+    border-bottom: 3px solid var(--crimson);
   }
 }
 
