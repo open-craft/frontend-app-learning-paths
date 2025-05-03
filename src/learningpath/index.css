@@ -159,20 +159,6 @@
         }
       }
     }
-
-    .hero-info-row {
-      .info-col {
-        flex: 0 0 calc(25% - 1rem);
-
-        .info-icon {
-          color: var(--crimson);
-        }
-
-        .info-title {
-          font-weight: bold;
-        }
-      }
-    }
   }
 
   .lp-info {
@@ -205,6 +191,20 @@
   }
 }
 
+.detail-page {
+  &.learning-path-detail-page {
+    .hero-info-row svg {
+        color: var(--crimson);
+      }
+  }
+
+  .hero-info-row {
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+  }
+}
+
 .lp-tabs {
   background-color: #f2f0ef;
   border-bottom: 1px solid #ddd;
@@ -212,10 +212,16 @@
   display: flex;
   align-items: center;
 
+  /* Ugly workaround to make the navbar span across the entire page. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);;
+
   .nav {
     border-bottom: 0;
 
     .nav-link {
+      color: black;
       position: relative;
       font-weight: 600;
       padding: 1rem 1.5rem;

@@ -6,7 +6,6 @@ import {
   Card,
   Row,
   Col,
-  Nav,
   Icon,
   ModalCloseButton,
   Button,
@@ -49,12 +48,6 @@ const CourseDetailContent = ({
     })
     : null;
 
-  const handleTabSelect = (selectedKey) => {
-    const el = document.getElementById(selectedKey);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
   const navigate = useNavigate();
   const handleClose = onClose || (() => navigate(-1));
   const { courseKey: urlCourseKey } = useParams();
@@ -109,7 +102,7 @@ const CourseDetailContent = ({
             )}
           </Col>
         </Row>
-        <Row className="mt-4">
+        <Row className="mt-4 hero-info-row">
           {dateDisplay && (
             <Col xs={6} md={3} className="mb-3">
               <div className="d-flex align-items-center">
@@ -147,7 +140,7 @@ const CourseDetailContent = ({
               <div>
                 <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
                 <p className="text-muted">
-                  {selfPaced ? 'Learn at your own speed' : 'Follow the course schedule'}
+                  {selfPaced ? 'Progress at your own speed' : 'Follow the course schedule'}
                 </p>
               </div>
             </div>
@@ -155,13 +148,8 @@ const CourseDetailContent = ({
         </Row>
       </div>
 
-      <div className="lp-tabs d-flex align-items-center px-4">
-        <Nav variant="tabs" onSelect={handleTabSelect} className="border-bottom-0">
-          <Nav.Item>
-            <Nav.Link eventKey="about">About</Nav.Link>
-          </Nav.Item>
-        </Nav>
-        {!isModalView && (
+      {!isModalView && (
+        <div className="lp-tabs d-flex align-items-center px-4 pt-2 pb-2">
           <Button
             variant="primary"
             className="ml-auto"
@@ -169,8 +157,8 @@ const CourseDetailContent = ({
           >
             View
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="p-4">
         <section id="about" className="mb-6">
@@ -252,7 +240,7 @@ const CourseDetailPage = ({
   };
 
   return (
-    <div className="course-detail-page">
+    <div className="detail-page course-detail-page">
       <CourseDetailContent
         course={courseWithFallbacks}
         isModalView={isModalView}

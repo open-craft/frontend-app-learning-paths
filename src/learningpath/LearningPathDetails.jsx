@@ -173,13 +173,13 @@ const LearningPathDetailPage = () => {
             {image && (<img src={image} alt={displayName} />)}
           </Col>
         </Row>
-        <Row className="mt-4 d-flex flex-wrap justify-content-between hero-info-row">
+        <Row className="mt-4 d-flex hero-info-row">
           {accessUntilDate && (
-            <Col xs={6} md={3} className="mb-3 info-col">
+            <Col xs={6} md={3} className="mb-3">
               <div className="d-flex align-items-center">
-                <Icon src={AccessTimeFilled} className="mr-4 mb-3 info-icon" />
+                <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
                 <div>
-                  <p className="mb-0 info-title">
+                  <p className="mb-0 font-weight-bold">
                     {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                   <p className="text-muted mb-0 info-subtext">Access ends</p>
@@ -187,31 +187,31 @@ const LearningPathDetailPage = () => {
               </div>
             </Col>
           )}
-          <Col xs={6} md={3} className="mb-3 info-col">
+          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Award} className="mr-4 mb-4 info-icon" />
+              <Icon src={Award} className="mr-4 mb-4" />
               <div>
-                <p className="mb-1 info-title">Certificate</p>
+                <p className="mb-1 font-weight-bold">Certificate</p>
                 <p className="text-muted info-subtext">Earn a certificate</p>
               </div>
             </div>
           </Col>
-          <Col xs={6} md={3} className="mb-3 info-col">
+          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Calendar} className="mr-4 mb-4 info-icon" />
+              <Icon src={Calendar} className="mr-4 mb-4" />
               <div>
-                <p className="mb-1 info-title">
+                <p className="mb-1 font-weight-bold">
                   {durationText || 'Duration not available'}
                 </p>
                 <p className="text-muted info-subtext">Duration</p>
               </div>
             </div>
           </Col>
-          <Col xs={6} md={3} className="mb-3 info-col">
+          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Person} className="mr-4 mb-4 info-icon" />
+              <Icon src={Person} className="mr-4 mb-4" />
               <div>
-                <p className="mb-1 info-title">Self-paced</p>
+                <p className="mb-1 font-weight-bold">Self-paced</p>
                 <p className="text-muted info-subtext">Progress at your own speed</p>
               </div>
             </div>
@@ -246,7 +246,7 @@ const LearningPathDetailPage = () => {
     } else {
       // Details view with all sections.
       content = (
-        <div className="learning-path-detail-page">
+        <div className="detail-page learning-path-detail-page">
           {heroSection}
           <div className="lp-tabs d-flex align-items-center px-4">
             <Nav
