@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Spinner, Row, Col, Button, Pagination,
+  Spinner, Row, Col, Button, Pagination, Icon,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
+import { FilterAlt } from '@openedx/paragon/icons';
 import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
@@ -69,7 +70,7 @@ const Dashboard = () => {
       ) : (
         <>
           {showFilters && (
-            <div className="filter-panel sidebar open">
+            <div className="filter-panel sidebar position-absolute open">
               <FilterPanel
                 selectedContentType={selectedContentType}
                 onSelectContentType={setSelectedContentType}
@@ -82,8 +83,8 @@ const Dashboard = () => {
           <div className={`main-content ${showFilters ? 'shifted' : ''}`}>
             <h2>My Learning</h2>
             {!showFilters && (
-              <Button onClick={() => setShowFilters(true)} variant="secondary">
-                <i className="fas fa-filter" /> Filter
+              <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">
+                <Icon src={FilterAlt} /> Filter
               </Button>
             )}
             <hr className="mt-0 mb-4" />

@@ -296,6 +296,10 @@
     margin-top: 1rem;
     margin-bottom: 20px;
   }
+
+  .filter-button, .filter-button:hover {
+    background-color: var(--crimson);
+  }
 }
 
 .main-content.shifted {
@@ -303,20 +307,45 @@
 }
 
 .filter-panel.sidebar {
-  position: fixed;
   top: 4rem;
   left: -350px;
   width: 350px;
-  height: 100vh;
   background-color: white;
   z-index: 999;
   box-shadow: -2px 0 6px rgba(0,0,0,0.15);
   transition: left 0.3s ease-in-out;
-  overflow-y: auto;
-}
 
-.filter-panel.sidebar.open {
-  left: 0;
+  &.open {
+    left: 0;
+  }
+
+  .btn.active {
+    background-color: var(--crimson);
+    color: white;
+  }
+
+  .filter-close-button {
+    /* Position the button on the side of the panel. */
+    position: absolute;
+    top: 1rem;
+    right: -18px;
+    z-index: 1000;
+
+    /* Make the button round. */
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #293352;
+
+    /* Center the icon inside. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      color: white;
+    }
+  }
 }
 
 .status-options {

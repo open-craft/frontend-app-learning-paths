@@ -15,7 +15,7 @@ const FilterPanel = ({
   <div className="p-3">
     <div className="d-flex justify-content-between align-items-center mb-3">
       <h4>Filter</h4>
-      <Button variant="link" onClick={onClose}>
+      <Button variant="link" onClick={onClose} className="filter-close-button">
         <Icon src={FilterList} />
       </Button>
     </div>
