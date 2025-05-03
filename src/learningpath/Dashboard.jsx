@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   Spinner, Row, Col, Button, Pagination,
 } from '@openedx/paragon';
+import { getConfig } from '@edx/frontend-platform';
 import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
@@ -51,13 +52,13 @@ const Dashboard = () => {
     return typeMatch && statusMatch;
   }), [items, selectedContentType, selectedStatuses]);
 
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 50;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
   const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredItems.slice(start, start + PAGE_SIZE);
-  }, [filteredItems, currentPage]);
+  }, [filteredItems, currentPage, PAGE_SIZE]);
 
   return (
     <div className="learningpath-list m-4.5">
