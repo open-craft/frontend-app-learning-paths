@@ -308,8 +308,8 @@
     margin-bottom: 20px;
   }
 
-  .filter-button, .filter-button:hover {
-    background-color: var(--crimson);
+  .filter-button, .filter-button:hover, .filter-button:active, .pagination .page-link.btn-primary {
+    background-color: var(--crimson) !important;
   }
 }
 
@@ -330,15 +330,20 @@
     left: 0;
   }
 
-  .btn.active {
-    background-color: var(--crimson);
-    color: white;
+  .btn:not(.filter-close-button) {
+    border-radius: 0.25rem;
+    border-color: #E0E0E0;
+
+    &.active {
+      background-color: var(--crimson);
+      color: white;
+    }
   }
 
   .filter-close-button {
     /* Position the button on the side of the panel. */
     position: absolute;
-    top: 1rem;
+    top: 2.3rem;
     right: -18px;
     z-index: 1000;
 

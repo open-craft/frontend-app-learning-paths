@@ -12,7 +12,7 @@ const FilterPanel = ({
   onChangeStatus,
   onClose,
 }) => (
-  <div className="p-3">
+  <div className="pl-3 pr-3 pt-2 mt-4.5">
     <div className="d-flex justify-content-between align-items-center mb-3">
       <h4>Filter</h4>
       <Button variant="link" onClick={onClose} className="filter-close-button">
@@ -49,13 +49,14 @@ const FilterPanel = ({
 
     {/* Status Checkboxes */}
     <div className="my-3">
-      <h5>Status</h5>
+      <h4>Status</h4>
       <Form>
         <div className="status-options">
           <Form.Checkbox
             value="In Progress"
             checked={selectedStatuses.includes('In Progress')}
             onChange={e => onChangeStatus('In Progress', e.target.checked)}
+            className="font-weight-light"
           >
             In progress
           </Form.Checkbox>
@@ -63,6 +64,7 @@ const FilterPanel = ({
             value="Not started"
             checked={selectedStatuses.includes('Not started')}
             onChange={e => onChangeStatus('Not started', e.target.checked)}
+            className="font-weight-light"
           >
             Not started
           </Form.Checkbox>
@@ -70,6 +72,7 @@ const FilterPanel = ({
             value="Completed"
             checked={selectedStatuses.includes('Completed')}
             onChange={e => onChangeStatus('Completed', e.target.checked)}
+            className="font-weight-light"
           >
             Completed
           </Form.Checkbox>

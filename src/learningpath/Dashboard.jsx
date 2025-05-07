@@ -93,7 +93,7 @@ const Dashboard = () => {
               </Button>
             )}
             <hr className="mt-0 mb-4" />
-            <Row>
+            <Row className="mx-lg-2">
               {paginatedItems.map(item => (item.type === 'course' ? (
                 <Col key={item.id} xs={12} lg={8} className={`mb-4 ${showFilters ? '' : 'mx-lg-6'}`}>
                   <CourseCard course={item} />
