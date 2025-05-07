@@ -53,7 +53,7 @@ const Dashboard = () => {
     return typeMatch && statusMatch;
   }), [items, selectedContentType, selectedStatuses]);
 
-  const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 50;
+  const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 10;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
   const paginatedItems = useMemo(() => {

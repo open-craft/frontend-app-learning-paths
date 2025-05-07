@@ -2,7 +2,7 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import {
-  APP_INIT_ERROR, APP_READY, subscribe, initialize,
+  APP_INIT_ERROR, APP_READY, subscribe, initialize, mergeConfig,
 } from '@edx/frontend-platform';
 import { AppProvider, ErrorPage } from '@edx/frontend-platform/react';
 import ReactDOM from 'react-dom/client';
@@ -56,4 +56,11 @@ subscribe(APP_INIT_ERROR, (error) => {
 
 initialize({
   messages,
+  handlers: {
+    config: () => {
+      mergeConfig({
+        DASHBOARD_PAGE_SIZE: process.env.DASHBOARD_PAGE_SIZE || null,
+      }, 'LearningPathsConfig');
+    },
+  },
 });
