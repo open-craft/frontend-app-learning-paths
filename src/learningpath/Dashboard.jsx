@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Spinner, Row, Col, Button, Pagination, Icon,
 } from '@openedx/paragon';
@@ -60,6 +60,11 @@ const Dashboard = () => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredItems.slice(start, start + PAGE_SIZE);
   }, [filteredItems, currentPage, PAGE_SIZE]);
+  useEffect(() => {
+    // Add a timeout to ensure DOM updates are complete.
+    const id = setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
+    return () => clearTimeout(id);
+  }, [currentPage]);
 
   return (
     <div className="learningpath-list m-4.5">
