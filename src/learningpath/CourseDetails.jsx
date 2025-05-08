@@ -61,7 +61,7 @@ const CourseDetailContent = ({
       <div className="hero-section p-4">
         {!isModalView && (
           <div className="mb-3">
-            <Link to="/" className="d-flex font-weight-bold">
+            <Link to="/" className="d-flex align-items-center back-link">
               <Icon src={ChevronLeft} />
               <span>Go Back</span>
             </Link>

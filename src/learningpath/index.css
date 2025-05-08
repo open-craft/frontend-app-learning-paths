@@ -121,10 +121,6 @@
   .hero-section {
     padding: 2rem;
 
-    .back-link {
-      font-weight: 600;
-    }
-
     .hero-content {
       display: flex;
       flex-wrap: wrap;
@@ -207,6 +203,10 @@
     justify-content: space-between;
     align-items: center;
     white-space: nowrap;
+  }
+
+  .hero-section .back-link {
+    color: black;
   }
 }
 

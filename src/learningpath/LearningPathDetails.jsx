@@ -151,7 +151,7 @@ const LearningPathDetailPage = () => {
     const heroSection = (
       <div className="hero-section p-4">
         <div className="mb-5">
-          <Link to="/" className="d-flex back-link">
+          <Link to="/" className="d-flex align-items-center back-link">
             <Icon src={ChevronLeft} />
             <span>Go Back</span>
           </Link>
