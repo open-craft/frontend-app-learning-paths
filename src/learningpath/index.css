@@ -306,10 +306,14 @@
   button {
     margin-top: 1rem;
     margin-bottom: 20px;
-  }
 
-  .filter-button, .filter-button:hover, .filter-button:active, .pagination .page-link.btn-primary {
-    background-color: var(--crimson) !important;
+    &.filter-button, &.filter-button:hover, &.filter-button:active, &.page-link.btn-primary {
+      background-color: var(--crimson) !important;
+    }
+
+    &.page-link {
+      border-radius: 0;
+    }
   }
 }
 
