@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Spinner, Row, Col, Button, Pagination, Icon,
+  Spinner, Row, Col, Button, Pagination, Icon, SearchField,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
 import { FilterAlt } from '@openedx/paragon/icons';
@@ -32,6 +32,7 @@ const Dashboard = () => {
 
   const items = useMemo(() => [...(courses || []), ...(learningPaths || [])], [courses, learningPaths]);
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedContentType, setSelectedContentType] = useState('All');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
@@ -50,9 +51,11 @@ const Dashboard = () => {
         || (selectedContentType === 'course' && item.type === 'course')
         || (selectedContentType === 'learning_path' && item.type === 'learning_path');
     const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(item.status);
-    return typeMatch && statusMatch;
-  }), [items, selectedContentType, selectedStatuses]);
-
+    const searchMatch = searchQuery === ''
+      || (item.displayName && item.displayName.toLowerCase().includes(searchQuery.toLowerCase()))
+      || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return typeMatch && statusMatch && searchMatch;
+  }), [items, selectedContentType, selectedStatuses, searchQuery]);
   const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 10;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
@@ -67,7 +70,7 @@ const Dashboard = () => {
   }, [currentPage]);
 
   return (
-    <div className="learningpath-list m-4.5">
+    <div className="dashboard m-4.5">
       {isLoading ? (
         <div className="d-flex justify-content-center align-items-center vh-100">
           <Spinner animation="border" variant="primary" />
@@ -86,7 +89,16 @@ const Dashboard = () => {
             </div>
           )}
           <div className={`main-content ${showFilters ? 'shifted' : ''}`}>
-            <h2>My Learning</h2>
+            <div className="dashboard-header d-flex justify-content-between align-items-center">
+              <h2>My Learning</h2>
+              <SearchField
+                onClear={() => setSearchQuery('')}
+                onChange={setSearchQuery}
+                onSubmit={() => {}}
+                value={searchQuery}
+                placeholder="Search"
+              />
+            </div>
             {!showFilters && (
               <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">
                 <Icon src={FilterAlt} /> Filter
