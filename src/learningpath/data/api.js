@@ -153,3 +153,24 @@ export async function fetchCourseEnrollmentStatus(courseId) {
     };
   }
 }
+
+export async function fetchOrganizations() {
+  const client = getAuthenticatedHttpClient();
+
+  let allResults = [];
+  let nextUrl = `${getConfig().LMS_BASE_URL}/api/organizations/v0/organizations/?page_size=100`;
+
+  while (nextUrl) {
+    // eslint-disable-next-line no-await-in-loop
+    const response = await client.get(nextUrl);
+    const results = response.data.results || [];
+    allResults = [...allResults, ...results];
+    nextUrl = response.data.next || null;
+  }
+
+  return camelCaseObject(allResults.map(org => ({
+    shortName: org.short_name,
+    name: org.name,
+    logo: org.logo,
+  })));
+}

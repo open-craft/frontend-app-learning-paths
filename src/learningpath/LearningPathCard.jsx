@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
@@ -14,7 +14,7 @@ import {
   FormatListBulleted,
   AccessTime,
 } from '@openedx/paragon/icons';
-import { usePrefetchLearningPathDetail } from './data/queries';
+import { useOrganizations, usePrefetchLearningPathDetail } from './data/queries';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 const LearningPathCard = ({ learningPath, showFilters = false }) => {
@@ -28,6 +28,7 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
     status,
     maxDate,
     percent,
+    org,
   } = learningPath;
 
   const { isSmall, isMedium } = useScreenSize();
@@ -73,9 +74,15 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
     ? `${subtitle} • ${duration} days`
     : subtitle || duration || '';
 
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   return (
     <Card orientation={orientation} className="lp-card" onMouseEnter={handleMouseEnter}>
-      <Card.ImageCap src={image} />
+      <Card.ImageCap src={image} logoSrc={orgData.logo} />
       <Card.Body>
         <Card.Section className="pb-2.5 d-flex justify-content-between">
           <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>
@@ -121,6 +128,7 @@ LearningPathCard.propTypes = {
     status: PropTypes.string.isRequired,
     maxDate: PropTypes.string,
     percent: PropTypes.number,
+    org: PropTypes.string,
   }).isRequired,
   showFilters: PropTypes.bool,
 };

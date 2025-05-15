@@ -12,7 +12,9 @@ import {
   Timelapse,
 } from '@openedx/paragon/icons';
 import { buildAssetUrl } from '../util/assetUrl';
-import { usePrefetchCourseDetail, useCourseEnrollmentStatus, useEnrollCourse } from './data/queries';
+import {
+  usePrefetchCourseDetail, useCourseEnrollmentStatus, useEnrollCourse, useOrganizations,
+} from './data/queries';
 import { buildCourseHomeUrl } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
 
@@ -99,16 +101,22 @@ export const CourseCard = ({
     buttonText = 'Loading...';
   }
 
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   return (
     <Card orientation={orientation} className="course-card" onMouseEnter={handleMouseEnter}>
-      <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} />
+      <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
       <Card.Body>
         <Card.Section className="pb-2.5 d-flex justify-content-between">
           <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
           <Chip iconBefore={statusIcon} className={`status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
         </Card.Section>
         <Card.Section className="pt-1 pb-1"><h3>{name}</h3></Card.Section>
-        <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{org}</Card.Section>
+        <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
         <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && (
             <ProgressBar.Annotated

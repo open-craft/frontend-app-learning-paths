@@ -13,6 +13,7 @@ export const QUERY_KEYS = {
   COURSE_COMPLETIONS: ['courseCompletions'],
   COURSE_COMPLETION: (courseId) => ['courseCompletion', courseId],
   COURSE_ENROLLMENT_STATUS: (courseId) => ['courseEnrollmentStatus', courseId],
+  ORGANIZATIONS: ['organizations'],
 };
 
 // Stale time configurations
@@ -25,6 +26,8 @@ export const STALE_TIMES = {
   COURSE_ENROLLMENTS: 60 * 1000, // 1 minute
 
   COMPLETIONS: 60 * 1000, // 1 minute
+
+  ORGANIZATIONS: 60 * 60 * 1000, // 1 hour
 };
 
 // Learning Paths Queries
@@ -99,6 +102,7 @@ export const useLearningPaths = () => {
           maxDate: isoMaxDate,
           percent,
           type: 'learning_path',
+          org: lp.key.match(/path-v1:([^+]+)/)[1],
         };
       });
     },
@@ -338,3 +342,18 @@ export const useEnrollCourse = (learningPathId) => {
     },
   });
 };
+
+export const useOrganizations = () => useQuery({
+  queryKey: QUERY_KEYS.ORGANIZATIONS,
+  queryFn: async () => {
+    const organizations = await api.fetchOrganizations();
+
+    const organizationsMap = {};
+    organizations.forEach(org => {
+      organizationsMap[org.shortName] = org;
+    });
+
+    return organizationsMap;
+  },
+  staleTime: STALE_TIMES.ORGANIZATIONS,
+});

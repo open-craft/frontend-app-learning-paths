@@ -72,6 +72,11 @@
       border-top: 5px solid var(--crimson) !important;
   }
 
+  .pgn__card-wrapper-image-cap .pgn__card-logo-cap {
+    top: 1rem;
+    left: 1rem !important;
+  }
+
   .pgn__card-body {
     border-top-right-radius: 0.4rem;
   }
