@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -21,7 +21,7 @@ import {
   Close,
   ChevronLeft,
 } from '@openedx/paragon/icons';
-import { useCourseDetail } from './data/queries';
+import { useCourseDetail, useOrganizations } from './data/queries';
 import { buildAssetUrl, replaceStaticAssetReferences } from '../util/assetUrl';
 import { buildCourseHomeUrl } from './utils';
 
@@ -39,6 +39,7 @@ const CourseDetailContent = ({
     selfPaced,
     courseImageAssetPath,
     description,
+    org,
   } = course;
 
   const dateDisplay = endDate
@@ -57,97 +58,85 @@ const CourseDetailContent = ({
     window.location.href = buildCourseHomeUrl(activeCourseKey);
   };
 
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   return (
     <>
-      <div className="hero-section p-4">
-        {!isModalView && (
-          <div className="mb-3">
-            <Link to="/" className="d-flex align-items-center back-link">
-              <Icon src={ChevronLeft} />
-              <span>Go Back</span>
-            </Link>
-          </div>
-        )}
+      <div className="hero">
         {isModalView && (
-          <div className="lp-course-modal-header d-flex align-items-center justify-content-between py-2">
-            {learningPathTitle && (
-              <h5 className="mb-0">
-                Learning Path: {learningPathTitle}
-              </h5>
+          <Row className="p-0 m-0 d-flex align-items-center modal-header">
+            <Col>
+              <h4 className="mb-0 pl-4 text-muted font-weight-normal">
+                <b>Learning Path:</b> {learningPathTitle}
+              </h4>
+            </Col>
+            <ModalCloseButton variant="tertiary" onClick={handleClose}>
+              <Icon src={Close} />
+            </ModalCloseButton>
+          </Row>
+        )}
+        <Card orientation="horizontal">
+          <Card.Body>
+            {!isModalView && (
+            <Card.Section>
+              <Link to="/" className="d-flex align-items-center back-link pl-4">
+                <Icon src={ChevronLeft} />
+                <span>Go Back</span>
+              </Link>
+            </Card.Section>
             )}
-            <div className="pgn__modal-close-container">
-              <ModalCloseButton variant="tertiary" onClick={handleClose}>
-                <Icon src={Close} />
-              </ModalCloseButton>
+            <Card.Section className="pl-5 pr-6">
+              <Chip iconBefore={LmsBook} className="course-chip">COURSE</Chip>
+              <h1 className="my-3">{name}</h1>
+              <p className="text-muted">{shortDescription}</p>
+            </Card.Section>
+          </Card.Body>
+          <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+        </Card>
+        <Row className="mt-4 mx-0 px-6 d-flex hero-info course-hero-info">
+          {dateDisplay && (
+            <div className="d-flex align-items-center">
+              <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
+              <div>
+                <p className="mb-1 font-weight-bold">{dateDisplay}</p>
+                <p className="text-muted">Access ends</p>
+              </div>
+            </div>
+          )}
+          <div className="d-flex align-items-center">
+            <Icon src={Award} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">Earn a certificate</p>
+              <p className="text-muted">Courses include certification</p>
             </div>
           </div>
-        )}
-        <Row className="border-bottom border-light">
-          <Col xs={12} md={8}>
-            <Chip iconBefore={LmsBook} className="course-chip">COURSE</Chip>
-            <h1 className="mb-2">{name}</h1>
-            {shortDescription && (
-              <p className="text-muted mb-4">{shortDescription}</p>
-            )}
-          </Col>
-          <Col xs={12} md={4}>
-            {courseImageAssetPath && (
-            <Card.ImageCap
-              src={buildAssetUrl(courseImageAssetPath)}
-              alt={name}
-              className="course-detail-image"
-            />
-            )}
-          </Col>
-        </Row>
-        <Row className="mt-4 hero-info-row">
-          {dateDisplay && (
-            <Col xs={6} md={3} className="mb-3">
-              <div className="d-flex align-items-center">
-                <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
-                <div>
-                  <p className="mb-1 font-weight-bold">{dateDisplay}</p>
-                  <p className="text-muted">Access ends</p>
-                </div>
-              </div>
-            </Col>
-          )}
-          <Col xs={6} md={3} className="mb-3">
-            <div className="d-flex align-items-center">
-              <Icon src={Award} className="mr-4 mb-4" />
-              <div>
-                <p className="mb-1 font-weight-bold">Earn a certificate</p>
-                <p className="text-muted">Courses include certification</p>
-              </div>
-            </div>
-          </Col>
           {duration && (
-            <Col xs={6} md={3} className="mb-3">
-              <div className="d-flex align-items-center">
-                <Icon src={Calendar} className="mr-4 mb-4" />
-                <div>
-                  <p className="mb-1 font-weight-bold">{duration}</p>
-                  <p className="text-muted">Approx. duration</p>
-                </div>
-              </div>
-            </Col>
-          )}
-          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Person} className="mr-4 mb-4" />
+              <Icon src={Calendar} className="mr-4 mb-4" />
               <div>
-                <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
-                <p className="text-muted">
-                  {selfPaced ? 'Progress at your own speed' : 'Follow the course schedule'}
-                </p>
+                <p className="mb-1 font-weight-bold">{duration}</p>
+                <p className="text-muted">Approx. duration</p>
               </div>
             </div>
-          </Col>
+          )}
+          <div className="d-flex align-items-center">
+            <Icon src={Person} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
+              <p className="text-muted">
+                {selfPaced ? 'Progress at your own speed' : 'Follow the course schedule'}
+              </p>
+            </div>
+          </div>
         </Row>
       </div>
 
       {!isModalView && (
-        <div className="lp-tabs d-flex align-items-center px-4 pt-2 pb-2">
+        <div className="tabs d-flex align-items-center px-4 pt-2 pb-2">
           <Button
             variant="primary"
             className="ml-auto"
@@ -181,6 +170,7 @@ CourseDetailContent.propTypes = {
     selfPaced: PropTypes.bool,
     courseImageAssetPath: PropTypes.string,
     description: PropTypes.string,
+    org: PropTypes.string,
   }).isRequired,
   isModalView: PropTypes.bool,
   onClose: PropTypes.func,

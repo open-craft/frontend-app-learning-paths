@@ -3,7 +3,7 @@ import {
   useParams, Link, useLocation, useNavigate,
 } from 'react-router-dom';
 import {
-  Row, Col, Spinner, Nav, Icon, ModalLayer, Button, Chip,
+  Row, Spinner, Nav, Icon, ModalLayer, Button, Chip, Card,
 } from '@openedx/paragon';
 import {
   Person,
@@ -13,14 +13,15 @@ import {
   AccessTimeFilled,
   ChevronLeft,
 } from '@openedx/paragon/icons';
-import { useLearningPathDetail, useCoursesByIds, useEnrollLearningPath } from './data/queries';
+import {
+  useLearningPathDetail, useCoursesByIds, useEnrollLearningPath, useOrganizations,
+} from './data/queries';
 import { CourseCard, CourseCardWithEnrollment } from './CourseCard';
 import CourseDetailPage from './CourseDetails';
 
 const LearningPathDetailPage = () => {
   const { key } = useParams();
   const [selectedCourseKey, setSelectedCourseKey] = useState(null);
-  const [selectedPathTitle, setSelectedPathTitle] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const [enrolling, setEnrolling] = useState(false);
@@ -78,14 +79,13 @@ const LearningPathDetailPage = () => {
   }, [coursesForPath]);
 
   // In the details view, open the course details modal.
-  const handleCourseViewButton = (courseId, pathTitle) => {
+  const handleCourseViewButton = (courseId) => {
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
     setSelectedCourseKey(courseId);
-    setSelectedPathTitle(pathTitle);
   };
 
   const handleCloseCourseModal = () => {
     setSelectedCourseKey(null);
-    setSelectedPathTitle('');
   };
 
   const handleViewClick = () => {
@@ -110,6 +110,14 @@ const LearningPathDetailPage = () => {
       navigate(`${location.pathname}?view=enrolled`);
     }
   };
+
+  // TODO: Retrieve this from the backend.
+  const org = key.match(/path-v1:([^+]+)/)[1];
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
 
   let content;
   if (loadingDetail || loadingCourses) {
@@ -149,70 +157,58 @@ const LearningPathDetailPage = () => {
 
     // Hero section - same for both full view and enrolled view.
     const heroSection = (
-      <div className="hero-section p-4">
-        <div className="mb-5">
-          <Link to="/" className="d-flex align-items-center back-link">
-            <Icon src={ChevronLeft} />
-            <span>Go Back</span>
-          </Link>
-        </div>
-        <Row className="border-bottom border-light hero-content">
-          <Col xs={12} md={8}>
-            <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
-            <h1 className="mb-3">{displayName}</h1>
-            {subtitle && (
-              <p className="text-muted mb-4" style={{ maxWidth: '80%' }}>
-                  {subtitle}
-              </p>
-            )}
-          </Col>
-          <Col xs={12} md={4} className="d-flex align-items-center justify-content-center hero-image">
-            {image && (<img src={image} alt={displayName} />)}
-          </Col>
-        </Row>
-        <Row className="mt-4 d-flex hero-info-row">
+      <div className="hero">
+        <Card orientation="horizontal">
+          <Card.Body>
+            <Card.Section>
+              <Link to="/" className="d-flex align-items-center back-link pl-4">
+                <Icon src={ChevronLeft} />
+                <span>Go Back</span>
+              </Link>
+            </Card.Section>
+            <Card.Section className="pl-5 pr-6">
+              <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
+              <h1 className="my-3">{displayName}</h1>
+              <p className="text-muted">{subtitle}</p>
+            </Card.Section>
+          </Card.Body>
+          <Card.ImageCap src={image} logoSrc={orgData.logo} />
+        </Card>
+        <Row className="mt-4 mx-0 px-6 d-flex hero-info lp-hero-info">
           {accessUntilDate && (
-            <Col xs={6} md={3} className="mb-3">
-              <div className="d-flex align-items-center">
-                <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
-                <div>
-                  <p className="mb-0 font-weight-bold">
-                    {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
-                  <p className="text-muted mb-0 info-subtext">Access ends</p>
-                </div>
-              </div>
-            </Col>
-          )}
-          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Award} className="mr-4 mb-4" />
+              <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
               <div>
-                <p className="mb-1 font-weight-bold">Certificate</p>
-                <p className="text-muted info-subtext">Earn a certificate</p>
-              </div>
-            </div>
-          </Col>
-          <Col xs={6} md={3} className="mb-3">
-            <div className="d-flex align-items-center">
-              <Icon src={Calendar} className="mr-4 mb-4" />
-              <div>
-                <p className="mb-1 font-weight-bold">
-                  {durationText || 'Duration not available'}
+                <p className="mb-0 font-weight-bold">
+                  {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
-                <p className="text-muted info-subtext">Duration</p>
+                <p className="text-muted mb-0 info-subtext">Access ends</p>
               </div>
             </div>
-          </Col>
-          <Col xs={6} md={3} className="mb-3">
-            <div className="d-flex align-items-center">
-              <Icon src={Person} className="mr-4 mb-4" />
-              <div>
-                <p className="mb-1 font-weight-bold">Self-paced</p>
-                <p className="text-muted info-subtext">Progress at your own speed</p>
-              </div>
+          )}
+          <div className="d-flex align-items-center">
+            <Icon src={Award} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">Certificate</p>
+              <p className="text-muted info-subtext">Earn a certificate</p>
             </div>
-          </Col>
+          </div>
+          <div className="d-flex align-items-center">
+            <Icon src={Calendar} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">
+                {durationText || 'Duration not available'}
+              </p>
+              <p className="text-muted info-subtext">Duration</p>
+            </div>
+          </div>
+          <div className="d-flex align-items-center">
+            <Icon src={Person} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">Self-paced</p>
+              <p className="text-muted info-subtext">Progress at your own speed</p>
+            </div>
+          </div>
         </Row>
       </div>
     );
@@ -245,7 +241,7 @@ const LearningPathDetailPage = () => {
       content = (
         <div className="detail-page learning-path-detail-page">
           {heroSection}
-          <div className="lp-tabs d-flex align-items-center px-4">
+          <div className="tabs d-flex align-items-center px-4">
             <Nav
               variant="tabs"
               onSelect={handleTabSelect}
@@ -327,7 +323,7 @@ const LearningPathDetailPage = () => {
             isModalView
             courseKey={selectedCourseKey}
             onClose={handleCloseCourseModal}
-            learningPathTitle={selectedPathTitle}
+            learningPathTitle={detail?.displayName}
           />
         </ModalLayer>
       )}
