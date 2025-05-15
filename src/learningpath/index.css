@@ -81,21 +81,10 @@
     border-top-right-radius: 0.4rem;
   }
 
-  .pgn__chip {
-    .pgn__chip__label {
-      font-size: 0.85rem;
-    }
-
-    .pgn__icon {
-      width: 21px;
-      height: 21px;
-    }
-  }
-
   .pgn__card-footer {
     .pgn__chip {
       .pgn__chip__label {
-        font-size: 0.9rem;
+        font-size: 0.9rem !important;
         color: #454545;
         font-weight: 400;
       }
@@ -107,55 +96,6 @@
 
     button {
       margin: 0;
-    }
-  }
-
-  .course-chip {
-    .pgn__chip__label {
-      color: #8C8179;
-    }
-
-    .pgn__icon {
-      background-color: #8C8179;
-      color: white !important;
-      font-size: 0.85rem;
-      border-radius: 5px;
-    }
-  }
-
-  .lp-chip {
-    .pgn__chip__label {
-      color: var(--crimson);
-    }
-
-    .pgn__icon {
-      background-color: var(--crimson);
-      color: white !important;
-      font-size: 0.85rem;
-      border-radius: 5px;
-
-      svg {
-        width: 80%;
-        margin: auto;
-      }
-    }
-  }
-
-  .status-chip {
-    &.status-secondary {
-      background-color: #8996A0;
-    }
-
-    &.status-info {
-      background-color: #05A59D;
-    }
-
-    &.status-success {
-      background-color: #52854C;
-    }
-
-    .pgn__chip__label, .pgn__icon {
-      color: white !important;
     }
   }
 
@@ -182,6 +122,64 @@
     .progress .progress-bar::after {
       display: none;
     }
+  }
+}
+
+.pgn__chip {
+  &.course-chip {
+    .pgn__chip__label {
+      color: #8C8179;
+    }
+
+    .pgn__icon {
+      background-color: #8C8179;
+      color: white !important;
+      border-radius: 5px;
+    }
+  }
+
+  &.lp-chip {
+    .pgn__chip__label {
+      color: var(--crimson);
+    }
+
+    .pgn__icon {
+      background-color: var(--crimson);
+      color: white !important;
+      border-radius: 5px;
+
+      svg {
+        width: 80%;
+        margin: auto;
+      }
+    }
+  }
+
+  &.status-chip {
+    &.status-secondary {
+      background-color: #8996A0;
+    }
+
+    &.status-info {
+      background-color: #05A59D;
+    }
+
+    &.status-success {
+      background-color: #52854C;
+    }
+
+    .pgn__chip__label, .pgn__icon {
+      color: white !important;
+    }
+  }
+
+  .pgn__chip__label {
+    font-size: 0.85rem !important;
+  }
+
+  .pgn__icon {
+    width: 21px !important;
+    height: 21px !important;
   }
 }
 
@@ -271,14 +269,33 @@
       }
   }
 
-  .hero-info-row {
-    justify-content: space-between;
-    align-items: center;
-    white-space: nowrap;
-  }
+  .hero-section {
+    .back-link {
+      color: black;
+    }
 
-  .hero-section .back-link {
-    color: black;
+    .pgn__chip {
+      padding: 2px 6px 2px 2px;
+
+      &.lp-chip {
+        background-color: var(--crimson);
+      }
+
+      &.course-chip {
+        background-color: #8C8179;
+      }
+
+      .pgn__chip__label {
+        color: white;
+        font-size: 0.95rem !important;
+      }
+    }
+
+    .hero-info-row {
+      justify-content: space-between;
+      align-items: center;
+      white-space: nowrap;
+    }
   }
 }
 
@@ -349,17 +366,6 @@
       object-fit: cover;
       border-radius: 4px;
     }
-  }
-
-  .course-detail-type-label {
-    color: white;
-    align-items: center;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background-color: #8C8179;
-    border-radius: 5px;
-    padding: 2px 2px;
-    max-width: 6rem;
   }
 }
 
@@ -447,18 +453,6 @@
       margin-bottom: 0.75rem;
     }
   }
-}
-
-.lp-detail-type-label {
-  background-color: var(--crimson);
-  max-width: 10rem;
-  color: white;
-  border-radius: 5px;
-  padding: 2px 2px;
-  align-items: center;
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem !important;
 }
 
 .lp-course-modal-header {

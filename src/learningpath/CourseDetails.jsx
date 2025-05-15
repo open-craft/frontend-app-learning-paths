@@ -10,6 +10,7 @@ import {
   ModalCloseButton,
   Button,
   Alert,
+  Chip,
 } from '@openedx/paragon';
 import {
   LmsBook,
@@ -83,10 +84,7 @@ const CourseDetailContent = ({
         )}
         <Row className="border-bottom border-light">
           <Col xs={12} md={8}>
-            <div className="course-detail-type-label d-flex text-uppercase mb-2">
-              <Icon src={LmsBook} className="mr-1" />
-              <span>Course</span>
-            </div>
+            <Chip iconBefore={LmsBook} className="course-chip">COURSE</Chip>
             <h1 className="mb-2">{name}</h1>
             {shortDescription && (
               <p className="text-muted mb-4">{shortDescription}</p>

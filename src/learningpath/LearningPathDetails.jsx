@@ -3,7 +3,7 @@ import {
   useParams, Link, useLocation, useNavigate,
 } from 'react-router-dom';
 import {
-  Row, Col, Spinner, Nav, Icon, ModalLayer, Button,
+  Row, Col, Spinner, Nav, Icon, ModalLayer, Button, Chip,
 } from '@openedx/paragon';
 import {
   Person,
@@ -158,10 +158,7 @@ const LearningPathDetailPage = () => {
         </div>
         <Row className="border-bottom border-light hero-content">
           <Col xs={12} md={8}>
-            <div className="lp-detail-type-label d-flex text-uppercase mb-2">
-              <Icon src={FormatListBulleted} className="mr-1" />
-              <span>Learning Path</span>
-            </div>
+            <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
             <h1 className="mb-3">{displayName}</h1>
             {subtitle && (
               <p className="text-muted mb-4" style={{ maxWidth: '80%' }}>
