@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Spinner, Row, Col, Button, Pagination, Icon, SearchField,
+  Spinner, Col, Button, Pagination, Icon, SearchField,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
 import { FilterAlt } from '@openedx/paragon/icons';
@@ -104,18 +104,14 @@ const Dashboard = () => {
                 <Icon src={FilterAlt} /> Filter
               </Button>
             )}
-            <hr className="mt-0 mb-4" />
-            <Row className="mx-lg-2">
-              {paginatedItems.map(item => (item.type === 'course' ? (
-                <Col key={item.id} xs={12} lg={8} className={`mb-4 ${showFilters ? '' : 'mx-lg-6'}`}>
-                  <CourseCard course={item} />
-                </Col>
-              ) : (
-                <Col key={item.key} xs={12} lg={8} className={`mb-4 ${showFilters ? '' : 'mx-lg-6'}`}>
-                  <LearningPathCard learningPath={item} />
-                </Col>
-              )))}
-            </Row>
+            <hr className={`mt-0 mb-4 ${showFilters ? 'invisible' : 'visible'}`} />
+            {paginatedItems.map(item => (
+              <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mx-lg-6'}`}>
+                {item.type === 'course'
+                  ? <CourseCard course={item} showFilters={showFilters} />
+                  : <LearningPathCard learningPath={item} showFilters={showFilters} />}
+              </Col>
+            ))}
             <Pagination
               paginationLabel="learning items navigation"
               pageCount={totalPages}

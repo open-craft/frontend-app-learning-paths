@@ -63,83 +63,120 @@
   }
 }
 
-.dashboard-card {
-  &.learning-path-card {
-    border-top: 5px solid var(--crimson) !important;
-
-    .type-label {
-      color: var(--crimson);
-
-      .type-icon {
-        background-color: var(--crimson);
-      }
-    }
-  }
-  &.course-card {
+.pgn__card {
+  &.course-card .pgn__card-body {
     border-top: 5px solid #8C8179 !important;
+  }
 
-    .type-label {
+  &.lp-card .pgn__card-body {
+      border-top: 5px solid var(--crimson) !important;
+  }
+
+  .pgn__card-body {
+    border-top-right-radius: 0.4rem;
+  }
+
+  .pgn__chip {
+    .pgn__chip__label {
+      font-size: 0.85rem;
+    }
+
+    .pgn__icon {
+      width: 21px;
+      height: 21px;
+    }
+  }
+
+  .pgn__card-footer {
+    .pgn__chip {
+      .pgn__chip__label {
+        font-size: 0.9rem;
+        color: #454545;
+        font-weight: 400;
+      }
+
+      .pgn__icon {
+        color: black !important;
+      }
+    }
+
+    button {
+      margin: 0;
+    }
+  }
+
+  .course-chip {
+    .pgn__chip__label {
       color: #8C8179;
-
-      .type-icon {
-        background-color: #8C8179;
-      }
     }
-  }
 
-  .image-col {
-    margin-left: -16px;
-    margin-top: -20px;
-    margin-bottom: -17px;
-
-    .image.vertical {
-      max-height: 258px;
-
-      img {
-        border-top-right-radius: 0;
-      }
-    }
-  }
-
-  .pgn__card-header-content{
-    margin-top: 1.5rem !important;
-  }
-
-  .meta {
-    font-size: 0.9rem;
-    color: #555;
-  }
-
-  .type-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-
-    .type-icon {
-      color: white;
+    .pgn__icon {
+      background-color: #8C8179;
+      color: white !important;
+      font-size: 0.85rem;
       border-radius: 5px;
-      padding-left: 2px;
     }
   }
-}
 
-.lp-status-badge {
-  position: absolute;
-  top: 0.95rem;
-  right: 1.95rem;
+  .lp-chip {
+    .pgn__chip__label {
+      color: var(--crimson);
+    }
 
-  .status-secondary {
-    background-color: #8996A0 !important;
-    color: white;
+    .pgn__icon {
+      background-color: var(--crimson);
+      color: white !important;
+      font-size: 0.85rem;
+      border-radius: 5px;
+
+      svg {
+        width: 80%;
+        margin: auto;
+      }
+    }
   }
 
-  .status-info {
-    background-color: #05A59D !important;
-    color: white;
+  .status-chip {
+    &.status-secondary {
+      background-color: #8996A0;
+    }
+
+    &.status-info {
+      background-color: #05A59D;
+    }
+
+    &.status-success {
+      background-color: #52854C;
+    }
+
+    .pgn__chip__label, .pgn__icon {
+      color: white !important;
+    }
   }
 
-  .status-success {
-    background-color: #52854C !important;
-    color: white;
+  .pgn__progress-annotated {
+    padding-bottom: 0;
+    padding-top: 30px;
+
+    .pgn__annotation {
+      display: flex;
+      align-items: center;
+      height: 20px;
+      font-size: 12px;
+
+      filter: none;
+
+      background-color: #E0E0E0;
+      color: black;
+
+      &::after {
+        border-top-color: #E0E0E0;
+      }
+    }
+
+    .progress .progress-bar::after {
+      display: none;
+    }
   }
 }
 
@@ -216,6 +253,7 @@
       .mb-3 {
         max-width: 1360px;
         margin-left: 6rem;
+        margin-right: 6rem;
       }
     }
   }
@@ -332,6 +370,10 @@
 .main-content {
   transition: margin-left 0.3s ease;
 
+  &.shifted {
+    margin-left: 350px;
+  }
+
   button {
     margin-top: 1rem;
     margin-bottom: 20px;
@@ -344,10 +386,6 @@
       border-radius: 0;
     }
   }
-}
-
-.main-content.shifted {
-  margin-left: 350px;
 }
 
 .filter-panel.sidebar {
@@ -395,40 +433,15 @@
       color: white;
     }
   }
-}
 
-.status-options {
-  display: flex;
-  flex-direction: column;
+  .status-options {
+    display: flex;
+    flex-direction: column;
 
-  .pgn__form-checkbox {
-    margin-bottom: 0.75rem;
+    .pgn__form-checkbox {
+      margin-bottom: 0.75rem;
+    }
   }
-}
-
-.pgn__annotation-dark-bottom {
-  background-color: #E0E0E0 !important;
-  color: #000 !important;
-}
-
-.pgn__annotation-dark-bottom::after {
-  border-top-color: #E0E0E0 !important;
-}
-
-.pgn__progress-annotated .progress .pgn__progress-bar--dark::after {
-  display: none !important;
-}
-
-.pgn__annotation {
-  filter: none !important;
-}
-
-.pgn__progress-annotated {
-  margin-left: 12px;
-}
-
-.pgn__card .pgn__card-footer.vertical {
-  padding: 0 !important;
 }
 
 .lp-detail-type-label {

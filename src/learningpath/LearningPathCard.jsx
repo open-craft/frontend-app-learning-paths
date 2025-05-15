@@ -4,11 +4,8 @@ import { Link } from 'react-router-dom';
 import {
   Card,
   Button,
-  Row,
-  Col,
-  Badge,
-  Icon,
   ProgressBar,
+  Chip,
 } from '@openedx/paragon';
 import {
   LmsCompletionSolid,
@@ -18,8 +15,9 @@ import {
   AccessTime,
 } from '@openedx/paragon/icons';
 import { usePrefetchLearningPathDetail } from './data/queries';
+import { useScreenSize } from '../hooks/useScreenSize';
 
-const LearningPathCard = ({ learningPath }) => {
+const LearningPathCard = ({ learningPath, showFilters = false }) => {
   const {
     key,
     image,
@@ -31,6 +29,9 @@ const LearningPathCard = ({ learningPath }) => {
     maxDate,
     percent,
   } = learningPath;
+
+  const { isSmall, isMedium } = useScreenSize();
+  const orientation = (showFilters && (isSmall || isMedium)) || (!showFilters && isSmall) ? 'vertical' : 'horizontal';
 
   // Prefetch the learning path detail when the user hovers over the card.
   const prefetchLearningPathDetail = usePrefetchLearningPathDetail();
@@ -73,65 +74,38 @@ const LearningPathCard = ({ learningPath }) => {
     : subtitle || duration || '';
 
   return (
-    <Card className="dashboard-card learning-path-card p-3 position-relative" onMouseEnter={handleMouseEnter}>
-      <div className="lp-status-badge">
-        <Badge variant={statusVariant} className={`d-flex text-uppercase align-items-center status-${statusVariant}`}>
-          <Icon src={statusIcon} className="mr-1" />
-          {status}
-        </Badge>
-      </div>
-      <Row>
-        <Col xs={12} md={4} className="image-col">
-          {image && (
-            <Card.ImageCap
-              src={image}
-              alt={displayName}
-              className="image"
-            />
-          )}
-        </Col>
-        <Col xs={12} md={8}>
-          <div className="type-label text-uppercase mb-2 d-flex align-items-center">
-            <span className="type-icon d-inline-flex align-items-center justify-content-center mr-1">
-              <Icon src={FormatListBulleted} className="mr-1" />
-            </span>
-            <span>Learning Path</span>
-          </div>
-          <Card.Header className="p-0 mb-2" title={displayName} />
-          {subtitleLine && (
-            <p className="card-subtitle text-muted mb-2">
-              {subtitleLine}
-            </p>
-          )}
+    <Card orientation={orientation} className="lp-card" onMouseEnter={handleMouseEnter}>
+      <Card.ImageCap src={image} />
+      <Card.Body>
+        <Card.Section className="pb-2.5 d-flex justify-content-between">
+          <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>
+          <Chip iconBefore={statusIcon} className={`status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+        </Card.Section>
+        <Card.Section className="pt-1 pb-1"><h3>{displayName}</h3></Card.Section>
+        <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{subtitleLine}</Card.Section>
+        <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && (
             <ProgressBar.Annotated
               now={Math.round(percent)}
               label={`${Math.round(percent)}%`}
               variant="dark"
-              className="mb-2"
             />
           )}
-          <Card.Footer className="d-flex align-items-center">
-            <div className="meta d-flex flex-wrap mr-auto mb-2">
-              {numCourses && (
-                <div className="mr-3 d-flex align-items-center">
-                  <Icon src={FormatListBulleted} className="mr-1" />
-                  {numCourses} courses
-                </div>
-              )}
-              {maxDate && (
-                <div className="mr-6 d-flex align-items-center">
-                  <Icon src={AccessTime} className="mr-1" />
-                  {accessText}
-                </div>
-              )}
-            </div>
-            <Link to={`/learningpath/${key}`}>
-              <Button variant="outline-primary">{buttonText}</Button>
-            </Link>
-          </Card.Footer>
-        </Col>
-      </Row>
+        </Card.Section>
+        <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
+          <Card.Section className="p-0">
+            {numCourses && (
+              <Chip iconBefore={FormatListBulleted} className="border-0 p-0">{numCourses} courses</Chip>
+            )}
+            {maxDate && (
+              <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
+            )}
+          </Card.Section>
+          <Link to={`/learningpath/${key}`}>
+            <Button variant="outline-primary">{buttonText}</Button>
+          </Link>
+        </Card.Footer>
+      </Card.Body>
     </Card>
   );
 };
@@ -148,6 +122,7 @@ LearningPathCard.propTypes = {
     maxDate: PropTypes.string,
     percent: PropTypes.number,
   }).isRequired,
+  showFilters: PropTypes.bool,
 };
 
 export default LearningPathCard;
