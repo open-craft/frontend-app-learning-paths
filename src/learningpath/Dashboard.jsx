@@ -106,7 +106,7 @@ const Dashboard = () => {
             )}
             <hr className={`mt-0 mb-4 ${showFilters ? 'invisible' : 'visible'}`} />
             {paginatedItems.map(item => (
-              <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mx-lg-6'}`}>
+              <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
                 {item.type === 'course'
                   ? <CourseCard course={item} showFilters={showFilters} />
                   : <LearningPathCard learningPath={item} showFilters={showFilters} />}
