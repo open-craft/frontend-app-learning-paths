@@ -68,6 +68,10 @@ const Dashboard = () => {
     const id = setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
     return () => clearTimeout(id);
   }, [currentPage]);
+  // Reset pagination when using filters or search.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedContentType, selectedStatuses]);
 
   return (
     <div className="dashboard m-4.5">
