@@ -33,7 +33,11 @@ const Dashboard = () => {
   const items = useMemo(() => [...(courses || []), ...(learningPaths || [])], [courses, learningPaths]);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+
+  const showFiltersKey = 'lp_dashboard_showFilters';
+  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) !== 'false');
+  useEffect(() => { localStorage.setItem(showFiltersKey, showFilters.toString()); }, [showFilters]);
+
   const [selectedContentType, setSelectedContentType] = useState('All');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
 
