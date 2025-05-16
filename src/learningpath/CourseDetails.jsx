@@ -136,10 +136,10 @@ const CourseDetailContent = ({
       </div>
 
       {!isModalView && (
-        <div className="tabs d-flex align-items-center px-4 pt-2 pb-2">
+        <div className="tabs d-flex align-items-center pl-5.5 pr-0">
           <Button
             variant="primary"
-            className="ml-auto"
+            className="ml-auto rounded-0 py-3 px-5.5 "
             onClick={handleViewClick}
           >
             View
@@ -147,7 +147,7 @@ const CourseDetailContent = ({
         </div>
       )}
 
-      <div className="p-4">
+      <div className="py-3">
         <section id="about">
           {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{
