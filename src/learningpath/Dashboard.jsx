@@ -35,11 +35,20 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const showFiltersKey = 'lp_dashboard_showFilters';
-  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) !== 'false');
-  useEffect(() => { localStorage.setItem(showFiltersKey, showFilters.toString()); }, [showFilters]);
+  const selectedContentTypeKey = 'lp_dashboard_contentType';
+  const selectedStatusesKey = 'lp_dashboard_selectedStatuses';
 
-  const [selectedContentType, setSelectedContentType] = useState('All');
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) !== 'false');
+  const [selectedContentType, setSelectedContentType] = useState(() => localStorage.getItem(selectedContentTypeKey) || 'All');
+  const [selectedStatuses, setSelectedStatuses] = useState(
+    () => JSON.parse(localStorage.getItem(selectedStatusesKey)) || [],
+  );
+
+  useEffect(() => { localStorage.setItem(showFiltersKey, showFilters.toString()); }, [showFilters]);
+  useEffect(() => {
+    localStorage.setItem(selectedContentTypeKey, selectedContentType.toString());
+  }, [selectedContentType]);
+  useEffect(() => { localStorage.setItem(selectedStatusesKey, JSON.stringify(selectedStatuses)); }, [selectedStatuses]);
 
   const handleStatusChange = (status, isChecked) => {
     setSelectedStatuses(prev => {
