@@ -190,14 +190,16 @@
   font-family: "Open Sans", sans-serif;
 
   &:has(.modal-header) {
-    /* An ugly workaround to move the modal to the top right corner. */
-    margin-left: auto;
-    margin-top: 96px;
-    margin-bottom: auto;
+    /* Move the modal to the top right corner. */
+    margin: 0 0 0 auto;
+    bottom: 0;
+
+    /* Fill full height with scrolling for content. */
+    height: 100vh;
+    overflow-y: auto;
 
     background-color: white;
     max-width: 90rem;
-    bottom: 6rem;
 
     .modal-header {
       /* Match the height of the platform's header. */
