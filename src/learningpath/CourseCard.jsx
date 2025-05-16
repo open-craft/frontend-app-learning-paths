@@ -113,7 +113,7 @@ export const CourseCard = ({
       <Card.Body>
         <Card.Section className="pb-2.5 d-flex justify-content-between">
           <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
-          <Chip iconBefore={statusIcon} className={`status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+          <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
         </Card.Section>
         <Card.Section className="pt-1 pb-1"><h3>{name}</h3></Card.Section>
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>

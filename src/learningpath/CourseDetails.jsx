@@ -74,7 +74,7 @@ const CourseDetailContent = ({
                 <b>Learning Path:</b> {learningPathTitle}
               </h4>
             </Col>
-            <ModalCloseButton variant="tertiary" onClick={handleClose}>
+            <ModalCloseButton variant="tertiary" onClick={handleClose} className="mr-1">
               <Icon src={Close} />
             </ModalCloseButton>
           </Row>

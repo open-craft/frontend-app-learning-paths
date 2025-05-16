@@ -109,6 +109,8 @@
       height: 20px;
       font-size: 12px;
 
+      padding: 0.75rem 0.5rem;
+
       filter: none;
 
       background-color: #E0E0E0;
@@ -147,11 +149,6 @@
       background-color: var(--crimson);
       color: white !important;
       border-radius: 5px;
-
-      svg {
-        width: 80%;
-        margin: auto;
-      }
     }
   }
 
@@ -180,6 +177,11 @@
   .pgn__icon {
     width: 21px !important;
     height: 21px !important;
+
+    svg {
+      width: 80%;
+      margin: auto;
+    }
   }
 }
 
@@ -205,6 +207,15 @@
     .card {
       border-top: 3px solid #8C8179;
       border-radius: 0;
+
+      .pgn__card-wrapper-image-cap {
+        padding: 1.5rem;
+
+        .pgn__card-logo-cap {
+          top: 2.5rem !important;
+          right: 2.5rem !important;
+        }
+      }
     }
   }
 
@@ -215,9 +226,14 @@
       box-shadow: none;
 
       .pgn__card-wrapper-image-cap {
+        flex: 0 0 auto;
         height: 320px;
         min-width: 320px !important;
         max-width: unset !important;
+
+        .pgn__card-image-cap {
+          border-radius: 0.375rem !important;
+        }
 
         .pgn__card-logo-cap {
           top: 1rem;
