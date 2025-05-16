@@ -3,7 +3,7 @@ import {
   useParams, Link, useLocation, useNavigate,
 } from 'react-router-dom';
 import {
-  Row, Col, Spinner, Nav, Icon, ModalLayer, Button,
+  Row, Spinner, Nav, Icon, ModalLayer, Button, Chip, Card,
 } from '@openedx/paragon';
 import {
   Person,
@@ -11,8 +11,11 @@ import {
   Calendar,
   FormatListBulleted,
   AccessTimeFilled,
+  ChevronLeft,
 } from '@openedx/paragon/icons';
-import { useLearningPathDetail, useCoursesByIds, useEnrollLearningPath } from './data/queries';
+import {
+  useLearningPathDetail, useCoursesByIds, useEnrollLearningPath, useOrganizations,
+} from './data/queries';
 import { CourseCard, CourseCardWithEnrollment } from './CourseCard';
 import CourseDetailPage from './CourseDetails';
 
@@ -77,6 +80,7 @@ const LearningPathDetailPage = () => {
 
   // In the details view, open the course details modal.
   const handleCourseViewButton = (courseId) => {
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
     setSelectedCourseKey(courseId);
   };
 
@@ -107,14 +111,29 @@ const LearningPathDetailPage = () => {
     }
   };
 
+  // TODO: Retrieve this from the backend.
+  const org = key.match(/path-v1:([^+]+)/)[1];
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   let content;
   if (loadingDetail || loadingCourses) {
-    content = <Spinner animation="border" variant="primary" />;
+    content = (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
   } else if (detailError || !detail) {
     content = (
       <div className="p-4">
         <p>Failed to load detail</p>
-        <Link to="/">Explore</Link>
+        <Link to="/">
+          <Icon src={ChevronLeft} />
+          <span>Go Back</span>
+        </Link>
       </div>
     );
   } else {
@@ -138,80 +157,58 @@ const LearningPathDetailPage = () => {
 
     // Hero section - same for both full view and enrolled view.
     const heroSection = (
-      <div className="hero-section p-4">
-        <div className="mb-3">
-          <Link to="/" style={{ fontWeight: 600 }}>
-            Explore
-          </Link>
-        </div>
-        <Row>
-          <Col xs={12} md={8}>
-            <div className="lp-type-label text-uppercase mb-2">
-              <Icon src={FormatListBulleted} className="mr-1" />
-              <span>Learning Path</span>
-            </div>
-            <h1 className="mb-3">{displayName}</h1>
-            {subtitle && (
-              <p className="text-muted mb-4" style={{ maxWidth: '80%' }}>
-                  {subtitle}
-              </p>
-            )}
-          </Col>
-          <Col xs={12} md={4} className="d-flex align-items-center justify-content-center">
-            {image && (
-            <img
-              src={image}
-              alt={displayName}
-              style={{
-                width: '100%', borderRadius: '4px', maxHeight: '250px', objectFit: 'cover',
-              }}
-            />
-            )}
-          </Col>
-        </Row>
-        <Row className="mt-4">
+      <div className="hero">
+        <Card orientation="horizontal">
+          <Card.Body>
+            <Card.Section>
+              <Link to="/" className="d-flex align-items-center back-link pl-4">
+                <Icon src={ChevronLeft} />
+                <span>Go Back</span>
+              </Link>
+            </Card.Section>
+            <Card.Section className="pl-5 pr-6">
+              <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
+              <h1 className="my-3">{displayName}</h1>
+              <p className="text-muted">{subtitle}</p>
+            </Card.Section>
+          </Card.Body>
+          <Card.ImageCap src={image} logoSrc={orgData.logo} />
+        </Card>
+        <Row className="mt-4 mx-0 px-6 d-flex hero-info lp-hero-info">
           {accessUntilDate && (
-            <Col xs={6} md={3} className="mb-3">
-              <div className="d-flex align-items-center">
-                <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
-                <div>
-                  <p className="mb-0 font-weight-bold">
-                    {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
-                  <p className="text-muted mb-0">Access ends</p>
-                </div>
-              </div>
-            </Col>
-          )}
-          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Award} className="mr-4 mb-4" />
+              <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
               <div>
-                <p className="mb-1 font-weight-bold">Certificate</p>
-                <p className="text-muted">Earn a certificate</p>
-              </div>
-            </div>
-          </Col>
-          <Col xs={6} md={3} className="mb-3">
-            <div className="d-flex align-items-center">
-              <Icon src={Calendar} className="mr-4 mb-4" />
-              <div>
-                <p className="mb-1 font-weight-bold">
-                  {durationText || 'Duration not available'}
+                <p className="mb-0 font-weight-bold">
+                  {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
-                <p className="text-muted">Duration</p>
+                <p className="text-muted mb-0 info-subtext">Access ends</p>
               </div>
             </div>
-          </Col>
-          <Col xs={6} md={3} className="mb-3">
-            <div className="d-flex align-items-center">
-              <Icon src={Person} className="mr-4 mb-4" />
-              <div>
-                <p className="mb-1 font-weight-bold">Self-paced</p>
-                <p className="text-muted">Progress at your own speed</p>
-              </div>
+          )}
+          <div className="d-flex align-items-center">
+            <Icon src={Award} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">Certificate</p>
+              <p className="text-muted info-subtext">Earn a certificate</p>
             </div>
-          </Col>
+          </div>
+          <div className="d-flex align-items-center">
+            <Icon src={Calendar} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">
+                {durationText || 'Duration not available'}
+              </p>
+              <p className="text-muted info-subtext">Duration</p>
+            </div>
+          </div>
+          <div className="d-flex align-items-center">
+            <Icon src={Person} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">Self-paced</p>
+              <p className="text-muted info-subtext">Progress at your own speed</p>
+            </div>
+          </div>
         </Row>
       </div>
     );
@@ -223,7 +220,6 @@ const LearningPathDetailPage = () => {
           {heroSection}
 
           <div className="p-4">
-            {loadingCourses && <Spinner animation="border" variant="primary" />}
             {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
               <p>No sub-courses found in this learning path.</p>
             )}
@@ -243,27 +239,29 @@ const LearningPathDetailPage = () => {
     } else {
       // Details view with all sections.
       content = (
-        <div className="learning-path-detail-page">
+        <div className="detail-page learning-path-detail-page">
           {heroSection}
-          <div className="lp-tabs d-flex align-items-center px-4">
+          <div className="tabs d-flex align-items-center pl-5.5 pr-0">
             <Nav
               variant="tabs"
               onSelect={handleTabSelect}
               className="border-bottom-0"
             >
               <Nav.Item>
-                <Nav.Link eventKey="about">About</Nav.Link>
+                <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="courses">Courses</Nav.Link>
+                <Nav.Link eventKey="courses" className="font-weight-normal">Courses</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="requirements">Requirements</Nav.Link>
-              </Nav.Item>
+              {requiredSkills && requiredSkills.length > 0 && (
+                <Nav.Item>
+                  <Nav.Link eventKey="requirements" className="font-weight-normal">Requirements</Nav.Link>
+                </Nav.Item>
+              )}
             </Nav>
             <Button
               variant="primary"
-              className="ml-auto"
+              className="ml-auto rounded-0 py-3 px-5.5"
               onClick={isEnrolled ? handleViewClick : handleEnrollClick}
               disabled={enrolling}
             >
@@ -274,40 +272,43 @@ const LearningPathDetailPage = () => {
               })()}
             </Button>
           </div>
-          <div className="p-4 lp-info">
-            <section id="about" className="mb-6">
+          <div className="py-3 lp-info">
+            <section id="about">
               <h2>About</h2>
               <p>
                 {/* eslint-disable-next-line react/no-danger */}
                 <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
               </p>
             </section>
-            <section id="courses" className="mb-6">
-              <h2>Courses</h2>
-              {loadingCourses && <Spinner animation="border" variant="primary" />}
-              {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
-                <p>No sub-courses found in this learning path.</p>
-              )}
-              {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                coursesForPath.map(course => (
-                  <div key={course.id} className="mb-3">
-                    <CourseCard
-                      course={course}
-                      parentPath=""
-                      onClick={handleCourseViewButton}
-                    />
-                  </div>
-                ))
-              )}
-            </section>
-            <section id="requirements" className="mb-6">
-              <h2>Requirements</h2>
-              {requiredSkills && requiredSkills.map((skillObj) => (
-                <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
-                  {skillObj.skill.displayName}
-                </p>
-              ))}
-            </section>
+            <div id="courses-section-wrapper">
+              <section id="courses">
+                <h2>Courses</h2>
+                {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
+                  <p>No sub-courses found in this learning path.</p>
+                )}
+                {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
+                  coursesForPath.map(course => (
+                    <div key={course.id} className="mb-3">
+                      <CourseCard
+                        course={course}
+                        parentPath=""
+                        onClick={handleCourseViewButton}
+                      />
+                    </div>
+                  ))
+                )}
+              </section>
+            </div>
+            {requiredSkills && requiredSkills.length > 0 && (
+              <section id="requirements">
+                <h2>Requirements</h2>
+                {requiredSkills.map((skillObj) => (
+                  <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
+                    {skillObj.skill.displayName}
+                  </p>
+                ))}
+              </section>
+            )}
           </div>
         </div>
       );
@@ -328,6 +329,7 @@ const LearningPathDetailPage = () => {
             isModalView
             courseKey={selectedCourseKey}
             onClose={handleCloseCourseModal}
+            learningPathTitle={detail?.displayName}
           />
         </ModalLayer>
       )}
