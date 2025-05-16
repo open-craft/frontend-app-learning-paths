@@ -325,31 +325,17 @@
   }
 
   .lp-info {
-    section h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .courses-section {
-      position: relative;
-      left: 50%;
-      right: 50%;
-      width: 100vw;
-      margin-left: -50vw;
-      margin-right: -50vw;
-      background-color: #FBFAF9;
-      padding-top: 2rem;
-      padding-bottom: 2rem;
+    section {
+      padding: 5rem 10rem;
 
       h2 {
-        margin-left: 6rem;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
       }
+    }
 
-      .mb-3 {
-        max-width: 1360px;
-        margin-left: 6rem;
-        margin-right: 6rem;
-      }
+    #courses-section-wrapper {
+      background-color: #FBFAF9;
     }
   }
 }

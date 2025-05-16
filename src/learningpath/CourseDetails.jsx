@@ -148,7 +148,7 @@ const CourseDetailContent = ({
       )}
 
       <div className="p-4">
-        <section id="about" className="mb-6">
+        <section id="about">
           {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{
             __html: replaceStaticAssetReferences(description || shortDescription || 'No description available.', course.id),

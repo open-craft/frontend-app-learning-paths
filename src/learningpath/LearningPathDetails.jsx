@@ -241,25 +241,27 @@ const LearningPathDetailPage = () => {
       content = (
         <div className="detail-page learning-path-detail-page">
           {heroSection}
-          <div className="tabs d-flex align-items-center px-4">
+          <div className="tabs d-flex align-items-center pl-5.5 pr-0">
             <Nav
               variant="tabs"
               onSelect={handleTabSelect}
               className="border-bottom-0"
             >
               <Nav.Item>
-                <Nav.Link eventKey="about">About</Nav.Link>
+                <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="courses">Courses</Nav.Link>
+                <Nav.Link eventKey="courses" className="font-weight-normal">Courses</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="requirements">Requirements</Nav.Link>
-              </Nav.Item>
+              {requiredSkills && requiredSkills.length > 0 && (
+                <Nav.Item>
+                  <Nav.Link eventKey="requirements" className="font-weight-normal">Requirements</Nav.Link>
+                </Nav.Item>
+              )}
             </Nav>
             <Button
               variant="primary"
-              className="ml-auto"
+              className="ml-auto rounded-0 py-3 px-5.5"
               onClick={isEnrolled ? handleViewClick : handleEnrollClick}
               disabled={enrolling}
             >
@@ -270,39 +272,43 @@ const LearningPathDetailPage = () => {
               })()}
             </Button>
           </div>
-          <div className="p-4 mt-3 ml-2 mr-2 lp-info">
-            <section id="about" className="mb-6">
+          <div className="py-3 lp-info">
+            <section id="about">
               <h2>About</h2>
               <p>
                 {/* eslint-disable-next-line react/no-danger */}
                 <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
               </p>
             </section>
-            <section id="courses" className="mb-6 courses-section">
-              <h2>Courses</h2>
-              {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
-                <p>No sub-courses found in this learning path.</p>
-              )}
-              {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                coursesForPath.map(course => (
-                  <div key={course.id} className="mb-3">
-                    <CourseCard
-                      course={course}
-                      parentPath=""
-                      onClick={handleCourseViewButton}
-                    />
-                  </div>
-                ))
-              )}
-            </section>
-            <section id="requirements" className="mb-6">
-              <h2>Requirements</h2>
-              {requiredSkills && requiredSkills.map((skillObj) => (
-                <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
-                  {skillObj.skill.displayName}
-                </p>
-              ))}
-            </section>
+            <div id="courses-section-wrapper">
+              <section id="courses">
+                <h2>Courses</h2>
+                {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
+                  <p>No sub-courses found in this learning path.</p>
+                )}
+                {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
+                  coursesForPath.map(course => (
+                    <div key={course.id} className="mb-3">
+                      <CourseCard
+                        course={course}
+                        parentPath=""
+                        onClick={handleCourseViewButton}
+                      />
+                    </div>
+                  ))
+                )}
+              </section>
+            </div>
+            {requiredSkills && requiredSkills.length > 0 && (
+              <section id="requirements">
+                <h2>Requirements</h2>
+                {requiredSkills.map((skillObj) => (
+                  <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
+                    {skillObj.skill.displayName}
+                  </p>
+                ))}
+              </section>
+            )}
           </div>
         </div>
       );
