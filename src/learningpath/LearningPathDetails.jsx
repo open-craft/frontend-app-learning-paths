@@ -142,7 +142,7 @@ const LearningPathDetailPage = () => {
             </Card.Section>
             <Card.Section className="pl-5 pr-6">
               <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
-              <h1 className="my-3">{displayName}</h1>
+              <h1 className="my-3 mt-4.5">{displayName}</h1>
               <p className="text-muted">{subtitle}</p>
             </Card.Section>
           </Card.Body>
@@ -150,37 +150,37 @@ const LearningPathDetailPage = () => {
         </Card>
         <Row className="mt-4 mx-0 px-6 d-flex hero-info lp-hero-info">
           {accessUntilDate && (
-            <div className="d-flex align-items-center">
+            <div className="d-flex">
               <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
               <div>
                 <p className="mb-0 font-weight-bold">
                   {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
-                <p className="text-muted mb-0 info-subtext">Access ends</p>
+                <p className="mb-2 text-muted info-subtext">Access ends</p>
               </div>
             </div>
           )}
-          <div className="d-flex align-items-center">
+          <div className="d-flex">
             <Icon src={Award} className="mr-4 mb-4" />
             <div>
-              <p className="mb-1 font-weight-bold">Certificate</p>
-              <p className="text-muted info-subtext">Earn a certificate</p>
+              <p className="mb-0 font-weight-bold">Certificate</p>
+              <p className="mb-2 text-muted info-subtext">Earn a certificate</p>
             </div>
           </div>
-          <div className="d-flex align-items-center">
+          <div className="d-flex">
             <Icon src={Calendar} className="mr-4 mb-4" />
             <div>
-              <p className="mb-1 font-weight-bold">
+              <p className="mb-0 font-weight-bold">
                 {durationText || 'Duration not available'}
               </p>
-              <p className="text-muted info-subtext">Duration</p>
+              <p className="mb-2 text-muted info-subtext">Duration</p>
             </div>
           </div>
-          <div className="d-flex align-items-center">
+          <div className="d-flex">
             <Icon src={Person} className="mr-4 mb-4" />
             <div>
-              <p className="mb-1 font-weight-bold">Self-paced</p>
-              <p className="text-muted info-subtext">Progress at your own speed</p>
+              <p className="mb-0 font-weight-bold">Self-paced</p>
+              <p className="mb-2 text-muted info-subtext">Progress at your own speed</p>
             </div>
           </div>
         </Row>
