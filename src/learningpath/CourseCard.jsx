@@ -147,7 +147,9 @@ CourseCard.propTypes = {
   showFilters: PropTypes.bool,
 };
 
-export const CourseCardWithEnrollment = ({ course, learningPathId, isEnrolledInLearningPath, onClick }) => {
+export const CourseCardWithEnrollment = ({
+  course, learningPathId, isEnrolledInLearningPath, onClick,
+}) => {
   const { data: enrollmentStatus, isLoading: checkingEnrollment } = useCourseEnrollmentStatus(course.id);
   const [enrolling, setEnrolling] = useState(false);
   const enrollCourseMutation = useEnrollCourse(learningPathId);
