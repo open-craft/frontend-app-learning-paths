@@ -1,7 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import {
-  useParams, Link, useLocation, useNavigate,
-} from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   Row, Spinner, Nav, Icon, ModalLayer, Button, Chip, Card,
 } from '@openedx/paragon';
@@ -16,14 +14,12 @@ import {
 import {
   useLearningPathDetail, useCoursesByIds, useEnrollLearningPath, useOrganizations,
 } from './data/queries';
-import { CourseCard, CourseCardWithEnrollment } from './CourseCard';
+import { CourseCardWithEnrollment } from './CourseCard';
 import CourseDetailPage from './CourseDetails';
 
 const LearningPathDetailPage = () => {
   const { key } = useParams();
   const [selectedCourseKey, setSelectedCourseKey] = useState(null);
-  const location = useLocation();
-  const navigate = useNavigate();
   const [enrolling, setEnrolling] = useState(false);
 
   const [activeTab, setActiveTab] = useState(null);
@@ -31,35 +27,17 @@ const LearningPathDetailPage = () => {
     setActiveTab(selectedKey);
   };
 
-  // Get the requested view mode from URL params.
-  const requestedEnrolledView = useMemo(
-    () => new URLSearchParams(location.search).get('view') === 'enrolled',
-    [location.search],
-  );
-
   const {
     data: detail,
     isLoading: loadingDetail,
     error: detailError,
   } = useLearningPathDetail(key);
 
-  // Check if the user can access the enrolled view.
-  const isEnrolledView = useMemo(
-    () => requestedEnrolledView && detail?.isEnrolled === true,
-    [requestedEnrolledView, detail?.isEnrolled],
-  );
   useEffect(() => {
     if (detail && activeTab === null) {
       setActiveTab(detail.isEnrolled ? 'courses' : 'about');
     }
   }, [detail, activeTab]);
-
-  // Redirect unenrolled users trying to access the enrolled view.
-  useEffect(() => {
-    if (!loadingDetail && detail && requestedEnrolledView && !detail.isEnrolled) {
-      navigate(location.pathname, { replace: true });
-    }
-  }, [requestedEnrolledView, detail, loadingDetail, navigate, location.pathname]);
 
   const courseIds = useMemo(() => (detail && detail.steps ? detail.steps.map(step => step.courseKey) : []), [detail]);
 
@@ -98,26 +76,18 @@ const LearningPathDetailPage = () => {
     setSelectedCourseKey(null);
   };
 
-  const handleViewClick = () => {
-    // Navigate to the enrolled view.
-    navigate(`${location.pathname}?view=enrolled`);
-  };
-
   const handleEnrollClick = async () => {
     if (detail && !detail.isEnrolled) {
       setEnrolling(true);
       try {
         await enrollMutation.mutateAsync(key);
-        navigate(`${location.pathname}?view=enrolled`);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Enrollment failed:', error);
       } finally {
+        setActiveTab('courses');
         setEnrolling(false);
       }
-    } else {
-      // Already enrolled.
-      navigate(`${location.pathname}?view=enrolled`);
     }
   };
 
@@ -217,111 +187,86 @@ const LearningPathDetailPage = () => {
       </div>
     );
 
-    if (isEnrolledView) {
-      // Enrolled view - keep the hero section, then only show courses.
-      content = (
-        <div className="learning-path-detail-page">
-          {heroSection}
-
-          <div className="p-4">
-            {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
-              <p>No sub-courses found in this learning path.</p>
+    content = (
+      <div className="detail-page learning-path-detail-page">
+        {heroSection}
+        <div className="tabs d-flex align-items-center pl-5.5 pr-0">
+          <Nav
+            variant="tabs"
+            onSelect={handleTabSelect}
+            className="border-bottom-0"
+            activeKey={activeTab}
+          >
+            <Nav.Item>
+              <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="courses" className="font-weight-normal">Courses</Nav.Link>
+            </Nav.Item>
+            {requiredSkills && requiredSkills.length > 0 && (
+              <Nav.Item>
+                <Nav.Link eventKey="requirements" className="font-weight-normal">Requirements</Nav.Link>
+              </Nav.Item>
             )}
-            {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-              coursesForPath.map(course => (
-                <div key={course.id} className="mb-3">
-                  <CourseCardWithEnrollment
-                    course={course}
-                    learningPathId={key}
-                  />
-                </div>
-              ))
-            )}
-          </div>
+          </Nav>
+          <Button
+            variant={isEnrolled ? 'secondary' : 'primary'}
+            className="ml-auto rounded-0 py-3 px-5.5"
+            onClick={handleEnrollClick}
+            disabled={enrolling || isEnrolled}
+          >
+            {(() => {
+              if (enrolling) { return 'Enrolling...'; }
+              if (isEnrolled) { return 'Enrolled'; }
+              return 'Enroll';
+            })()}
+          </Button>
         </div>
-      );
-    } else {
-      // Details view with all sections.
-      content = (
-        <div className="detail-page learning-path-detail-page">
-          {heroSection}
-          <div className="tabs d-flex align-items-center pl-5.5 pr-0">
-            <Nav
-              variant="tabs"
-              onSelect={handleTabSelect}
-              className="border-bottom-0"
-              activeKey={activeTab}
-            >
-              <Nav.Item>
-                <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="courses" className="font-weight-normal">Courses</Nav.Link>
-              </Nav.Item>
-              {requiredSkills && requiredSkills.length > 0 && (
-                <Nav.Item>
-                  <Nav.Link eventKey="requirements" className="font-weight-normal">Requirements</Nav.Link>
-                </Nav.Item>
-              )}
-            </Nav>
-            <Button
-              variant="primary"
-              className="ml-auto rounded-0 py-3 px-5.5"
-              onClick={isEnrolled ? handleViewClick : handleEnrollClick}
-              disabled={enrolling}
-            >
-              {(() => {
-                if (enrolling) { return 'Enrolling...'; }
-                if (isEnrolled) { return 'View'; }
-                return 'Enroll';
-              })()}
-            </Button>
-          </div>
-          <div className="py-3 lp-info">
-            {activeTab === 'about' && (
-              <section id="about">
-                <h2>About</h2>
-                <p>
-                  {/* eslint-disable-next-line react/no-danger */}
-                  <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
+        <div className="py-3 lp-info">
+          {activeTab === 'about' && (
+            <section id="about">
+              <h2>About</h2>
+              <p>
+                {/* eslint-disable-next-line react/no-danger */}
+                <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
+              </p>
+            </section>
+          )}
+          {activeTab === 'courses' && (
+            <div id="courses-section-wrapper">
+              <section id="courses">
+                <h2>Courses</h2>
+                {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
+                  <p>No sub-courses found in this learning path.</p>
+                )}
+                {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
+                  coursesForPath.map(course => (
+                    <div key={course.id} className="mb-3">
+                      <CourseCardWithEnrollment
+                        course={course}
+                        learningPathId={key}
+                        isEnrolledInLearningPath={isEnrolled}
+                        onClick={() => handleCourseViewButton(course.id)}
+                      />
+                    </div>
+                  ))
+                )}
+              </section>
+            </div>
+          )}
+          {activeTab === 'requirements' && (
+            <section id="requirements">
+              <h2>Requirements</h2>
+              {requiredSkills.map((skillObj) => (
+                <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
+                  {skillObj.skill.displayName}
                 </p>
-              </section>
-            )}
-            {activeTab === 'courses' && (
-              <div id="courses-section-wrapper">
-                <section id="courses">
-                  <h2>Courses</h2>
-                  {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
-                    <p>No sub-courses found in this learning path.</p>
-                  )}
-                  {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                    coursesForPath.map(course => (
-                      <div key={course.id} className="mb-3">
-                        <CourseCard
-                          course={course}
-                          parentPath=""
-                          onClick={handleCourseViewButton}
-                        />
-                      </div>
-                    ))
-                  )}
-                </section>
-              </div>
-            )}
-            {activeTab === 'requirements' && (
-              <section id="requirements">
-                <h2>Requirements</h2>
-                {requiredSkills.map((skillObj) => (
-                  <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
-                    {skillObj.skill.displayName}
-                  </p>
-                ))}
-              </section>
-            )}
-          </div>
+              ))}
+            </section>
+          )}
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   return (

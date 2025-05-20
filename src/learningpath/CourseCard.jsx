@@ -19,9 +19,8 @@ import { buildCourseHomeUrl } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 export const CourseCard = ({
-  course, parentPath, onClick, showFilters = false,
+  course, onClick, onClickViewButton, isEnrolledInLearningPath, showFilters = false,
 }) => {
-  const courseKey = course.id;
   const {
     name,
     org,
@@ -29,7 +28,6 @@ export const CourseCard = ({
     endDate,
     status,
     percent,
-    isEnrolledInCourse,
     checkingEnrollment,
   } = course;
 
@@ -37,23 +35,14 @@ export const CourseCard = ({
   const orientation = (showFilters && (isSmall || isMedium)) || (!showFilters && isSmall) ? 'vertical' : 'horizontal';
 
   // Prefetch the course detail when the user hovers over the card.
-  const prefetchCourseDetail = usePrefetchCourseDetail(courseKey);
+  const prefetchCourseDetail = usePrefetchCourseDetail(course.id);
   const handleMouseEnter = () => {
     prefetchCourseDetail();
   };
 
   const progressBarPercent = useMemo(() => Math.round(percent * 100), [percent]);
 
-  const linkTo = parentPath
-    ? `${parentPath}/course/${courseKey}`
-    : `/course/${courseKey}`;
-
-  const handleViewClick = (e) => {
-    if (onClick) {
-      e.preventDefault();
-      onClick(courseKey);
-    }
-  };
+  const linkTo = buildCourseHomeUrl(course.id);
 
   let statusVariant = 'dark'; // default
   let statusIcon = 'fa-circle'; // default icon
@@ -86,20 +75,11 @@ export const CourseCard = ({
     })
     : null;
 
-  let buttonVariant = 'outline-primary';
-
-  // Update the button based on enrollment status (if available).
-  if (isEnrolledInCourse === false) {
-    buttonText = 'Start';
-    buttonVariant = 'primary';
-  } else if (isEnrolledInCourse === true) {
-    buttonText = 'Resume';
-    buttonVariant = 'outline-success';
-  }
-
   if (checkingEnrollment) {
     buttonText = 'Loading...';
   }
+
+  const disableStartButton = checkingEnrollment || isEnrolledInLearningPath === false;
 
   const { data: organizations = {} } = useOrganizations();
   const orgData = useMemo(() => ({
@@ -132,8 +112,11 @@ export const CourseCard = ({
               <Chip iconBefore={AccessTime} className="border-0 p-0">Access until <b>{endDateFormatted}</b></Chip>
             )}
           </Col>
+          {onClickViewButton && (
+            <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2">More Info</Button>
+          )}
           {onClick ? (
-            <Button variant={buttonVariant} onClick={handleViewClick} disabled={checkingEnrollment}>
+            <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
               {buttonText}
             </Button>
           ) : (
@@ -156,15 +139,15 @@ CourseCard.propTypes = {
     endDate: PropTypes.string,
     status: PropTypes.string.isRequired,
     percent: PropTypes.number.isRequired,
-    isEnrolledInCourse: PropTypes.bool,
     checkingEnrollment: PropTypes.bool,
   }).isRequired,
-  parentPath: PropTypes.string,
   onClick: PropTypes.func,
+  onClickViewButton: PropTypes.func,
+  isEnrolledInLearningPath: PropTypes.bool,
   showFilters: PropTypes.bool,
 };
 
-export const CourseCardWithEnrollment = ({ course, learningPathId }) => {
+export const CourseCardWithEnrollment = ({ course, learningPathId, isEnrolledInLearningPath, onClick }) => {
   const { data: enrollmentStatus, isLoading: checkingEnrollment } = useCourseEnrollmentStatus(course.id);
   const [enrolling, setEnrolling] = useState(false);
   const enrollCourseMutation = useEnrollCourse(learningPathId);
@@ -205,6 +188,8 @@ export const CourseCardWithEnrollment = ({ course, learningPathId }) => {
     <CourseCard
       course={courseWithEnrollment}
       onClick={handleCourseAction}
+      onClickViewButton={onClick}
+      isEnrolledInLearningPath={isEnrolledInLearningPath}
     />
   );
 };
@@ -214,4 +199,6 @@ CourseCardWithEnrollment.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   learningPathId: PropTypes.string.isRequired,
+  isEnrolledInLearningPath: PropTypes.bool,
+  onClick: PropTypes.func.isRequired,
 };
