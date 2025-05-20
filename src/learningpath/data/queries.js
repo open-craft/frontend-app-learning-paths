@@ -1,7 +1,12 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import * as api from './api';
-import { addCompletionStatus, createCompletionsMap } from './dataUtils';
+import {
+  addCompletionStatus,
+  addLearningPathNames,
+  createCompletionsMap,
+  createCourseToLearningPathsMap,
+} from './dataUtils';
 
 // Query keys
 export const QUERY_KEYS = {
@@ -179,11 +184,26 @@ export const useCourses = () => {
         queryFn: api.fetchAllCourseCompletions,
       });
 
+      const learningPaths = queryClient.getQueryData(QUERY_KEYS.ALL_LEARNING_PATHS)
+        || await queryClient.fetchQuery({
+          queryKey: QUERY_KEYS.ALL_LEARNING_PATHS,
+          queryFn: api.fetchLearningPaths,
+        });
+
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
+      const courseToLearningPathMap = createCourseToLearningPathsMap(learningPaths);
+
       const courses = await api.fetchCourses();
-      return courses.map(course => ({ ...addCompletionStatus(course, completionsMap, course.id), type: 'course' }));
+      return courses.map(course => {
+        const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
+        const coursesWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
+        return {
+          ...coursesWithLearningPaths,
+          type: 'course',
+        };
+      });
     },
   });
 };

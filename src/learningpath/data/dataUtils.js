@@ -43,3 +43,41 @@ export const createCompletionsMap = (completions) => {
   });
   return completionsMap;
 };
+
+/**
+ * Creates a map of course keys to learning path names
+ * @param {Array} learningPaths - Array of learning path data
+ * @returns {Object} Map of course keys to an array of learning path names
+ */
+export const createCourseToLearningPathsMap = (learningPaths) => {
+  const courseToLearningPathsMap = {};
+
+  if (!learningPaths || !Array.isArray(learningPaths)) {
+    return courseToLearningPathsMap;
+  }
+
+  learningPaths.forEach(path => {
+    if (path.steps && Array.isArray(path.steps)) {
+      path.steps.forEach(step => {
+        if (!courseToLearningPathsMap[step.courseKey]) {
+          courseToLearningPathsMap[step.courseKey] = [];
+        }
+
+        courseToLearningPathsMap[step.courseKey].push(path.displayName);
+      });
+    }
+  });
+
+  return courseToLearningPathsMap;
+};
+
+/**
+ * Adds learning path names to a course
+ * @param {Object} course - Course object
+ * @param {Object} courseToLearningPathMap - Map of course keys to an array of learning path names
+ * @returns {Object} Course object with learning path names
+ */
+export const addLearningPathNames = (course, courseToLearningPathMap) => ({
+  ...course,
+  learningPathNames: courseToLearningPathMap[course.id],
+});

@@ -125,7 +125,7 @@ const Dashboard = () => {
             {paginatedItems.map(item => (
               <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
                 {item.type === 'course'
-                  ? <CourseCard course={item} showFilters={showFilters} />
+                  ? <CourseCard course={item} learningPathNames={item.learningPathNames} showFilters={showFilters} />
                   : <LearningPathCard learningPath={item} showFilters={showFilters} />}
               </Col>
             ))}

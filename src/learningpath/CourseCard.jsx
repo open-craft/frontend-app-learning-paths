@@ -19,7 +19,7 @@ import { buildCourseHomeUrl } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 export const CourseCard = ({
-  course, onClick, onClickViewButton, isEnrolledInLearningPath, showFilters = false,
+  course, learningPathNames, onClick, onClickViewButton, isEnrolledInLearningPath, showFilters = false,
 }) => {
   const {
     name,
@@ -96,6 +96,20 @@ export const CourseCard = ({
           <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
         </Card.Section>
         <Card.Section className="pt-1 pb-1"><h3>{name}</h3></Card.Section>
+        {learningPathNames && (
+          <Card.Section className="pt-1 pb-1 card-subtitle text-muted">
+            {learningPathNames.length === 1 ? (
+              <span>Part of {learningPathNames[0]}</span>
+            ) : (
+              <>
+                <div>Part of:</div>
+                <ul className="pl-4 mb-0 mt-1">
+                  {learningPathNames.map((pathName) => (<li>{pathName}</li>))}
+                </ul>
+              </>
+            )}
+          </Card.Section>
+        )}
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
         <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && (
@@ -141,6 +155,7 @@ CourseCard.propTypes = {
     percent: PropTypes.number.isRequired,
     checkingEnrollment: PropTypes.bool,
   }).isRequired,
+  learningPathNames: PropTypes.arrayOf(PropTypes.string),
   onClick: PropTypes.func,
   onClickViewButton: PropTypes.func,
   isEnrolledInLearningPath: PropTypes.bool,
