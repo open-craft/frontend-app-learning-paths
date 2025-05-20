@@ -75,7 +75,7 @@
   .pgn__card-wrapper-image-cap {
     .pgn__card-image-cap {
       /* The default (`auto`) value does not work in Safari. */
-      width: unset !important;
+      width: 240px !important;
     }
 
     .pgn__card-logo-cap {
@@ -242,6 +242,9 @@
 
         .pgn__card-image-cap {
           border-radius: 0.375rem !important;
+
+          /* The default (`auto`) value does not work in Safari. */
+          width: 100% !important;
         }
 
         .pgn__card-logo-cap {
