@@ -26,6 +26,11 @@ const LearningPathDetailPage = () => {
   const navigate = useNavigate();
   const [enrolling, setEnrolling] = useState(false);
 
+  const [activeTab, setActiveTab] = useState(null);
+  const handleTabSelect = (selectedKey) => {
+    setActiveTab(selectedKey);
+  };
+
   // Get the requested view mode from URL params.
   const requestedEnrolledView = useMemo(
     () => new URLSearchParams(location.search).get('view') === 'enrolled',
@@ -43,6 +48,11 @@ const LearningPathDetailPage = () => {
     () => requestedEnrolledView && detail?.isEnrolled === true,
     [requestedEnrolledView, detail?.isEnrolled],
   );
+  useEffect(() => {
+    if (detail && activeTab === null) {
+      setActiveTab(detail.isEnrolled ? 'courses' : 'about');
+    }
+  }, [detail, activeTab]);
 
   // Redirect unenrolled users trying to access the enrolled view.
   useEffect(() => {
@@ -148,12 +158,6 @@ const LearningPathDetailPage = () => {
     } = detail;
 
     const durationText = durationInDays ? `${durationInDays} days` : null;
-    const handleTabSelect = (selectedKey) => {
-      const el = document.getElementById(selectedKey);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
 
     // Hero section - same for both full view and enrolled view.
     const heroSection = (
@@ -246,6 +250,7 @@ const LearningPathDetailPage = () => {
               variant="tabs"
               onSelect={handleTabSelect}
               className="border-bottom-0"
+              activeKey={activeTab}
             >
               <Nav.Item>
                 <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
@@ -273,33 +278,37 @@ const LearningPathDetailPage = () => {
             </Button>
           </div>
           <div className="py-3 lp-info">
-            <section id="about">
-              <h2>About</h2>
-              <p>
-                {/* eslint-disable-next-line react/no-danger */}
-                <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
-              </p>
-            </section>
-            <div id="courses-section-wrapper">
-              <section id="courses">
-                <h2>Courses</h2>
-                {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
-                  <p>No sub-courses found in this learning path.</p>
-                )}
-                {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                  coursesForPath.map(course => (
-                    <div key={course.id} className="mb-3">
-                      <CourseCard
-                        course={course}
-                        parentPath=""
-                        onClick={handleCourseViewButton}
-                      />
-                    </div>
-                  ))
-                )}
+            {activeTab === 'about' && (
+              <section id="about">
+                <h2>About</h2>
+                <p>
+                  {/* eslint-disable-next-line react/no-danger */}
+                  <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
+                </p>
               </section>
-            </div>
-            {requiredSkills && requiredSkills.length > 0 && (
+            )}
+            {activeTab === 'courses' && (
+              <div id="courses-section-wrapper">
+                <section id="courses">
+                  <h2>Courses</h2>
+                  {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
+                    <p>No sub-courses found in this learning path.</p>
+                  )}
+                  {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
+                    coursesForPath.map(course => (
+                      <div key={course.id} className="mb-3">
+                        <CourseCard
+                          course={course}
+                          parentPath=""
+                          onClick={handleCourseViewButton}
+                        />
+                      </div>
+                    ))
+                  )}
+                </section>
+              </div>
+            )}
+            {activeTab === 'requirements' && (
               <section id="requirements">
                 <h2>Requirements</h2>
                 {requiredSkills.map((skillObj) => (
