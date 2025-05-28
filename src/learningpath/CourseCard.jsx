@@ -11,6 +11,7 @@ import {
   LmsCompletionSolid,
   Timelapse,
 } from '@openedx/paragon/icons';
+import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import { buildAssetUrl } from '../util/assetUrl';
 import {
   usePrefetchCourseDetail, useCourseEnrollmentStatus, useEnrollCourse, useOrganizations,
@@ -25,12 +26,14 @@ export const CourseCard = ({
     name,
     org,
     courseImageAssetPath,
+    startDate,
     endDate,
     status,
     percent,
     checkingEnrollment,
   } = course;
 
+  const { administrator } = getAuthenticatedUser();
   const { isSmall, isMedium } = useScreenSize();
   const orientation = (showFilters && (isSmall || isMedium)) || (!showFilters && isSmall) ? 'vertical' : 'horizontal';
 
@@ -63,23 +66,32 @@ export const CourseCard = ({
       buttonText = 'Resume';
       break;
     default:
-      statusVariant = 'dark';
-      statusIcon = 'fa-circle';
       break;
   }
-  const endDateFormatted = endDate
-    ? new Date(endDate).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-    : null;
 
   if (checkingEnrollment) {
     buttonText = 'Loading...';
   }
 
-  const disableStartButton = checkingEnrollment || isEnrolledInLearningPath === false;
+  let accessText = '';
+  const currentDate = new Date();
+
+  const startDateObj = startDate ? new Date(startDate) : null;
+  const endDateObj = endDate ? new Date(endDate) : null;
+  if (startDateObj && startDateObj > currentDate) {
+    const startDateStr = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    accessText = <>Access starts on <b>{startDateStr}</b></>;
+    buttonText = 'View';
+  } else if (endDateObj) {
+    const endDateStr = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    accessText = currentDate > endDateObj
+      ? <>Access ended on <b>{endDateStr}</b></>
+      : <>Access until <b>{endDateStr}</b></>;
+  }
+
+  const disableStartButton = checkingEnrollment
+      || isEnrolledInLearningPath === false
+      || (startDateObj && startDateObj > currentDate && !administrator);
 
   const { data: organizations = {} } = useOrganizations();
   const orgData = useMemo(() => ({
@@ -122,8 +134,8 @@ export const CourseCard = ({
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
           <Col className="p-0">
-            {endDateFormatted && (
-              <Chip iconBefore={AccessTime} className="border-0 p-0">Access until <b>{endDateFormatted}</b></Chip>
+            {accessText && (
+              <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
             )}
           </Col>
           {onClickViewButton && (
@@ -135,7 +147,7 @@ export const CourseCard = ({
             </Button>
           ) : (
             <Link to={linkTo}>
-              <Button variant="outline-primary">{buttonText}</Button>
+              <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
             </Link>
           )}
         </Card.Footer>
@@ -150,6 +162,7 @@ CourseCard.propTypes = {
     name: PropTypes.string.isRequired,
     org: PropTypes.string.isRequired,
     courseImageAssetPath: PropTypes.string,
+    startDate: PropTypes.string,
     endDate: PropTypes.string,
     status: PropTypes.string.isRequired,
     percent: PropTypes.number.isRequired,

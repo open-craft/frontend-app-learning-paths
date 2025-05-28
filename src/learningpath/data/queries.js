@@ -89,22 +89,31 @@ export const useLearningPaths = () => {
           percent = Math.round(progress * 100);
         }
 
+        let minDate = null;
         let maxDate = null;
         for (const course of lp.steps) {
-          if (course.dueDate) {
-            const dueDateObj = new Date(course.dueDate);
-            if (!maxDate || dueDateObj > maxDate) {
-              maxDate = dueDateObj;
+          if (course.courseDates && course.courseDates.length > 0) {
+            if (course.courseDates[0]) {
+              const startDateObj = new Date(course.courseDates[0]);
+              if (!minDate || startDateObj < minDate) {
+                minDate = startDateObj;
+              }
+            }
+            if (course.courseDates[1]) {
+              const endDateObj = new Date(course.courseDates[1]);
+              if (!maxDate || endDateObj > maxDate) {
+                maxDate = endDateObj;
+              }
             }
           }
         }
-        const isoMaxDate = maxDate ? maxDate.toISOString() : null;
 
         return {
           ...lp,
           numCourses: totalCourses,
           status,
-          maxDate: isoMaxDate,
+          minDate,
+          maxDate,
           percent,
           type: 'learning_path',
           org: lp.key.match(/path-v1:([^+]+)/)[1],
