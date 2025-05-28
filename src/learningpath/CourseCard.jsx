@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
-  Card, Button, Row, Col, Icon, Badge, ProgressBar,
+  Card, Button, Col, ProgressBar, Chip,
 } from '@openedx/paragon';
 import {
   LmsBook,
@@ -11,44 +11,45 @@ import {
   LmsCompletionSolid,
   Timelapse,
 } from '@openedx/paragon/icons';
+import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import { buildAssetUrl } from '../util/assetUrl';
-import { usePrefetchCourseDetail, useCourseEnrollmentStatus, useEnrollCourse } from './data/queries';
+import {
+  usePrefetchCourseDetail, useCourseEnrollmentStatus, useEnrollCourse, useOrganizations,
+} from './data/queries';
 import { buildCourseHomeUrl } from './utils';
+import { useScreenSize } from '../hooks/useScreenSize';
 
-export const CourseCard = ({ course, parentPath, onClick }) => {
-  const courseKey = course.id;
+export const CourseCard = ({
+  course, learningPathNames, onClick, onClickViewButton, isEnrolledInLearningPath, showFilters = false,
+}) => {
   const {
     name,
     org,
     courseImageAssetPath,
+    startDate,
     endDate,
     status,
     percent,
-    isEnrolledInCourse,
     checkingEnrollment,
   } = course;
 
+  const { administrator } = getAuthenticatedUser();
+  const { isSmall, isMedium } = useScreenSize();
+  const orientation = (showFilters && (isSmall || isMedium)) || (!showFilters && isSmall) ? 'vertical' : 'horizontal';
+
   // Prefetch the course detail when the user hovers over the card.
-  const prefetchCourseDetail = usePrefetchCourseDetail(courseKey);
+  const prefetchCourseDetail = usePrefetchCourseDetail(course.id);
   const handleMouseEnter = () => {
     prefetchCourseDetail();
   };
 
   const progressBarPercent = useMemo(() => Math.round(percent * 100), [percent]);
 
-  const linkTo = parentPath
-    ? `${parentPath}/course/${courseKey}`
-    : `/course/${courseKey}`;
-
-  const handleViewClick = (e) => {
-    if (onClick) {
-      e.preventDefault();
-      onClick(courseKey);
-    }
-  };
+  const linkTo = buildCourseHomeUrl(course.id);
 
   let statusVariant = 'dark'; // default
   let statusIcon = 'fa-circle'; // default icon
+  let buttonText = 'View';
   switch (status?.toLowerCase()) {
     case 'completed':
       statusVariant = 'success';
@@ -57,94 +58,100 @@ export const CourseCard = ({ course, parentPath, onClick }) => {
     case 'not started':
       statusVariant = 'secondary';
       statusIcon = LmsCompletionSolid;
+      buttonText = 'Start';
       break;
     case 'in progress':
       statusVariant = 'info';
       statusIcon = Timelapse;
+      buttonText = 'Resume';
       break;
     default:
-      statusVariant = 'dark';
-      statusIcon = 'fa-circle';
       break;
-  }
-  const endDateFormatted = endDate
-    ? new Date(endDate).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-    : null;
-
-  let buttonText = 'View';
-  let buttonVariant = 'outline-primary';
-
-  // Update the button based on enrollment status (if available).
-  if (isEnrolledInCourse === false) {
-    buttonText = 'Start';
-    buttonVariant = 'primary';
-  } else if (isEnrolledInCourse === true) {
-    buttonText = 'Resume';
-    buttonVariant = 'outline-success';
   }
 
   if (checkingEnrollment) {
     buttonText = 'Loading...';
   }
 
+  let accessText = '';
+  const currentDate = new Date();
+
+  const startDateObj = startDate ? new Date(startDate) : null;
+  const endDateObj = endDate ? new Date(endDate) : null;
+  if (startDateObj && startDateObj > currentDate) {
+    const startDateStr = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    accessText = <>Access starts on <b>{startDateStr}</b></>;
+    buttonText = 'View';
+  } else if (endDateObj) {
+    const endDateStr = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    accessText = currentDate > endDateObj
+      ? <>Access ended on <b>{endDateStr}</b></>
+      : <>Access until <b>{endDateStr}</b></>;
+  }
+
+  const disableStartButton = checkingEnrollment
+      || isEnrolledInLearningPath === false
+      || (startDateObj && startDateObj > currentDate && !administrator);
+
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   return (
-    <Card className="course-card p-3" onMouseEnter={handleMouseEnter}>
-      <div className="lp-status-badge">
-        <Badge variant={statusVariant} className="d-flex align-items-center">
-          <Icon src={statusIcon} className="mr-1" />
-          {status}
-        </Badge>
-      </div>
-      <Row>
-        <Col xs={12} md={4} className="course-card-image-col">
-          {courseImageAssetPath && (
-          <Card.ImageCap
-            src={buildAssetUrl(courseImageAssetPath)}
-            alt={name}
-            style={{ maxHeight: '150px', objectFit: 'cover' }}
-          />
-          )}
-        </Col>
-        <Col xs={12} md={8}>
-          <div className="course-type-label text-uppercase mb-2">
-            <Icon src={LmsBook} className="mr-1" />
-            <span>Course</span>
-          </div>
-          <Card.Header className="p-0 mb-2" title={name} />
-          {org && <p className="card-subtitle text-muted mb-2">{org}</p>}
+    <Card orientation={orientation} className="course-card" onMouseEnter={handleMouseEnter}>
+      <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+      <Card.Body>
+        <Card.Section className="pb-2.5 d-flex justify-content-between">
+          <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
+          <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+        </Card.Section>
+        <Card.Section className="pt-1 pb-1"><h3>{name}</h3></Card.Section>
+        {learningPathNames && (
+          <Card.Section className="pt-1 pb-1 card-subtitle text-muted">
+            {learningPathNames.length === 1 ? (
+              <span>Part of {learningPathNames[0]}</span>
+            ) : (
+              <>
+                <div>Part of:</div>
+                <ul className="pl-4 mb-0 mt-1">
+                  {learningPathNames.map((pathName) => (<li>{pathName}</li>))}
+                </ul>
+              </>
+            )}
+          </Card.Section>
+        )}
+        <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
+        <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && (
             <ProgressBar.Annotated
               now={progressBarPercent}
               label={`${progressBarPercent}%`}
               variant="dark"
-              className="mb-2"
             />
           )}
-          <Card.Footer className="p-0 d-flex align-items-center">
-            <div className="d-flex flex-wrap mr-auto mb-2">
-              {endDateFormatted && (
-                <div className="mr-3 d-flex align-items-center">
-                  <Icon src={AccessTime} className="mr-1" />
-                  Access until {endDateFormatted}
-                </div>
-              )}
-            </div>
-            {onClick ? (
-              <Button variant={buttonVariant} onClick={handleViewClick} disabled={checkingEnrollment}>
-                {buttonText}
-              </Button>
-            ) : (
-              <Link to={linkTo}>
-                <Button variant="outline-primary">View</Button>
-              </Link>
+        </Card.Section>
+        <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
+          <Col className="p-0">
+            {accessText && (
+              <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
             )}
-          </Card.Footer>
-        </Col>
-      </Row>
+          </Col>
+          {onClickViewButton && (
+            <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2">More Info</Button>
+          )}
+          {onClick ? (
+            <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
+              {buttonText}
+            </Button>
+          ) : (
+            <Link to={linkTo}>
+              <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
+            </Link>
+          )}
+        </Card.Footer>
+      </Card.Body>
     </Card>
   );
 };
@@ -155,17 +162,22 @@ CourseCard.propTypes = {
     name: PropTypes.string.isRequired,
     org: PropTypes.string.isRequired,
     courseImageAssetPath: PropTypes.string,
+    startDate: PropTypes.string,
     endDate: PropTypes.string,
     status: PropTypes.string.isRequired,
     percent: PropTypes.number.isRequired,
-    isEnrolledInCourse: PropTypes.bool,
     checkingEnrollment: PropTypes.bool,
   }).isRequired,
-  parentPath: PropTypes.string,
+  learningPathNames: PropTypes.arrayOf(PropTypes.string),
   onClick: PropTypes.func,
+  onClickViewButton: PropTypes.func,
+  isEnrolledInLearningPath: PropTypes.bool,
+  showFilters: PropTypes.bool,
 };
 
-export const CourseCardWithEnrollment = ({ course, learningPathId }) => {
+export const CourseCardWithEnrollment = ({
+  course, learningPathId, isEnrolledInLearningPath, onClick,
+}) => {
   const { data: enrollmentStatus, isLoading: checkingEnrollment } = useCourseEnrollmentStatus(course.id);
   const [enrolling, setEnrolling] = useState(false);
   const enrollCourseMutation = useEnrollCourse(learningPathId);
@@ -206,6 +218,8 @@ export const CourseCardWithEnrollment = ({ course, learningPathId }) => {
     <CourseCard
       course={courseWithEnrollment}
       onClick={handleCourseAction}
+      onClickViewButton={onClick}
+      isEnrolledInLearningPath={isEnrolledInLearningPath}
     />
   );
 };
@@ -215,4 +229,6 @@ CourseCardWithEnrollment.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   learningPathId: PropTypes.string.isRequired,
+  isEnrolledInLearningPath: PropTypes.bool,
+  onClick: PropTypes.func.isRequired,
 };

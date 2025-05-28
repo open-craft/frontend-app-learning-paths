@@ -1,7 +1,12 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import * as api from './api';
-import { addCompletionStatus, createCompletionsMap } from './dataUtils';
+import {
+  addCompletionStatus,
+  addLearningPathNames,
+  createCompletionsMap,
+  createCourseToLearningPathsMap,
+} from './dataUtils';
 
 // Query keys
 export const QUERY_KEYS = {
@@ -13,6 +18,7 @@ export const QUERY_KEYS = {
   COURSE_COMPLETIONS: ['courseCompletions'],
   COURSE_COMPLETION: (courseId) => ['courseCompletion', courseId],
   COURSE_ENROLLMENT_STATUS: (courseId) => ['courseEnrollmentStatus', courseId],
+  ORGANIZATIONS: ['organizations'],
 };
 
 // Stale time configurations
@@ -25,6 +31,8 @@ export const STALE_TIMES = {
   COURSE_ENROLLMENTS: 60 * 1000, // 1 minute
 
   COMPLETIONS: 60 * 1000, // 1 minute
+
+  ORGANIZATIONS: 60 * 60 * 1000, // 1 hour
 };
 
 // Learning Paths Queries
@@ -81,24 +89,34 @@ export const useLearningPaths = () => {
           percent = Math.round(progress * 100);
         }
 
+        let minDate = null;
         let maxDate = null;
         for (const course of lp.steps) {
-          if (course.dueDate) {
-            const dueDateObj = new Date(course.dueDate);
-            if (!maxDate || dueDateObj > maxDate) {
-              maxDate = dueDateObj;
+          if (course.courseDates && course.courseDates.length > 0) {
+            if (course.courseDates[0]) {
+              const startDateObj = new Date(course.courseDates[0]);
+              if (!minDate || startDateObj < minDate) {
+                minDate = startDateObj;
+              }
+            }
+            if (course.courseDates[1]) {
+              const endDateObj = new Date(course.courseDates[1]);
+              if (!maxDate || endDateObj > maxDate) {
+                maxDate = endDateObj;
+              }
             }
           }
         }
-        const isoMaxDate = maxDate ? maxDate.toISOString() : null;
 
         return {
           ...lp,
           numCourses: totalCourses,
           status,
-          maxDate: isoMaxDate,
+          minDate,
+          maxDate,
           percent,
           type: 'learning_path',
+          org: lp.key.match(/path-v1:([^+]+)/)[1],
         };
       });
     },
@@ -175,11 +193,26 @@ export const useCourses = () => {
         queryFn: api.fetchAllCourseCompletions,
       });
 
+      const learningPaths = queryClient.getQueryData(QUERY_KEYS.ALL_LEARNING_PATHS)
+        || await queryClient.fetchQuery({
+          queryKey: QUERY_KEYS.ALL_LEARNING_PATHS,
+          queryFn: api.fetchLearningPaths,
+        });
+
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
+      const courseToLearningPathMap = createCourseToLearningPathsMap(learningPaths);
+
       const courses = await api.fetchCourses();
-      return courses.map(course => ({ ...addCompletionStatus(course, completionsMap, course.id), type: 'course' }));
+      return courses.map(course => {
+        const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
+        const coursesWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
+        return {
+          ...coursesWithLearningPaths,
+          type: 'course',
+        };
+      });
     },
   });
 };
@@ -338,3 +371,18 @@ export const useEnrollCourse = (learningPathId) => {
     },
   });
 };
+
+export const useOrganizations = () => useQuery({
+  queryKey: QUERY_KEYS.ORGANIZATIONS,
+  queryFn: async () => {
+    const organizations = await api.fetchOrganizations();
+
+    const organizationsMap = {};
+    organizations.forEach(org => {
+      organizationsMap[org.shortName] = org;
+    });
+
+    return organizationsMap;
+  },
+  staleTime: STALE_TIMES.ORGANIZATIONS,
+});

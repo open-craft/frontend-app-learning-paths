@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -6,11 +6,11 @@ import {
   Card,
   Row,
   Col,
-  Nav,
   Icon,
   ModalCloseButton,
   Button,
   Alert,
+  Chip,
 } from '@openedx/paragon';
 import {
   LmsBook,
@@ -19,12 +19,18 @@ import {
   Calendar,
   Person,
   Close,
+  ChevronLeft,
 } from '@openedx/paragon/icons';
-import { useCourseDetail } from './data/queries';
+import { useCourseDetail, useOrganizations } from './data/queries';
 import { buildAssetUrl, replaceStaticAssetReferences } from '../util/assetUrl';
 import { buildCourseHomeUrl } from './utils';
 
-const CourseDetailContent = ({ course, isModalView = false, onClose }) => {
+const CourseDetailContent = ({
+  course,
+  isModalView = false,
+  onClose,
+  learningPathTitle,
+}) => {
   const {
     name,
     shortDescription,
@@ -33,6 +39,7 @@ const CourseDetailContent = ({ course, isModalView = false, onClose }) => {
     selfPaced,
     courseImageAssetPath,
     description,
+    org,
   } = course;
 
   const dateDisplay = endDate
@@ -43,12 +50,6 @@ const CourseDetailContent = ({ course, isModalView = false, onClose }) => {
     })
     : null;
 
-  const handleTabSelect = (selectedKey) => {
-    const el = document.getElementById(selectedKey);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
   const navigate = useNavigate();
   const handleClose = onClose || (() => navigate(-1));
   const { courseKey: urlCourseKey } = useParams();
@@ -57,107 +58,97 @@ const CourseDetailContent = ({ course, isModalView = false, onClose }) => {
     window.location.href = buildCourseHomeUrl(activeCourseKey);
   };
 
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   return (
     <>
-      <div className="hero-section p-4">
-        {!isModalView && (
-          <div className="mb-3">
-            <Link to="/" style={{ fontWeight: 600 }}>Explore</Link>
-          </div>
-        )}
+      <div className="hero">
         {isModalView && (
-          <div className="pgn__modal-close-container">
-            <ModalCloseButton variant="tertiary" onClick={handleClose}>
+          <Row className="p-0 m-0 d-flex align-items-center modal-header">
+            <Col>
+              <h4 className="mb-0 pl-4 text-muted font-weight-normal">
+                <b>Learning Path:</b> {learningPathTitle}
+              </h4>
+            </Col>
+            <ModalCloseButton variant="tertiary" onClick={handleClose} className="mr-1">
               <Icon src={Close} />
             </ModalCloseButton>
-          </div>
+          </Row>
         )}
-        <Row>
-          <Col xs={12} md={8}>
-            <div className="course-type-label text-uppercase mb-2">
-              <Icon src={LmsBook} className="mr-1" />
-              <span>Course</span>
-            </div>
-            <h1 className="mb-2">{name}</h1>
-            {shortDescription && (
-              <p className="text-muted mb-4">{shortDescription}</p>
+        <Card orientation="horizontal">
+          <Card.Body>
+            {!isModalView && (
+            <Card.Section>
+              <Link to="/" className="d-flex align-items-center back-link pl-4">
+                <Icon src={ChevronLeft} />
+                <span>Go Back</span>
+              </Link>
+            </Card.Section>
             )}
-          </Col>
-          <Col xs={12} md={4}>
-            {courseImageAssetPath && (
-            <Card.ImageCap
-              src={buildAssetUrl(courseImageAssetPath)}
-              alt={name}
-              className="course-card-image"
-            />
-            )}
-          </Col>
-        </Row>
-        <Row className="mt-4">
+            <Card.Section className="pl-5 pr-6">
+              <Chip iconBefore={LmsBook} className="course-chip">COURSE</Chip>
+              <h1 className="my-3 mt-4.5">{name}</h1>
+              <p className="text-muted">{shortDescription}</p>
+            </Card.Section>
+          </Card.Body>
+          <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+        </Card>
+        <Row className="mt-4 mx-0 px-6 d-flex hero-info course-hero-info">
           {dateDisplay && (
-            <Col xs={6} md={3} className="mb-3">
-              <div className="d-flex align-items-center">
-                <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
-                <div>
-                  <p className="mb-1 font-weight-bold">{dateDisplay}</p>
-                  <p className="text-muted">Access ends</p>
-                </div>
-              </div>
-            </Col>
-          )}
-          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Award} className="mr-4 mb-4" />
+              <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
               <div>
-                <p className="mb-1 font-weight-bold">Earn a certificate</p>
-                <p className="text-muted">Courses include certification</p>
+                <p className="mb-1 font-weight-bold">{dateDisplay}</p>
+                <p className="text-muted">Access ends</p>
               </div>
             </div>
-          </Col>
+          )}
+          <div className="d-flex align-items-center">
+            <Icon src={Award} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">Earn a certificate</p>
+              <p className="text-muted">Courses include certification</p>
+            </div>
+          </div>
           {duration && (
-            <Col xs={6} md={3} className="mb-3">
-              <div className="d-flex align-items-center">
-                <Icon src={Calendar} className="mr-4 mb-4" />
-                <div>
-                  <p className="mb-1 font-weight-bold">{duration}</p>
-                  <p className="text-muted">Approx. duration</p>
-                </div>
-              </div>
-            </Col>
-          )}
-          <Col xs={6} md={3} className="mb-3">
             <div className="d-flex align-items-center">
-              <Icon src={Person} className="mr-4 mb-4" />
+              <Icon src={Calendar} className="mr-4 mb-4" />
               <div>
-                <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
-                <p className="text-muted">
-                  {selfPaced ? 'Learn at your own speed' : 'Follow the course schedule'}
-                </p>
+                <p className="mb-1 font-weight-bold">{duration}</p>
+                <p className="text-muted">Approx. duration</p>
               </div>
             </div>
-          </Col>
+          )}
+          <div className="d-flex align-items-center">
+            <Icon src={Person} className="mr-4 mb-4" />
+            <div>
+              <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
+              <p className="text-muted">
+                {selfPaced ? 'Progress at your own speed' : 'Follow the course schedule'}
+              </p>
+            </div>
+          </div>
         </Row>
       </div>
 
-      <div className="lp-tabs d-flex align-items-center px-4">
-        <Nav variant="tabs" onSelect={handleTabSelect} className="border-bottom-0">
-          <Nav.Item>
-            <Nav.Link eventKey="about">About</Nav.Link>
-          </Nav.Item>
-        </Nav>
-        {!isModalView && (
+      {!isModalView && (
+        <div className="tabs d-flex align-items-center pl-5.5 pr-0">
           <Button
             variant="primary"
-            className="ml-auto"
+            className="ml-auto rounded-0 py-3 px-5.5 "
             onClick={handleViewClick}
           >
             View
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="p-4">
-        <section id="about" className="mb-6">
+      <div className="py-3">
+        <section id="about">
           {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{
             __html: replaceStaticAssetReferences(description || shortDescription || 'No description available.', course.id),
@@ -179,12 +170,19 @@ CourseDetailContent.propTypes = {
     selfPaced: PropTypes.bool,
     courseImageAssetPath: PropTypes.string,
     description: PropTypes.string,
+    org: PropTypes.string,
   }).isRequired,
   isModalView: PropTypes.bool,
   onClose: PropTypes.func,
+  learningPathTitle: PropTypes.string,
 };
 
-const CourseDetailPage = ({ isModalView = false, onClose, courseKey: propCourseKey }) => {
+const CourseDetailPage = ({
+  isModalView = false,
+  onClose,
+  courseKey: propCourseKey,
+  learningPathTitle,
+}) => {
   const { courseKey: urlCourseKey } = useParams();
   const courseKey = propCourseKey || urlCourseKey;
 
@@ -195,7 +193,11 @@ const CourseDetailPage = ({ isModalView = false, onClose, courseKey: propCourseK
   } = useCourseDetail(courseKey);
 
   if (isLoading) {
-    return <Spinner animation="border" variant="primary" />;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
   }
 
   if (error) {
@@ -226,8 +228,13 @@ const CourseDetailPage = ({ isModalView = false, onClose, courseKey: propCourseK
   };
 
   return (
-    <div className="course-detail-page">
-      <CourseDetailContent course={courseWithFallbacks} isModalView={isModalView} onClose={onClose} />
+    <div className="detail-page course-detail-page">
+      <CourseDetailContent
+        course={courseWithFallbacks}
+        isModalView={isModalView}
+        onClose={onClose}
+        learningPathTitle={learningPathTitle}
+      />
     </div>
   );
 };
@@ -236,6 +243,7 @@ CourseDetailPage.propTypes = {
   isModalView: PropTypes.bool,
   onClose: PropTypes.func,
   courseKey: PropTypes.string,
+  learningPathTitle: PropTypes.string,
 };
 
 export default CourseDetailPage;
