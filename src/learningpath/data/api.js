@@ -20,7 +20,7 @@ export async function fetchCourses() {
   const courses = response.data.courses || [];
 
   return camelCaseObject(courses.map(course => {
-    const { courseRun, course: courseInfo } = course;
+    const { courseRun, course: courseInfo, enrollment } = course;
 
     return {
       id: courseRun.courseId,
@@ -34,6 +34,7 @@ export async function fetchCourses() {
       courseImageAssetPath: courseInfo.bannerImgSrc,
       isStarted: courseRun.isStarted,
       isArchived: courseRun.isArchived,
+      enrollmentDate: enrollment?.lastEnrolled || null,
     };
   }));
 }

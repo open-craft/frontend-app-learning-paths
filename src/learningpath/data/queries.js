@@ -117,6 +117,7 @@ export const useLearningPaths = () => {
           percent,
           type: 'learning_path',
           org: lp.key.match(/path-v1:([^+]+)/)[1],
+          enrollmentDate: lp.enrollmentDate ? new Date(lp.enrollmentDate) : null,
         };
       });
     },
@@ -207,10 +208,11 @@ export const useCourses = () => {
       const courses = await api.fetchCourses();
       return courses.map(course => {
         const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
-        const coursesWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
+        const courseWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
         return {
-          ...coursesWithLearningPaths,
+          ...courseWithLearningPaths,
           type: 'course',
+          enrollmentDate: course.enrollmentDate ? new Date(course.enrollmentDate) : null,
         };
       });
     },

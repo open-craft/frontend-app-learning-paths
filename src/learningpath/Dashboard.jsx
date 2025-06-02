@@ -69,13 +69,39 @@ const Dashboard = () => {
       || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase()));
     return typeMatch && statusMatch && searchMatch;
   }), [items, selectedContentType, selectedStatuses, searchQuery]);
+
+  const sortedItems = useMemo(() => {
+    const statusOrder = { 'not started': 1, 'in progress': 2, completed: 3 };
+
+    return [...filteredItems].sort((a, b) => {
+      // Sort by status.
+      const statusA = statusOrder[a.status?.toLowerCase()] || 999;
+      const statusB = statusOrder[b.status?.toLowerCase()] || 999;
+
+      if (statusA !== statusB) {
+        return statusA - statusB;
+      }
+
+      // Within the status, sort by enrollment date (oldest first).
+      const dateA = a.enrollmentDate;
+      const dateB = b.enrollmentDate;
+
+      // Put null dates at the end.
+      if (!dateA && !dateB) { return 0; }
+      if (!dateA) { return 1; }
+      if (!dateB) { return -1; }
+
+      return dateA - dateB; // Oldest first.
+    });
+  }, [filteredItems]);
+
   const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
+  const totalPages = Math.ceil(sortedItems.length / PAGE_SIZE);
   const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredItems.slice(start, start + PAGE_SIZE);
-  }, [filteredItems, currentPage, PAGE_SIZE]);
+    return sortedItems.slice(start, start + PAGE_SIZE);
+  }, [sortedItems, currentPage, PAGE_SIZE]);
   useEffect(() => {
     // Add a timeout to ensure DOM updates are complete.
     const id = setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
