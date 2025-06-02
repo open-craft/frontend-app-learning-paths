@@ -73,25 +73,32 @@ export const CourseCard = ({
     buttonText = 'Loading...';
   }
 
+  let disableStartButton = checkingEnrollment || isEnrolledInLearningPath === false;
+
   let accessText = '';
   const currentDate = new Date();
 
   const startDateObj = startDate ? new Date(startDate) : null;
   const endDateObj = endDate ? new Date(endDate) : null;
+
+  // Determine access text and override button text based on access dates.
   if (startDateObj && startDateObj > currentDate) {
+    // Course will start in the future.
     const startDateStr = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     accessText = <>Access starts on <b>{startDateStr}</b></>;
-    buttonText = 'View';
+    buttonText = 'Start';
+    disableStartButton = disableStartButton || !administrator;
   } else if (endDateObj) {
     const endDateStr = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    accessText = currentDate > endDateObj
-      ? <>Access ended on <b>{endDateStr}</b></>
-      : <>Access until <b>{endDateStr}</b></>;
+    if (currentDate > endDateObj) {
+      // Course has ended.
+      accessText = <>Access ended on <b>{endDateStr}</b></>;
+      buttonText = 'View';
+    } else {
+      // Course is currently available.
+      accessText = <>Access until <b>{endDateStr}</b></>;
+    }
   }
-
-  const disableStartButton = checkingEnrollment
-      || isEnrolledInLearningPath === false
-      || (startDateObj && startDateObj > currentDate && !administrator);
 
   const { data: organizations = {} } = useOrganizations();
   const orgData = useMemo(() => ({

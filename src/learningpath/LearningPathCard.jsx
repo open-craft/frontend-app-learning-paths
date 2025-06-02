@@ -66,15 +66,22 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
   let accessText = '';
   const currentDate = new Date();
 
+  // Determine access text and override button text based on access dates.
   if (minDate && minDate > currentDate) {
+    // Learning path will start in the future.
     const minDateStr = minDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     accessText = <>Access starts on <b>{minDateStr}</b></>;
     buttonText = 'View';
   } else if (maxDate) {
     const maxDateStr = maxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    accessText = currentDate > maxDate
-      ? <>Access ended on <b>{maxDateStr}</b></>
-      : <>Access until <b>{maxDateStr}</b></>;
+    if (currentDate > maxDate) {
+      // Learning path has ended.
+      accessText = <>Access ended on <b>{maxDateStr}</b></>;
+      buttonText = 'View';
+    } else {
+      // Learning path is currently available.
+      accessText = <>Access until <b>{maxDateStr}</b></>;
+    }
   }
   const subtitleLine = subtitle && duration
     ? `${subtitle} • ${duration} days`
