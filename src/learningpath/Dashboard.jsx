@@ -82,7 +82,7 @@ const Dashboard = () => {
         return statusA - statusB;
       }
 
-      // Within the status, sort by enrollment date (oldest first).
+      // Within the status, sort by enrollment date (newest first).
       const dateA = a.enrollmentDate;
       const dateB = b.enrollmentDate;
 
@@ -91,7 +91,7 @@ const Dashboard = () => {
       if (!dateA) { return 1; }
       if (!dateB) { return -1; }
 
-      return dateA - dateB; // Oldest first.
+      return dateB - dateA; // Newest first.
     });
   }, [filteredItems]);
 
