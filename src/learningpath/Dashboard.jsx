@@ -164,7 +164,7 @@ const Dashboard = () => {
                 Showing <b>{showingCount}</b> of <b>{totalCount}</b>
               </div>
             </div>
-            <hr className={`mt-0 mb-4 ${showFilters ? 'invisible' : 'visible'}`} />
+            <hr className={`mt-0 mb-4 ${showFilters || isSmall ? 'invisible' : 'visible'}`} />
             {paginatedItems.map(item => (
               <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
                 {item.type === 'course'
