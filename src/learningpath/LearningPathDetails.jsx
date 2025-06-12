@@ -27,6 +27,13 @@ const LearningPathDetailPage = () => {
     setActiveTab(selectedKey);
   };
 
+  // Scroll to the top when the component mounts.
+  useEffect(() => {
+    // Add a timeout to ensure DOM updates are complete.
+    const id = setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 10);
+    return () => clearTimeout(id);
+  }, []);
+
   const {
     data: detail,
     isLoading: loadingDetail,
