@@ -79,10 +79,41 @@ const Dashboard = () => {
   }), [items, selectedContentType, selectedStatuses, searchQuery]);
 
   const sortedItems = useMemo(() => {
+    const currentDate = new Date();
+
+    const getStartDateCategory = (item) => {
+      let startDate = null;
+      let endDate = null;
+
+      if (item.type === 'course') {
+        startDate = item.startDate ? new Date(item.startDate) : null;
+        endDate = item.endDate ? new Date(item.endDate) : null;
+      } else if (item.type === 'learning_path') {
+        startDate = item.minDate ? new Date(item.minDate) : null;
+        endDate = item.maxDate ? new Date(item.maxDate) : null;
+      }
+
+      if (startDate && startDate > currentDate) {
+        return 1; // Not started.
+      }
+      if (endDate && endDate < currentDate) {
+        return 3; // Ended.
+      }
+      return 2; // Available.
+    };
+
     const statusOrder = { 'not started': 1, 'in progress': 2, completed: 3 };
 
     return [...filteredItems].sort((a, b) => {
-      // Sort by status.
+      // 1. Sort by start date category.
+      const startCategoryA = getStartDateCategory(a);
+      const startCategoryB = getStartDateCategory(b);
+
+      if (startCategoryA !== startCategoryB) {
+        return startCategoryA - startCategoryB;
+      }
+
+      // 2. Sort by progress status.
       const statusA = statusOrder[a.status?.toLowerCase()] || 999;
       const statusB = statusOrder[b.status?.toLowerCase()] || 999;
 
@@ -90,16 +121,11 @@ const Dashboard = () => {
         return statusA - statusB;
       }
 
-      // Within the status, sort by enrollment date (newest first).
-      const dateA = a.enrollmentDate;
-      const dateB = b.enrollmentDate;
+      // 3. Sort alphabetically by name.
+      const nameA = (a.displayName || a.name || '').toLowerCase();
+      const nameB = (b.displayName || b.name || '').toLowerCase();
 
-      // Put null dates at the end.
-      if (!dateA && !dateB) { return 0; }
-      if (!dateA) { return 1; }
-      if (!dateB) { return -1; }
-
-      return dateB - dateA; // Newest first.
+      return nameA.localeCompare(nameB);
     });
   }, [filteredItems]);
 
