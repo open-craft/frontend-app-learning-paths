@@ -64,6 +64,7 @@
 }
 
 .pgn__card {
+  &.horizontal {
   &.course-card .pgn__card-body {
     border-top: 5px solid #8C8179 !important;
   }
@@ -81,6 +82,65 @@
     .pgn__card-logo-cap {
       top: 1rem;
       left: 1rem !important;
+      }
+    }
+  }
+
+  &.vertical {
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.25);
+
+    &.course-card .pgn__card-body {
+      border-bottom: 5px solid #8C8179 !important;
+    }
+
+    &.lp-card .pgn__card-body {
+        border-bottom: 5px solid var(--crimson) !important;
+    }
+
+    .pgn__card-body {
+      border-radius: 0.25rem;
+    }
+
+    .title {
+      padding-top: 2rem !important;
+    }
+
+    .chip-section {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+
+      padding: 0;
+
+      .pgn__chip {
+        &:not(.status-chip) {
+          background-color: unset;
+
+          .pgn__chip__label {
+            display: none;
+          }
+        }
+
+        &.status-chip {
+          padding-left: 0.5rem !important;
+          .pgn__icon {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .pgn__card-footer {
+      flex-direction: column;
+
+      a:has(.btn) {
+        align-self: flex-end;
+        padding: 1rem 0.5rem 1rem 0;
+
+        .btn {
+          font-size: 1.35rem;
+        }
+      }
     }
   }
 
@@ -160,6 +220,8 @@
   }
 
   &.status-chip {
+    border: 0;
+
     &.status-secondary {
       background-color: #8996A0;
     }

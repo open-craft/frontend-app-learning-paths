@@ -107,14 +107,14 @@ export const CourseCard = ({
   }), [organizations, org]);
 
   return (
-    <Card orientation={orientation} className="course-card" onMouseEnter={handleMouseEnter}>
+    <Card orientation={orientation} className={`course-card ${orientation}`} onMouseEnter={handleMouseEnter}>
       <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
       <Card.Body>
-        <Card.Section className="pb-2.5 d-flex justify-content-between">
+        <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
           <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
           <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
         </Card.Section>
-        <Card.Section className="pt-1 pb-1"><h3>{name}</h3></Card.Section>
+        <Card.Section className="pt-1 pb-1 title"><h3>{name}</h3></Card.Section>
         {learningPathNames && (
           <Card.Section className="pt-1 pb-1 card-subtitle text-muted">
             {learningPathNames.length === 1 ? (
@@ -132,11 +132,19 @@ export const CourseCard = ({
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
         <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && (
-            <ProgressBar.Annotated
-              now={progressBarPercent}
-              label={`${progressBarPercent}%`}
-              variant="dark"
-            />
+            orientation === 'vertical' ? (
+              <ProgressBar
+                now={progressBarPercent}
+                label={`${progressBarPercent}%`}
+                variant="primary"
+              />
+            ) : (
+              <ProgressBar.Annotated
+                now={progressBarPercent}
+                label={`${progressBarPercent}%`}
+                variant="dark"
+              />
+            )
           )}
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
