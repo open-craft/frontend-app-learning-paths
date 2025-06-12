@@ -8,8 +8,11 @@ import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
 import FilterPanel from './FilterPanel';
+import { useScreenSize } from '../hooks/useScreenSize';
 
 const Dashboard = () => {
+  const { isSmall } = useScreenSize();
+
   const {
     data: learningPaths,
     isLoading: isLoadingPaths,
@@ -102,6 +105,10 @@ const Dashboard = () => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return sortedItems.slice(start, start + PAGE_SIZE);
   }, [sortedItems, currentPage, PAGE_SIZE]);
+
+  const showingCount = Math.min(PAGE_SIZE, sortedItems.length - (currentPage - 1) * PAGE_SIZE);
+  const totalCount = sortedItems.length;
+
   useEffect(() => {
     // Add a timeout to ensure DOM updates are complete.
     const id = setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
@@ -142,11 +149,16 @@ const Dashboard = () => {
                 placeholder="Search"
               />
             </div>
-            {!showFilters && (
-              <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">
-                <Icon src={FilterAlt} /> Filter
-              </Button>
-            )}
+            <div className="d-flex justify-content-between align-items-center">
+              {!showFilters && (
+                <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">
+                  <Icon src={FilterAlt} /> Filter
+                </Button>
+              )}
+              <div className={`small text-muted ${showFilters ? '' : 'ml-auto'}`}>
+                Showing <b>{showingCount}</b> of <b>{totalCount}</b>
+              </div>
+            </div>
             <hr className={`mt-0 mb-4 ${showFilters ? 'invisible' : 'visible'}`} />
             {paginatedItems.map(item => (
               <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
@@ -157,6 +169,7 @@ const Dashboard = () => {
             ))}
             <Pagination
               paginationLabel="learning items navigation"
+              variant={isSmall ? 'reduced' : 'default'}
               pageCount={totalPages}
               currentPage={currentPage}
               onPageSelect={page => setCurrentPage(page)}
