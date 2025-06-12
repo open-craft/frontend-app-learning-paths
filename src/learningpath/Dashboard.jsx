@@ -41,7 +41,12 @@ const Dashboard = () => {
   const selectedContentTypeKey = 'lp_dashboard_contentType';
   const selectedStatusesKey = 'lp_dashboard_selectedStatuses';
 
-  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) !== 'false');
+  const [showFilters, setShowFilters] = useState(() => {
+    if (isSmall) {
+      return false; // Always closed by default on mobile - do not use the remembered state.
+    }
+    return localStorage.getItem(showFiltersKey) !== 'false'; // Open by default on desktop.
+  });
   const [selectedContentType, setSelectedContentType] = useState(() => localStorage.getItem(selectedContentTypeKey) || 'All');
   const [selectedStatuses, setSelectedStatuses] = useState(
     () => JSON.parse(localStorage.getItem(selectedStatusesKey)) || [],
