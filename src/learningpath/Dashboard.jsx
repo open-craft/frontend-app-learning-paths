@@ -41,7 +41,7 @@ const Dashboard = () => {
   const selectedContentTypeKey = 'lp_dashboard_contentType';
   const selectedStatusesKey = 'lp_dashboard_selectedStatuses';
 
-  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) !== 'false');
+  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) === 'true');
   const [selectedContentType, setSelectedContentType] = useState(() => localStorage.getItem(selectedContentTypeKey) || 'All');
   const [selectedStatuses, setSelectedStatuses] = useState(
     () => JSON.parse(localStorage.getItem(selectedStatusesKey)) || [],
