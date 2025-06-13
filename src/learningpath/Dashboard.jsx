@@ -1,13 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Spinner, Row, Col, Button,
+  Spinner, Col, Button, Pagination, Icon, SearchField,
 } from '@openedx/paragon';
+import { getConfig } from '@edx/frontend-platform';
+import { FilterAlt } from '@openedx/paragon/icons';
 import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
 import FilterPanel from './FilterPanel';
+import { useScreenSize } from '../hooks/useScreenSize';
 
 const Dashboard = () => {
+  const { isSmall } = useScreenSize();
+
   const {
     data: learningPaths,
     isLoading: isLoadingPaths,
@@ -30,9 +35,23 @@ const Dashboard = () => {
 
   const items = useMemo(() => [...(courses || []), ...(learningPaths || [])], [courses, learningPaths]);
 
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedContentType, setSelectedContentType] = useState('All');
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const showFiltersKey = 'lp_dashboard_showFilters';
+  const selectedContentTypeKey = 'lp_dashboard_contentType';
+  const selectedStatusesKey = 'lp_dashboard_selectedStatuses';
+
+  const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) === 'true');
+  const [selectedContentType, setSelectedContentType] = useState(() => localStorage.getItem(selectedContentTypeKey) || 'All');
+  const [selectedStatuses, setSelectedStatuses] = useState(
+    () => JSON.parse(localStorage.getItem(selectedStatusesKey)) || [],
+  );
+
+  useEffect(() => { localStorage.setItem(showFiltersKey, showFilters.toString()); }, [showFilters]);
+  useEffect(() => {
+    localStorage.setItem(selectedContentTypeKey, selectedContentType.toString());
+  }, [selectedContentType]);
+  useEffect(() => { localStorage.setItem(selectedStatusesKey, JSON.stringify(selectedStatuses)); }, [selectedStatuses]);
 
   const handleStatusChange = (status, isChecked) => {
     setSelectedStatuses(prev => {
@@ -48,17 +67,94 @@ const Dashboard = () => {
         || (selectedContentType === 'course' && item.type === 'course')
         || (selectedContentType === 'learning_path' && item.type === 'learning_path');
     const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(item.status);
-    return typeMatch && statusMatch;
-  }), [items, selectedContentType, selectedStatuses]);
+    const searchMatch = searchQuery === ''
+      || (item.displayName && item.displayName.toLowerCase().includes(searchQuery.toLowerCase()))
+      || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return typeMatch && statusMatch && searchMatch;
+  }), [items, selectedContentType, selectedStatuses, searchQuery]);
+
+  const sortedItems = useMemo(() => {
+    const currentDate = new Date();
+
+    const getStartDateCategory = (item) => {
+      let startDate = null;
+      let endDate = null;
+
+      if (item.type === 'course') {
+        startDate = item.startDate ? new Date(item.startDate) : null;
+        endDate = item.endDate ? new Date(item.endDate) : null;
+      } else if (item.type === 'learning_path') {
+        startDate = item.minDate ? new Date(item.minDate) : null;
+        endDate = item.maxDate ? new Date(item.maxDate) : null;
+      }
+
+      if (startDate && startDate > currentDate) {
+        return 1; // Not started.
+      }
+      if (endDate && endDate < currentDate) {
+        return 3; // Ended.
+      }
+      return 2; // Available.
+    };
+
+    const statusOrder = { 'not started': 1, 'in progress': 2, completed: 3 };
+
+    return [...filteredItems].sort((a, b) => {
+      // 1. Sort by start date category.
+      const startCategoryA = getStartDateCategory(a);
+      const startCategoryB = getStartDateCategory(b);
+
+      if (startCategoryA !== startCategoryB) {
+        return startCategoryA - startCategoryB;
+      }
+
+      // 2. Sort by progress status.
+      const statusA = statusOrder[a.status?.toLowerCase()] || 999;
+      const statusB = statusOrder[b.status?.toLowerCase()] || 999;
+
+      if (statusA !== statusB) {
+        return statusA - statusB;
+      }
+
+      // 3. Sort alphabetically by name.
+      const nameA = (a.displayName || a.name || '').toLowerCase();
+      const nameB = (b.displayName || b.name || '').toLowerCase();
+
+      return nameA.localeCompare(nameB);
+    });
+  }, [filteredItems]);
+
+  const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(sortedItems.length / PAGE_SIZE);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedItems.slice(start, start + PAGE_SIZE);
+  }, [sortedItems, currentPage, PAGE_SIZE]);
+
+  const showingCount = Math.min(PAGE_SIZE, sortedItems.length - (currentPage - 1) * PAGE_SIZE);
+  const totalCount = sortedItems.length;
+
+  useEffect(() => {
+    // Add a timeout to ensure DOM updates are complete.
+    const id = setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 10);
+    return () => clearTimeout(id);
+  }, [currentPage]);
+  // Reset pagination when using filters or search.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedContentType, selectedStatuses]);
 
   return (
-    <div className="learningpath-list">
+    <div className="dashboard m-4.5">
       {isLoading ? (
-        <Spinner animation="border" variant="primary" />
+        <div className="d-flex justify-content-center align-items-center vh-100">
+          <Spinner animation="border" variant="primary" />
+        </div>
       ) : (
         <>
           {showFilters && (
-            <div className="filter-panel sidebar open">
+            <div className="filter-panel sidebar position-absolute open">
               <FilterPanel
                 selectedContentType={selectedContentType}
                 onSelectContentType={setSelectedContentType}
@@ -69,23 +165,42 @@ const Dashboard = () => {
             </div>
           )}
           <div className={`main-content ${showFilters ? 'shifted' : ''}`}>
-            <h2>My Learning</h2>
-            {!showFilters && (
-              <Button onClick={() => setShowFilters(true)} variant="secondary">
-                <i className="fas fa-filter" /> Filter
-              </Button>
-            )}
-            <Row>
-              {filteredItems.map(item => (item.type === 'course' ? (
-                <Col key={item.id} xs={12} lg={8} className="mb-4 ml-6">
-                  <CourseCard course={item} />
-                </Col>
-              ) : (
-                <Col key={item.key} xs={12} lg={8} className="mb-4 ml-6">
-                  <LearningPathCard learningPath={item} />
-                </Col>
-              )))}
-            </Row>
+            <div className="dashboard-header d-flex justify-content-between align-items-center">
+              <h2>My Learning</h2>
+              <SearchField
+                onClear={() => setSearchQuery('')}
+                onChange={setSearchQuery}
+                onSubmit={() => {}}
+                value={searchQuery}
+                placeholder="Search"
+              />
+            </div>
+            <div className="d-flex justify-content-between align-items-center">
+              {!showFilters && (
+                <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">
+                  <Icon src={FilterAlt} /> Filter
+                </Button>
+              )}
+              <div className={`small text-muted ${showFilters ? '' : 'ml-auto'}`}>
+                Showing <b>{showingCount}</b> of <b>{totalCount}</b>
+              </div>
+            </div>
+            <hr className={`mt-0 mb-4 ${showFilters || isSmall ? 'invisible' : 'visible'}`} />
+            {paginatedItems.map(item => (
+              <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
+                {item.type === 'course'
+                  ? <CourseCard course={item} learningPathNames={item.learningPathNames} showFilters={showFilters} />
+                  : <LearningPathCard learningPath={item} showFilters={showFilters} />}
+              </Col>
+            ))}
+            <Pagination
+              paginationLabel="learning items navigation"
+              variant={isSmall ? 'reduced' : 'default'}
+              pageCount={totalPages}
+              currentPage={currentPage}
+              onPageSelect={page => setCurrentPage(page)}
+              className="d-flex justify-content-center mt-4"
+            />
           </div>
         </>
       )}
