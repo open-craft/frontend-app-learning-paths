@@ -65,23 +65,23 @@
 
 .pgn__card {
   &.horizontal {
-  &.course-card .pgn__card-body {
-    border-top: 5px solid #8C8179 !important;
-  }
-
-  &.lp-card .pgn__card-body {
-      border-top: 5px solid var(--crimson) !important;
-  }
-
-  .pgn__card-wrapper-image-cap {
-    .pgn__card-image-cap {
-      /* The default (`auto`) value does not work in Safari. */
-      width: 240px !important;
+    &.course-card .pgn__card-body {
+      border-top: 5px solid #8C8179 !important;
     }
 
-    .pgn__card-logo-cap {
-      top: 1rem;
-      left: 1rem !important;
+    &.lp-card .pgn__card-body {
+        border-top: 5px solid var(--crimson) !important;
+    }
+
+    .pgn__card-wrapper-image-cap {
+      .pgn__card-image-cap {
+        /* The default (`auto`) value does not work in Safari. */
+        width: 240px !important;
+      }
+
+      .pgn__card-logo-cap {
+        top: 1rem;
+        left: 1rem !important;
       }
     }
   }
