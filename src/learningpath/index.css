@@ -97,37 +97,42 @@
         border-bottom: 5px solid var(--crimson) !important;
     }
 
+    .pgn__card-wrapper-image-cap {
+      /* Prevent overlapping the title with chip icons when the image is missing. */
+      padding-bottom: 2rem;
+    }
+
     .pgn__card-body {
       border-radius: 0.25rem;
-    }
 
-    .title {
-      padding-top: 2rem !important;
-    }
+      .chip-section {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        right: 1rem;
 
-    .chip-section {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      right: 1rem;
+        padding: 0;
 
-      padding: 0;
+        .pgn__chip {
+          &:not(.status-chip) {
+            background-color: unset;
 
-      .pgn__chip {
-        &:not(.status-chip) {
-          background-color: unset;
+            .pgn__chip__label {
+              display: none;
+            }
+          }
 
-          .pgn__chip__label {
-            display: none;
+          &.status-chip {
+            padding-left: 0.5rem !important;
+            .pgn__icon {
+              display: none;
+            }
           }
         }
+      }
 
-        &.status-chip {
-          padding-left: 0.5rem !important;
-          .pgn__icon {
-            display: none;
-          }
-        }
+      .title {
+        padding-top: 2rem !important;
       }
     }
 
