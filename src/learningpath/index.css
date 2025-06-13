@@ -108,6 +108,7 @@
     .chip-section {
       position: absolute;
       top: 1rem;
+      left: 1rem;
       right: 1rem;
 
       padding: 0;
