@@ -19,13 +19,12 @@
     flex: 1 0 auto;
   }
 
-  footer {
-    flex-shrink: 0;
+  header.learning-header > div {
+    max-width: unset;
   }
 
-  /* Add border to the header. */
-  .site-header-desktop {
-    border-bottom: 3px solid var(--crimson);
+  footer {
+    flex-shrink: 0;
   }
 }
 
@@ -302,7 +301,7 @@
 
     .modal-header {
       /* Match the height of the platform's header. */
-      height: 64px;
+      height: 66px;
     }
 
     .card {
