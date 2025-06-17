@@ -53,9 +53,9 @@ const FilterPanel = ({
       <Form>
         <div className="status-options">
           <Form.Checkbox
-            value="In Progress"
-            checked={selectedStatuses.includes('In Progress')}
-            onChange={e => onChangeStatus('In Progress', e.target.checked)}
+            value="In progress"
+            checked={selectedStatuses.includes('In progress')}
+            onChange={e => onChangeStatus('In progress', e.target.checked)}
             className="font-weight-light"
           >
             In progress

@@ -75,7 +75,7 @@ export const useLearningPaths = () => {
         const progress = totalCompletion / totalCourses;
         const requiredCompletion = lp.requiredCompletion || 0;
 
-        let status = 'In Progress';
+        let status = 'In progress';
         if (progress === 0) {
           status = 'Not started';
         } else if (progress >= requiredCompletion) {
