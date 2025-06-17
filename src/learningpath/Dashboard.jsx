@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Spinner, Col, Button, Pagination, Icon, SearchField,
+  Spinner, Col, Button, Pagination, Icon, SearchField, Image,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
 import { FilterAlt } from '@openedx/paragon/icons';
@@ -9,6 +9,7 @@ import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
 import FilterPanel from './FilterPanel';
 import { useScreenSize } from '../hooks/useScreenSize';
+import noResultsSVG from '../assets/no_results.svg';
 
 const Dashboard = () => {
   const { isSmall } = useScreenSize();
@@ -186,21 +187,39 @@ const Dashboard = () => {
               </div>
             </div>
             <hr className={`mt-0 mb-4 ${showFilters || isSmall ? 'invisible' : 'visible'}`} />
-            {paginatedItems.map(item => (
-              <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
-                {item.type === 'course'
-                  ? <CourseCard course={item} learningPathNames={item.learningPathNames} showFilters={showFilters} />
-                  : <LearningPathCard learningPath={item} showFilters={showFilters} />}
-              </Col>
-            ))}
-            <Pagination
-              paginationLabel="learning items navigation"
-              variant={isSmall ? 'reduced' : 'default'}
-              pageCount={totalPages}
-              currentPage={currentPage}
-              onPageSelect={page => setCurrentPage(page)}
-              className="d-flex justify-content-center mt-4"
-            />
+            {sortedItems.length === 0 ? (
+              <div className="d-flex flex-column align-items-center justify-content-center text-center py-5">
+                <Image src={noResultsSVG} alt="No results" className="mb-4" />
+                <div>
+                  <div className="h3 my-2">No matching results</div>
+                  <div className="text-muted">Try another search or clear your filters</div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {paginatedItems.map(item => (
+                  <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
+                    {item.type === 'course'
+                      ? (
+                        <CourseCard
+                          course={item}
+                          learningPathNames={item.learningPathNames}
+                          showFilters={showFilters}
+                        />
+                      )
+                      : <LearningPathCard learningPath={item} showFilters={showFilters} />}
+                  </Col>
+                ))}
+                <Pagination
+                  paginationLabel="learning items navigation"
+                  variant={isSmall ? 'reduced' : 'default'}
+                  pageCount={totalPages}
+                  currentPage={currentPage}
+                  onPageSelect={page => setCurrentPage(page)}
+                  className="d-flex justify-content-center mt-4"
+                />
+              </>
+            )}
           </div>
         </>
       )}
