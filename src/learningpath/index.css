@@ -1,5 +1,6 @@
 :root {
   --crimson: #821122;
+  --m-teal: #00a69c
 }
 
 #root {
@@ -69,6 +70,13 @@
         color: var(--crimson);
       }
     }
+  }
+
+  /* Notification bubble with the number of active filters on mobile. */
+  .pgn__bubble {
+    min-width: 1rem;
+    min-height: 1rem;
+    background-color: var(--m-teal) !important;
   }
 }
 

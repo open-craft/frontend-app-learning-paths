@@ -2,7 +2,7 @@ import React, {
   useState, useMemo, useEffect, useRef,
 } from 'react';
 import {
-  Spinner, Col, Button, Pagination, Icon, IconButton, SearchField, Image,
+  Spinner, Col, Button, Pagination, Icon, IconButton, SearchField, Image, Bubble,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
 import { FilterAlt, FilterList, Search } from '@openedx/paragon/icons';
@@ -91,6 +91,11 @@ const Dashboard = () => {
     setSelectedContentType('All');
     setSelectedStatuses([]);
   };
+
+  const activeFiltersCount = useMemo(
+    () => (selectedContentType !== 'All') + selectedStatuses.length,
+    [selectedContentType, selectedStatuses],
+  );
 
   const filteredItems = useMemo(() => items.filter(item => {
     const typeMatch = selectedContentType === 'All'
@@ -210,7 +215,12 @@ const Dashboard = () => {
               ) : (
                 <div>
                   <IconButton src={Search} iconAs={Icon} variant="black" alt="Search" onClick={handleMobileSearchClick} />
-                  <IconButton src={FilterList} iconAs={Icon} variant="black" alt="Filter" onClick={() => setShowFilters(true)} />
+                  <div className="d-inline-block">
+                    <IconButton src={FilterList} iconAs={Icon} variant="black" alt="Filter" onClick={() => setShowFilters(true)} />
+                    {activeFiltersCount > 0 && (
+                      <Bubble className="position-absolute mt-4 ml-n3.5">{activeFiltersCount}</Bubble>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
