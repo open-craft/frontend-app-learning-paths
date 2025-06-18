@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, ButtonGroup, Form, Icon,
+  Button, ButtonGroup, Form, Icon, IconButton,
 } from '@openedx/paragon';
 import { FilterList } from '@openedx/paragon/icons';
 
@@ -15,9 +15,7 @@ const FilterPanel = ({
   <div className="pl-3 pr-3 pt-2 mt-4.5">
     <div className="d-flex justify-content-between align-items-center mb-3">
       <h4>Filter</h4>
-      <Button variant="link" onClick={onClose} className="filter-close-button">
-        <Icon src={FilterList} />
-      </Button>
+      <IconButton src={FilterList} iconAs={Icon} variant="link" onClick={onClose} className="filter-close-button" />
     </div>
 
     {/* Content Type Tabs */}
