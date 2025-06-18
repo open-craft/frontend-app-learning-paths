@@ -5,7 +5,7 @@ import {
   Spinner, Col, Button, Pagination, Icon, IconButton, SearchField, Image,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
-import { FilterAlt, Search } from '@openedx/paragon/icons';
+import { FilterAlt, FilterList, Search } from '@openedx/paragon/icons';
 import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
@@ -201,7 +201,10 @@ const Dashboard = () => {
                   placeholder="Search"
                 />
               ) : (
-                <IconButton src={Search} iconAs={Icon} variant="black" alt="Search" onClick={handleMobileSearchClick} />
+                <div>
+                  <IconButton src={Search} iconAs={Icon} variant="black" alt="Search" onClick={handleMobileSearchClick} />
+                  <IconButton src={FilterList} iconAs={Icon} variant="black" alt="Filter" onClick={() => setShowFilters(true)} />
+                </div>
               )}
             </div>
             {isSmall && showMobileSearch && (
@@ -217,7 +220,7 @@ const Dashboard = () => {
               </div>
             )}
             <div className="d-flex justify-content-between align-items-center">
-              {!showFilters && (
+              {!showFilters && !isSmall && (
                 <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">
                   <Icon src={FilterAlt} /> Filter
                 </Button>
