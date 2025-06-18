@@ -87,6 +87,11 @@ const Dashboard = () => {
     });
   };
 
+  const handleClearFilters = () => {
+    setSelectedContentType('All');
+    setSelectedStatuses([]);
+  };
+
   const filteredItems = useMemo(() => items.filter(item => {
     const typeMatch = selectedContentType === 'All'
         || (selectedContentType === 'course' && item.type === 'course')
@@ -179,17 +184,19 @@ const Dashboard = () => {
       ) : (
         <>
           {showFilters && (
-            <div className="filter-panel sidebar position-absolute open">
+            <div className={`filter-panel sidebar position-absolute open ${isSmall ? 'mobile' : ''}`}>
               <FilterPanel
                 selectedContentType={selectedContentType}
                 onSelectContentType={setSelectedContentType}
                 selectedStatuses={selectedStatuses}
                 onChangeStatus={handleStatusChange}
                 onClose={() => setShowFilters(false)}
+                isSmall={isSmall}
+                onClearAll={handleClearFilters}
               />
             </div>
           )}
-          <div className={`main-content ${showFilters ? 'shifted' : ''}`}>
+          <div className={`main-content ${showFilters ? 'shifted' : ''} ${showFilters && isSmall ? 'hidden' : ''}`}>
             <div className="dashboard-header d-flex justify-content-between align-items-center">
               <h2>My Learning</h2>
               {!isSmall ? (

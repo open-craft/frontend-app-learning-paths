@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {
   Button, ButtonGroup, Form, Icon, IconButton,
 } from '@openedx/paragon';
-import { FilterList } from '@openedx/paragon/icons';
+import { FilterList, Close } from '@openedx/paragon/icons';
 
 const FilterPanel = ({
   selectedContentType,
@@ -11,11 +11,19 @@ const FilterPanel = ({
   selectedStatuses,
   onChangeStatus,
   onClose,
+  isSmall,
+  onClearAll,
 }) => (
   <div className="pl-3 pr-3 pt-2 mt-4.5">
     <div className="d-flex justify-content-between align-items-center mb-3">
       <h4>Filter</h4>
-      <IconButton src={FilterList} iconAs={Icon} variant="link" onClick={onClose} className="filter-close-button" />
+      <IconButton
+        src={isSmall ? Close : FilterList}
+        iconAs={Icon}
+        variant="link"
+        onClick={onClose}
+        className="filter-close-button"
+      />
     </div>
 
     {/* Content Type Tabs */}
@@ -77,6 +85,18 @@ const FilterPanel = ({
         </div>
       </Form>
     </div>
+
+    {/* Action Buttons */}
+    <ButtonGroup className="pb-4 filter-actions">
+      <Button variant="outline-secondary" onClick={onClearAll}>
+        Clear all
+      </Button>
+      {isSmall && (
+        <Button variant="primary" onClick={onClose} className="pl-3">
+          Apply
+        </Button>
+      )}
+    </ButtonGroup>
   </div>
 );
 
@@ -86,6 +106,8 @@ FilterPanel.propTypes = {
   selectedStatuses: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChangeStatus: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
+  isSmall: PropTypes.bool.isRequired,
+  onClearAll: PropTypes.func.isRequired,
 };
 
 export default FilterPanel;
