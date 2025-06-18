@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, {
+  useState, useMemo, useEffect, useRef,
+} from 'react';
 import {
-  Spinner, Col, Button, Pagination, Icon, SearchField, Image,
+  Spinner, Col, Button, Pagination, Icon, IconButton, SearchField, Image,
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
-import { FilterAlt } from '@openedx/paragon/icons';
+import { FilterAlt, Search } from '@openedx/paragon/icons';
 import { useLearningPaths, useCourses } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
@@ -37,6 +39,28 @@ const Dashboard = () => {
   const items = useMemo(() => [...(courses || []), ...(learningPaths || [])], [courses, learningPaths]);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const mobileSearchRef = useRef(null);
+
+  const handleMobileSearchClick = () => {
+    setShowMobileSearch(true);
+    // Focus the search field after it becomes visible.
+    setTimeout(() => {
+      if (mobileSearchRef.current) {
+        const inputElement = mobileSearchRef.current.querySelector('input');
+        if (inputElement) {
+          inputElement.focus();
+        }
+      }
+    }, 0);
+  };
+
+  const handleMobileSearchBlur = () => {
+    // Hide mobile search when user taps outside and the search query is empty.
+    if (isSmall && !searchQuery) {
+      setShowMobileSearch(false);
+    }
+  };
 
   const showFiltersKey = 'lp_dashboard_showFilters';
   const selectedContentTypeKey = 'lp_dashboard_contentType';
@@ -168,14 +192,30 @@ const Dashboard = () => {
           <div className={`main-content ${showFilters ? 'shifted' : ''}`}>
             <div className="dashboard-header d-flex justify-content-between align-items-center">
               <h2>My Learning</h2>
-              <SearchField
-                onClear={() => setSearchQuery('')}
-                onChange={setSearchQuery}
-                onSubmit={() => {}}
-                value={searchQuery}
-                placeholder="Search"
-              />
+              {!isSmall ? (
+                <SearchField
+                  onClear={() => setSearchQuery('')}
+                  onChange={setSearchQuery}
+                  onSubmit={() => {}}
+                  value={searchQuery}
+                  placeholder="Search"
+                />
+              ) : (
+                <IconButton src={Search} iconAs={Icon} variant="black" alt="Search" onClick={handleMobileSearchClick} />
+              )}
             </div>
+            {isSmall && showMobileSearch && (
+              <div className="mobile-search" ref={mobileSearchRef}>
+                <SearchField
+                  onClear={() => setSearchQuery('')}
+                  onChange={setSearchQuery}
+                  onSubmit={() => {}}
+                  onBlur={handleMobileSearchBlur}
+                  value={searchQuery}
+                  placeholder="Search"
+                />
+              </div>
+            )}
             <div className="d-flex justify-content-between align-items-center">
               {!showFilters && (
                 <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button">

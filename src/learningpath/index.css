@@ -28,36 +28,46 @@
   }
 }
 
-.dashboard .dashboard-header .pgn__searchfield {
-  width: 30%;
-  height: 3rem;
-
-  border-width: 2px;
-  border-radius: 0.3rem;
-  /* Avoid cutting corners with the border radius. */
-  overflow: hidden;
-
-  &.has-focus {
-    border-color: black;
+.dashboard {
+  /* Desktop version of the search field. */
+  .dashboard-header .pgn__searchfield {
+    width: 30%;
   }
 
-  /* Hide the extra border when the search field is focused. */
-  &:after {
-    display: none;
+  /* Prevent the mobile search field from changing the height of the container. */
+  .mobile-search .pgn__searchfield .pgn__searchfield__iconbutton-submit {
+    visibility: hidden
   }
 
-  button {
-    &:hover {
-      background: none;
-      color: unset;
+  .pgn__searchfield {
+    height: 3rem;
+    border-width: 2px;
+    border-radius: 0.3rem;
+    /* Avoid cutting corners with the border radius. */
+    overflow: hidden;
+
+    &.has-focus {
+      border-color: black;
     }
 
-    &.pgn__searchfield__iconbutton-submit {
-      color: black;
+    /* Hide the extra border when the search field is focused. */
+    &:after {
+      display: none;
     }
 
-    &.pgn__searchfield__iconbutton-reset {
-      color: var(--crimson);
+    button {
+      &:hover {
+        background: none;
+        color: unset;
+      }
+
+      &.pgn__searchfield__iconbutton-submit {
+        color: black;
+      }
+
+      &.pgn__searchfield__iconbutton-reset {
+        color: var(--crimson);
+      }
     }
   }
 }
