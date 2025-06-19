@@ -2,7 +2,7 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import {
-  APP_INIT_ERROR, APP_READY, subscribe, initialize,
+  APP_INIT_ERROR, APP_READY, subscribe, initialize, mergeConfig,
 } from '@edx/frontend-platform';
 import { AppProvider, ErrorPage } from '@edx/frontend-platform/react';
 import ReactDOM from 'react-dom/client';
@@ -10,7 +10,7 @@ import { Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import Header from '@edx/frontend-component-header';
+import { LearningHeader as Header } from '@edx/frontend-component-header';
 import FooterSlot from '@openedx/frontend-slot-footer';
 import messages from './i18n';
 import queryClient from './queryClient';
@@ -56,4 +56,12 @@ subscribe(APP_INIT_ERROR, (error) => {
 
 initialize({
   messages,
+  requireAuthenticatedUser: true,
+  handlers: {
+    config: () => {
+      mergeConfig({
+        DASHBOARD_PAGE_SIZE: process.env.DASHBOARD_PAGE_SIZE || null,
+      }, 'LearningPathsConfig');
+    },
+  },
 });
