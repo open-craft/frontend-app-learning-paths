@@ -242,7 +242,7 @@ const Dashboard = () => {
                   <Icon src={FilterAlt} /> Filter
                 </Button>
               )}
-              <div className={`small text-muted ${showFilters ? '' : 'ml-auto'}`}>
+              <div className="small text-muted">
                 Showing <b>{showingCount}</b> of <b>{totalCount}</b>
               </div>
             </div>
