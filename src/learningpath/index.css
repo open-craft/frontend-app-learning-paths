@@ -58,7 +58,7 @@
 
     button {
       &:hover {
-        background: none;
+        background-color: transparent;
         color: unset;
       }
 
