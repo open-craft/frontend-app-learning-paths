@@ -16,7 +16,10 @@ const FilterPanel = ({
 }) => (
   <div className="pl-3 pr-3 pt-2 mt-4.5">
     <div className="d-flex justify-content-between align-items-center mb-3">
-      <h4>Filter</h4>
+      <h4 className="mb-0">Filter</h4>
+      {!isSmall && (
+        <Button variant="link" onClick={onClearAll} className="pr-4 filter-clear-link">Clear all</Button>
+      )}
       <IconButton
         src={isSmall ? Close : FilterList}
         iconAs={Icon}
@@ -28,7 +31,7 @@ const FilterPanel = ({
 
     {/* Content Type Tabs */}
     <div className="my-3">
-      <ButtonGroup>
+      <ButtonGroup className="filter-content-buttons">
         <Button
           variant={selectedContentType === 'All' ? 'primary' : 'outline-secondary'}
           onClick={() => onSelectContentType('All')}
@@ -87,16 +90,16 @@ const FilterPanel = ({
     </div>
 
     {/* Action Buttons */}
-    <ButtonGroup className="pb-4 filter-actions">
-      <Button variant="outline-secondary" onClick={onClearAll}>
-        Clear all
-      </Button>
-      {isSmall && (
+    {isSmall && (
+      <ButtonGroup className="pb-4 filter-actions">
+        <Button variant="outline-secondary" onClick={onClearAll}>
+          Clear all
+        </Button>
         <Button variant="primary" onClick={onClose} className="pl-3">
           Apply
         </Button>
-      )}
-    </ButtonGroup>
+      </ButtonGroup>
+    )}
   </div>
 );
 

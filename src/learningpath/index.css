@@ -528,8 +528,17 @@
     }
   }
 
-  .btn:not(.filter-close-button) {
+  .filter-clear-link {
+    color: var(--m-teal);
+    border: none;
+    font-size: small;
+  }
+
+  .btn {
     border-radius: 0.25rem;
+  }
+
+  .filter-content-buttons .btn {
     border-color: #E0E0E0;
 
     &.active {
@@ -570,5 +579,11 @@
 
   .filter-actions {
     gap: 2rem;
+
+    .btn {
+      /* This is !important to override edges in the middle of the button group. */
+      border-radius: 0.25rem !important;
+      border-color: #293352;
+    }
   }
 }
