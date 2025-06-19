@@ -202,8 +202,8 @@ const Dashboard = () => {
             </div>
           )}
           <div className={`main-content ${showFilters ? 'shifted' : ''} ${showFilters && isSmall ? 'hidden' : ''}`}>
-            <div className="dashboard-header d-flex justify-content-between align-items-center mt-4.5 mb-3">
-              <h2>My Progress</h2>
+            <div className="dashboard-header d-flex justify-content-between align-items-center">
+              <h2>My Learning</h2>
               {!isSmall ? (
                 <SearchField
                   onClear={() => setSearchQuery('')}
