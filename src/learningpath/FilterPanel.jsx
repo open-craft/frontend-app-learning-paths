@@ -58,7 +58,7 @@ const FilterPanel = ({
 
     {/* Status Checkboxes */}
     <div className="my-3">
-      <h4>Status</h4>
+      <h4 className="mt-4.5 mb-3">My Progress</h4>
       <Form>
         <div className="status-options">
           <Form.Checkbox
