@@ -78,6 +78,42 @@
     min-height: 1rem;
     background-color: var(--m-teal) !important;
   }
+
+  .dashboard-content {
+    transition: margin-left 0.3s ease;
+
+    &.shifted {
+      margin-left: 350px;
+    }
+
+    &.hidden {
+      display: none;
+    }
+
+    button {
+      margin-top: 1rem;
+      margin-bottom: 20px;
+
+      &.filter-button, &.filter-button:hover, &.filter-button:active, &.page-link.btn-primary {
+        background-color: var(--crimson) !important;
+      }
+
+      &.page-link {
+        border-radius: 0;
+      }
+    }
+
+    .pagination {
+      .dropdown-toggle {
+        padding-right: 8px;
+      }
+
+      .page-item > .btn-icon-primary:hover {
+        color: unset;
+        background-color: #E1DDDB;
+      }
+    }
+  }
 }
 
 .pgn__card {
@@ -457,42 +493,6 @@
 
     #courses-section-wrapper {
       background-color: #FBFAF9;
-    }
-  }
-}
-
-.main-content {
-  transition: margin-left 0.3s ease;
-
-  &.shifted {
-    margin-left: 350px;
-  }
-
-  &.hidden {
-    display: none;
-  }
-
-  button {
-    margin-top: 1rem;
-    margin-bottom: 20px;
-
-    &.filter-button, &.filter-button:hover, &.filter-button:active, &.page-link.btn-primary {
-      background-color: var(--crimson) !important;
-    }
-
-    &.page-link {
-      border-radius: 0;
-    }
-  }
-
-  .pagination {
-    .dropdown-toggle {
-      padding-right: 8px;
-    }
-
-    .page-item > .btn-icon-primary:hover {
-      color: unset;
-      background-color: #E1DDDB;
     }
   }
 }
