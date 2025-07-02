@@ -241,7 +241,7 @@ const LearningPathDetailPage = () => {
           )}
           {activeTab === 'courses' && (
             <div id="courses-section-wrapper">
-              <section id="courses">
+              <section id="courses" className="mx-auto">
                 <h2>Courses</h2>
                 {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
                   <p>No sub-courses found in this learning path.</p>
