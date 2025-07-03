@@ -30,6 +30,7 @@ const Dashboard = () => {
 
   const courses = learnerDashboardData?.courses;
   const emailConfirmation = learnerDashboardData?.emailConfirmation;
+  const enterpriseDashboard = learnerDashboardData?.enterpriseDashboard;
 
   const isLoading = isLoadingPaths || isLoadingCourses;
   const error = pathsError || coursesError;
@@ -195,6 +196,14 @@ const Dashboard = () => {
         <Alert className="account-activation m-0 p-2 rounded-0 text-center">
           Activate your account! Check your inbox for an account activation link from {getConfig().SITE_NAME}.
           If you need help, <a href={emailConfirmation.sendEmailUrl}>contact us</a>.
+        </Alert>
+      )}
+      {enterpriseDashboard?.isLearnerPortalEnabled && (
+        <Alert className="enterprise-dashboard m-0 p-2 rounded-0 text-center">
+          You have access to the <b>{enterpriseDashboard.label}</b> dashboard. To access the courses available to you through {enterpriseDashboard.label}, visit the{' '}
+          <a href={`${enterpriseDashboard.url}?utm_source=lms_dashboard_banner`}>
+            {enterpriseDashboard.label} dashboard
+          </a>.
         </Alert>
       )}
       <div className="dashboard m-4.5">

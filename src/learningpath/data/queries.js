@@ -219,6 +219,7 @@ export const useLearnerDashboard = () => {
       return {
         courses: processedCourses,
         emailConfirmation: dashboardData.emailConfirmation,
+        enterpriseDashboard: dashboardData.enterpriseDashboard,
       };
     },
   });

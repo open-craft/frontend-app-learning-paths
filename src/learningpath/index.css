@@ -19,9 +19,16 @@
   #main-content {
     flex: 1 0 auto;
 
-    .alert-content.account-activation {
-      background-color: var(--crimson);
+    .alert-content{
       color: white;
+
+      &.account-activation {
+        background-color: var(--crimson);
+      }
+
+      &.enterprise-dashboard {
+        background-color: #166A79;
+      }
 
       a {
         color: white;
