@@ -13,7 +13,7 @@ export const QUERY_KEYS = {
   ALL_LEARNING_PATHS: ['learningPaths'],
   LEARNING_PATH_DETAIL: (key) => ['learningPath', key],
   LEARNING_PATH_PROGRESS: (key) => ['learningPathProgress', key],
-  ALL_COURSES: ['courses'],
+  LEARNER_DASHBOARD: ['learnerDashboard'],
   COURSE_DETAILS: (courseId) => ['course', courseId],
   COURSE_COMPLETIONS: ['courseCompletions'],
   COURSE_COMPLETION: (courseId) => ['courseCompletion', courseId],
@@ -183,11 +183,11 @@ export const usePrefetchLearningPathDetail = () => {
 };
 
 // Course Queries
-export const useCourses = () => {
+export const useLearnerDashboard = () => {
   const queryClient = useQueryClient();
 
   return useQuery({
-    queryKey: QUERY_KEYS.ALL_COURSES,
+    queryKey: QUERY_KEYS.LEARNER_DASHBOARD,
     queryFn: async () => {
       await queryClient.prefetchQuery({
         queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
@@ -205,8 +205,8 @@ export const useCourses = () => {
 
       const courseToLearningPathMap = createCourseToLearningPathsMap(learningPaths);
 
-      const courses = await api.fetchCourses();
-      return courses.map(course => {
+      const dashboardData = await api.fetchLearnerDashboard();
+      const processedCourses = dashboardData.courses.map(course => {
         const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
         const courseWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
         return {
@@ -215,6 +215,11 @@ export const useCourses = () => {
           enrollmentDate: course.enrollmentDate ? new Date(course.enrollmentDate) : null,
         };
       });
+
+      return {
+        courses: processedCourses,
+        emailConfirmation: dashboardData.emailConfirmation,
+      };
     },
   });
 };

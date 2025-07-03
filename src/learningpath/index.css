@@ -18,6 +18,16 @@
 
   #main-content {
     flex: 1 0 auto;
+
+    .alert-content.account-activation {
+      background-color: var(--crimson);
+      color: white;
+
+      a {
+        color: white;
+        text-decoration: underline;
+      }
+    }
   }
 
   header.learning-header > div {

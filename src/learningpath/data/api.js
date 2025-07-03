@@ -15,11 +15,12 @@ export async function fetchLearningPathDetail(key) {
   return camelCaseObject(response.data);
 }
 
-export async function fetchCourses() {
+export async function fetchLearnerDashboard() {
   const response = await getAuthenticatedHttpClient().get(`${getConfig().LMS_BASE_URL}/api/learner_home/init/`);
   const courses = response.data.courses || [];
+  const emailConfirmation = response.data.emailConfirmation || {};
 
-  return camelCaseObject(courses.map(course => {
+  const processedCourses = camelCaseObject(courses.map(course => {
     const { courseRun, course: courseInfo, enrollment } = course;
 
     return {
@@ -37,6 +38,11 @@ export async function fetchCourses() {
       enrollmentDate: enrollment?.lastEnrolled || null,
     };
   }));
+
+  return {
+    courses: processedCourses,
+    emailConfirmation: camelCaseObject(emailConfirmation),
+  };
 }
 
 export async function fetchCourseDetails(courseId) {
