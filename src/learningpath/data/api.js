@@ -15,12 +15,14 @@ export async function fetchLearningPathDetail(key) {
   return camelCaseObject(response.data);
 }
 
-export async function fetchCourses() {
+export async function fetchLearnerDashboard() {
   const response = await getAuthenticatedHttpClient().get(`${getConfig().LMS_BASE_URL}/api/learner_home/init/`);
   const courses = response.data.courses || [];
+  const emailConfirmation = response.data.emailConfirmation || {};
+  const enterpriseDashboard = response.data.enterpriseDashboard || {};
 
-  return camelCaseObject(courses.map(course => {
-    const { courseRun, course: courseInfo } = course;
+  const processedCourses = camelCaseObject(courses.map(course => {
+    const { courseRun, course: courseInfo, enrollment } = course;
 
     return {
       id: courseRun.courseId,
@@ -34,8 +36,15 @@ export async function fetchCourses() {
       courseImageAssetPath: courseInfo.bannerImgSrc,
       isStarted: courseRun.isStarted,
       isArchived: courseRun.isArchived,
+      enrollmentDate: enrollment?.lastEnrolled || null,
     };
   }));
+
+  return {
+    courses: processedCourses,
+    emailConfirmation: camelCaseObject(emailConfirmation),
+    enterpriseDashboard: camelCaseObject(enterpriseDashboard),
+  };
 }
 
 export async function fetchCourseDetails(courseId) {
@@ -152,4 +161,25 @@ export async function fetchCourseEnrollmentStatus(courseId) {
       error,
     };
   }
+}
+
+export async function fetchOrganizations() {
+  const client = getAuthenticatedHttpClient();
+
+  let allResults = [];
+  let nextUrl = `${getConfig().LMS_BASE_URL}/api/organizations/v0/organizations/?page_size=100`;
+
+  while (nextUrl) {
+    // eslint-disable-next-line no-await-in-loop
+    const response = await client.get(nextUrl);
+    const results = response.data.results || [];
+    allResults = [...allResults, ...results];
+    nextUrl = response.data.next || null;
+  }
+
+  return camelCaseObject(allResults.map(org => ({
+    shortName: org.short_name,
+    name: org.name,
+    logo: org.logo,
+  })));
 }

@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
   Card,
   Button,
-  Row,
-  Col,
-  Badge,
-  Icon,
   ProgressBar,
+  Chip,
 } from '@openedx/paragon';
 import {
   LmsCompletionSolid,
@@ -17,9 +14,10 @@ import {
   FormatListBulleted,
   AccessTime,
 } from '@openedx/paragon/icons';
-import { usePrefetchLearningPathDetail } from './data/queries';
+import { useOrganizations, usePrefetchLearningPathDetail } from './data/queries';
+import { useScreenSize } from '../hooks/useScreenSize';
 
-const LearningPathCard = ({ learningPath }) => {
+const LearningPathCard = ({ learningPath, showFilters = false }) => {
   const {
     key,
     image,
@@ -28,9 +26,14 @@ const LearningPathCard = ({ learningPath }) => {
     duration,
     numCourses,
     status,
+    minDate,
     maxDate,
     percent,
+    org,
   } = learningPath;
+
+  const { isSmall, isMedium } = useScreenSize();
+  const orientation = (showFilters && (isSmall || isMedium)) || (!showFilters && isSmall) ? 'vertical' : 'horizontal';
 
   // Prefetch the learning path detail when the user hovers over the card.
   const prefetchLearningPathDetail = usePrefetchLearningPathDetail();
@@ -40,6 +43,7 @@ const LearningPathCard = ({ learningPath }) => {
 
   let statusVariant = 'dark';
   let statusIcon = 'fa-circle';
+  let buttonText = 'View';
   switch (status?.toLowerCase()) {
     case 'completed':
       statusVariant = 'success';
@@ -48,85 +52,88 @@ const LearningPathCard = ({ learningPath }) => {
     case 'not started':
       statusVariant = 'secondary';
       statusIcon = LmsCompletionSolid;
+      buttonText = 'Start';
       break;
     case 'in progress':
       statusVariant = 'info';
       statusIcon = Timelapse;
+      buttonText = 'Resume';
       break;
     default:
-      statusVariant = 'dark';
-      statusIcon = 'fa-circle';
       break;
   }
 
+  let accessText = '';
   const currentDate = new Date();
-  const accessDateObj = new Date(maxDate);
-  const accessText = currentDate > accessDateObj
-    ? 'Access ended'
-    : `Access until ${accessDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
+  // Determine access text and override button text based on access dates.
+  if (minDate && minDate > currentDate) {
+    // Learning path will start in the future.
+    const minDateStr = minDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    accessText = <>Access starts on <b>{minDateStr}</b></>;
+    buttonText = 'View';
+  } else if (maxDate) {
+    const maxDateStr = maxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (currentDate > maxDate) {
+      // Learning path has ended.
+      accessText = <>Access ended on <b>{maxDateStr}</b></>;
+      buttonText = 'View';
+    } else {
+      // Learning path is currently available.
+      accessText = <>Access until <b>{maxDateStr}</b></>;
+    }
+  }
   const subtitleLine = subtitle && duration
     ? `${subtitle} • ${duration} days`
     : subtitle || duration || '';
 
+  const { data: organizations = {} } = useOrganizations();
+  const orgData = useMemo(() => ({
+    name: organizations[org]?.name || org,
+    logo: organizations[org]?.logo,
+  }), [organizations, org]);
+
   return (
-    <Card className="learning-path-card p-3 position-relative" onMouseEnter={handleMouseEnter}>
-      <div className="lp-status-badge">
-        <Badge variant={statusVariant} className="d-flex align-items-center">
-          <Icon src={statusIcon} className="mr-1" />
-          {status}
-        </Badge>
-      </div>
-      <Row>
-        <Col xs={12} md={4} className="lp-card-image-col">
-          {image && (
-            <Card.ImageCap
-              src={image}
-              alt={displayName}
-              className="lp-card-image"
-            />
-          )}
-        </Col>
-        <Col xs={12} md={8}>
-          <div className="lp-type-label text-uppercase mb-2">
-            <Icon src={FormatListBulleted} className="mr-1" />
-            <span>Learning Path</span>
-          </div>
-          <Card.Header className="p-0 mb-2" title={displayName} />
-          {subtitleLine && (
-            <p className="card-subtitle text-muted mb-2">
-              {subtitleLine}
-            </p>
-          )}
+    <Card orientation={orientation} className={`lp-card ${orientation}`} onMouseEnter={handleMouseEnter}>
+      <Card.ImageCap src={image} logoSrc={orgData.logo} className={orientation} />
+      <Card.Body>
+        <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
+          <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>
+          <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+        </Card.Section>
+        <Card.Section className="pt-1 pb-1 title"><h3>{displayName}</h3></Card.Section>
+        <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{subtitleLine}</Card.Section>
+        <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && (
-            <ProgressBar.Annotated
-              now={Math.round(percent)}
-              label={`${Math.round(percent)}%`}
-              variant="dark"
-              className="mb-2"
-            />
+            orientation === 'vertical' ? (
+              <ProgressBar
+                now={Math.round(percent)}
+                label={`${Math.round(percent)}%`}
+                variant="primary"
+              />
+            ) : (
+              <ProgressBar.Annotated
+                now={Math.round(percent)}
+                label={`${Math.round(percent)}%`}
+                variant="dark"
+              />
+            )
           )}
-          <Card.Footer className="p-3 d-flex align-items-center">
-            <div className="lp-meta d-flex flex-wrap mr-auto mb-2">
-              {numCourses && (
-                <div className="mr-3 d-flex align-items-center">
-                  <Icon src={FormatListBulleted} className="mr-1" />
-                  {numCourses} courses
-                </div>
-              )}
-              {maxDate && (
-                <div className="mr-6 d-flex align-items-center">
-                  <Icon src={AccessTime} className="mr-1" />
-                  {accessText}
-                </div>
-              )}
-            </div>
-            <Link to={`/learningpath/${key}`}>
-              <Button variant="outline-primary">View</Button>
-            </Link>
-          </Card.Footer>
-        </Col>
-      </Row>
+        </Card.Section>
+        <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
+          <Card.Section className="p-0">
+            {numCourses && (
+              <Chip iconBefore={FormatListBulleted} className="border-0 p-0">{numCourses} courses</Chip>
+            )}
+            {accessText && (
+              <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
+            )}
+          </Card.Section>
+          <Link to={`/learningpath/${key}`}>
+            <Button variant="outline-primary">{buttonText}</Button>
+          </Link>
+        </Card.Footer>
+      </Card.Body>
     </Card>
   );
 };
@@ -140,9 +147,12 @@ LearningPathCard.propTypes = {
     duration: PropTypes.string,
     numCourses: PropTypes.number,
     status: PropTypes.string.isRequired,
-    maxDate: PropTypes.string,
+    minDate: PropTypes.instanceOf(Date),
+    maxDate: PropTypes.instanceOf(Date),
     percent: PropTypes.number,
+    org: PropTypes.string,
   }).isRequired,
+  showFilters: PropTypes.bool,
 };
 
 export default LearningPathCard;
