@@ -202,9 +202,9 @@ const Dashboard = () => {
       {!emailConfirmation?.isNeeded && enterpriseDashboard?.isLearnerPortalEnabled && (
         <Alert className="enterprise-dashboard m-0 p-2 rounded-0 text-center">
           You have access to the <b>{enterpriseDashboard.label}</b> dashboard. To access the courses available to you through {enterpriseDashboard.label}, visit the{' '}
-          <a href={`${enterpriseDashboard.url}?utm_source=lms_dashboard_banner`}>
+          <Link to={`${enterpriseDashboard.url}?utm_source=lms_dashboard_banner`}>
             {enterpriseDashboard.label} dashboard
-          </a>.
+          </Link>.
         </Alert>
       )}
       <div className="dashboard m-4.5">
