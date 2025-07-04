@@ -1,6 +1,7 @@
 import React, {
   useState, useMemo, useEffect, useRef,
 } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Spinner, Col, Button, Pagination, Icon, IconButton, SearchField, Image, Bubble, Alert,
 } from '@openedx/paragon';
@@ -195,7 +196,7 @@ const Dashboard = () => {
       {emailConfirmation?.isNeeded && (
         <Alert className="account-activation m-0 p-2 rounded-0 text-center">
           Activate your account! Check your inbox for an account activation link from {getConfig().SITE_NAME}.
-          If you need help, <a href={emailConfirmation.sendEmailUrl}>contact us</a>.
+          If you need help, <Link to={`${getConfig().LMS_BASE_URL}/contact`}>contact us</Link>.
         </Alert>
       )}
       {!emailConfirmation?.isNeeded && enterpriseDashboard?.isLearnerPortalEnabled && (
