@@ -160,7 +160,7 @@ export const CourseCard = ({
         </Card.Body>
       </Card>
       {relatedLearningPaths && relatedLearningPaths.length > 0 && (
-        <PageBanner variant="light">
+        <PageBanner className="pgn__pageBanner__light rounded-bottom">
           <div className="d-flex flex-wrap text-left w-100 mt-2 ml-2">
             <Icon src={Info} className="mr-2" />
             <p className="mb-0">Related Learning Path{relatedLearningPaths.length > 1 ? 's' : ''}:</p>
