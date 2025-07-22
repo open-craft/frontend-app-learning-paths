@@ -44,7 +44,7 @@ export const CourseCard = ({
     prefetchCourseDetail();
   };
 
-  const progressBarPercent = useMemo(() => Math.round(percent * 100), [percent]);
+  const progressBarPercent = useMemo(() => +(percent * 100).toFixed(1), [percent]);
 
   const linkTo = buildCourseHomeUrl(course.id);
 
