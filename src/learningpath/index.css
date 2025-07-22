@@ -42,6 +42,12 @@
     max-width: unset;
   }
 
+  .pgn__spinner {
+    color: var(--crimson) !important;
+    /* Move the spinner to the center of the screen. */
+    margin-bottom: 200px;
+  }
+
   footer {
     flex-shrink: 0;
   }
