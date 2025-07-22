@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import * as api from './api';
 import {
   addCompletionStatus,
-  addLearningPathNames,
+  addLearningPaths,
   createCompletionsMap,
   createCourseToLearningPathsMap,
 } from './dataUtils';
@@ -208,7 +208,7 @@ export const useLearnerDashboard = () => {
       const dashboardData = await api.fetchLearnerDashboard();
       const processedCourses = dashboardData.courses.map(course => {
         const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
-        const courseWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
+        const courseWithLearningPaths = addLearningPaths(courseWithCompletion, courseToLearningPathMap);
         return {
           ...courseWithLearningPaths,
           type: 'course',

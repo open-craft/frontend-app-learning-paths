@@ -1,6 +1,7 @@
 :root {
   --crimson: #821122;
-  --m-teal: #00a69c
+  --m-teal: #00a69c;
+  --icon-blue: #293352;
 }
 
 #root {
@@ -192,11 +193,11 @@
     box-shadow: 0 8px 16px -4px rgba(0,0,0,0.25);
 
     &.course-card .pgn__card-body {
-      border-bottom: 5px solid #8C8179 !important;
+      border-bottom: 5px solid #8C8179;
     }
 
     &.lp-card .pgn__card-body {
-        border-bottom: 5px solid var(--crimson) !important;
+        border-bottom: 5px solid var(--crimson);
     }
 
     .pgn__card-wrapper-image-cap {
@@ -268,6 +269,31 @@
           overflow: unset;
         }
       }
+    }
+  }
+
+  /* Adjust box shadow and turn off the border radius for the bottom corners when there is an alert below the card. */
+  &:has(+ [role="alert"]) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 0 0.125rem #00000026, 0 0 0.25rem #00000026;
+
+    .pgn__card-body {
+      border-bottom: 0 !important;
+    }
+
+    img.pgn__card-image-cap {
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+
+  /* Style the alert below the card. */
+  &+ [role="alert"] {
+    background-color: #F2F0EF;
+    box-shadow: 0 0.0625rem 0.125rem #00000026, 0 0.0625rem 0.25rem #00000026;
+
+    .pgn__pageBanner-content .pgn__icon {
+      color: var(--icon-blue);
     }
   }
 
@@ -577,7 +603,7 @@
 
     width: 36px;
     height: 36px;
-    background-color: #293352;
+    background-color: var(--icon-blue);
 
     /* Center the icon inside. */
     display: flex;
@@ -604,7 +630,7 @@
     .btn {
       /* This is !important to override edges in the middle of the button group. */
       border-radius: 0.25rem !important;
-      border-color: #293352;
+      border-color: var(--icon-blue);
     }
   }
 }

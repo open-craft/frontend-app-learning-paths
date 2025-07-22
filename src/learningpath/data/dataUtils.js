@@ -45,9 +45,9 @@ export const createCompletionsMap = (completions) => {
 };
 
 /**
- * Creates a map of course keys to learning path names
+ * Creates a map of course keys to learning path data
  * @param {Array} learningPaths - Array of learning path data
- * @returns {Object} Map of course keys to an array of learning path names
+ * @returns {Object} Map of course keys to an array of learning path objects with name and key
  */
 export const createCourseToLearningPathsMap = (learningPaths) => {
   const courseToLearningPathsMap = {};
@@ -63,7 +63,10 @@ export const createCourseToLearningPathsMap = (learningPaths) => {
           courseToLearningPathsMap[step.courseKey] = [];
         }
 
-        courseToLearningPathsMap[step.courseKey].push(path.displayName);
+        courseToLearningPathsMap[step.courseKey].push({
+          name: path.displayName,
+          key: path.key,
+        });
       });
     }
   });
@@ -72,12 +75,12 @@ export const createCourseToLearningPathsMap = (learningPaths) => {
 };
 
 /**
- * Adds learning path names to a course
+ * Adds learning path data to a course
  * @param {Object} course - Course object
- * @param {Object} courseToLearningPathMap - Map of course keys to an array of learning path names
- * @returns {Object} Course object with learning path names
+ * @param {Object} courseToLearningPathMap - Map of course keys to an array of learning path objects with name and key
+ * @returns {Object} Course object with learning path data
  */
-export const addLearningPathNames = (course, courseToLearningPathMap) => ({
+export const addLearningPaths = (course, courseToLearningPathMap) => ({
   ...course,
-  learningPathNames: courseToLearningPathMap[course.id],
+  learningPaths: courseToLearningPathMap[course.id],
 });
