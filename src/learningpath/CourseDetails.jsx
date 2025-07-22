@@ -24,6 +24,7 @@ import {
 import { useCourseDetail, useOrganizations } from './data/queries';
 import { buildAssetUrl, replaceStaticAssetReferences } from '../util/assetUrl';
 import { buildCourseHomeUrl } from './utils';
+import { useScreenSize } from '../hooks/useScreenSize';
 
 const CourseDetailContent = ({
   course,
@@ -50,6 +51,7 @@ const CourseDetailContent = ({
     })
     : null;
 
+  const { isSmall } = useScreenSize();
   const navigate = useNavigate();
   const handleClose = onClose || (() => navigate(-1));
   const { courseKey: urlCourseKey } = useParams();
@@ -91,7 +93,7 @@ const CourseDetailContent = ({
             )}
             <Card.Section className="pl-5 pr-6">
               <Chip iconBefore={LmsBook} className="course-chip">COURSE</Chip>
-              <h1 className="my-3 mt-4.5">{name}</h1>
+              <h1 className={`my-3 mt-4.5${isSmall ? ' h2' : ''}`}>{name}</h1>
               {/* eslint-disable-next-line react/no-danger */}
               <div className="text-muted" dangerouslySetInnerHTML={{ __html: shortDescription || 'No description available.' }} />
             </Card.Section>
