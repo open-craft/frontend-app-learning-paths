@@ -289,7 +289,7 @@ const Dashboard = () => {
                         ? (
                           <CourseCard
                             course={item}
-                            learningPathNames={item.learningPathNames}
+                            relatedLearningPaths={item.learningPaths}
                             showFilters={showFilters}
                           />
                         )
