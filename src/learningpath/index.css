@@ -399,6 +399,21 @@
     .modal-header {
       /* Match the height of the platform's header. */
       height: 66px;
+
+      .pgn__modal-close-button {
+        height: 40px;
+        width: 40px;
+
+        &:hover {
+          color: white;
+          background-color: var(--crimson);
+        }
+
+        &:active {
+          color: var(--crimson);
+          background-color: transparent;
+        }
+      }
     }
 
     .card {
