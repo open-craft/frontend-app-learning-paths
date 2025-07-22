@@ -155,39 +155,39 @@ const LearningPathDetailPage = () => {
           </Card.Body>
           <Card.ImageCap src={image} logoSrc={orgData.logo} />
         </Card>
-        <Row className="mt-4 mx-0 px-6 d-flex hero-info lp-hero-info">
+        <Row className="my-4 mx-0 px-6 d-flex hero-info lp-hero-info">
           {accessUntilDate && (
             <div className="d-flex">
-              <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
+              <Icon src={AccessTimeFilled} className="mr-4 mb-3.5" />
               <div>
                 <p className="mb-0 font-weight-bold">
                   {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
-                <p className="mb-2 text-muted info-subtext">Access ends</p>
+                <p className="mb-0 text-muted">Access ends</p>
               </div>
             </div>
           )}
           <div className="d-flex">
-            <Icon src={Award} className="mr-4 mb-4" />
+            <Icon src={Award} className="mr-4 mb-3.5" />
             <div>
               <p className="mb-0 font-weight-bold">Certificate</p>
-              <p className="mb-2 text-muted info-subtext">Courses include certification</p>
+              <p className="mb-0 text-muted">Courses include certification</p>
             </div>
           </div>
           <div className="d-flex">
-            <Icon src={Calendar} className="mr-4 mb-4" />
+            <Icon src={Calendar} className="mr-4 mb-3.5" />
             <div>
               <p className="mb-0 font-weight-bold">
                 {duration || 'Duration not available'}
               </p>
-              <p className="mb-2 text-muted info-subtext">{timeCommitment || 'Duration'}</p>
+              <p className="mb-0 text-muted">{timeCommitment || 'Duration'}</p>
             </div>
           </div>
           <div className="d-flex">
-            <Icon src={Person} className="mr-4 mb-4" />
+            <Icon src={Person} className="mr-4 mb-3.5" />
             <div>
               <p className="mb-0 font-weight-bold">Self-paced</p>
-              <p className="mb-2 text-muted info-subtext">Progress at your own speed</p>
+              <p className="mb-0 text-muted">Progress at your own speed</p>
             </div>
           </div>
         </Row>

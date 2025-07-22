@@ -484,6 +484,10 @@
       align-items: center;
       white-space: nowrap;
 
+      .text-muted {
+        font-size: 0.8rem;
+      }
+
       &.lp-hero-info svg {
         color: var(--crimson);
       }
