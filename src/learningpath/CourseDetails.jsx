@@ -100,7 +100,7 @@ const CourseDetailContent = ({
           </Card.Body>
           <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
         </Card>
-        <Row className="mt-4 mx-0 px-6 d-flex hero-info course-hero-info">
+        <Row className="my-4 mx-0 px-6 d-flex hero-info course-hero-info">
           {dateDisplay && (
             <div className="d-flex align-items-center">
               <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
