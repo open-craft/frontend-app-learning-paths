@@ -93,6 +93,8 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
     logo: organizations[org]?.logo,
   }), [organizations, org]);
 
+  const progressBarPercent = percent ? +percent.toFixed(1) : '0.0';
+
   return (
     <Card orientation={orientation} className={`lp-card ${orientation}`} onMouseEnter={handleMouseEnter}>
       <Card.ImageCap src={image} logoSrc={orgData.logo} className={orientation} />
@@ -107,14 +109,14 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
           {status.toLowerCase() === 'in progress' && (
             orientation === 'vertical' ? (
               <ProgressBar
-                now={Math.round(percent)}
-                label={`${Math.round(percent)}%`}
+                now={progressBarPercent}
+                label={`${progressBarPercent}%`}
                 variant="primary"
               />
             ) : (
               <ProgressBar.Annotated
-                now={Math.round(percent)}
-                label={`${Math.round(percent)}%`}
+                now={progressBarPercent}
+                label={`${progressBarPercent}%`}
                 variant="dark"
               />
             )
