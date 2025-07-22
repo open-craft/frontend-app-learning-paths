@@ -489,6 +489,7 @@
         font-weight: 600;
         padding: 1rem 1.5rem;
         text-decoration: none !important;
+        border: none;
 
         &:focus {
           box-shadow: none !important;
@@ -506,7 +507,7 @@
         }
 
         &:hover::after,
-        &:active::after {
+        &.active::after {
           height: 4px;
           background-color: var(--crimson);
         }
