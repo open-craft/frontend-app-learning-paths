@@ -81,7 +81,10 @@ const CourseDetailContent = ({
             </ModalCloseButton>
           </Row>
         )}
-        <Card orientation="horizontal">
+        <Card orientation={isSmall ? 'vertical' : 'horizontal'}>
+          {isSmall && (
+            <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} className="mb-4" />
+          )}
           <Card.Body>
             {!isModalView && (
             <Card.Section>
@@ -98,14 +101,16 @@ const CourseDetailContent = ({
               <div className="text-muted" dangerouslySetInnerHTML={{ __html: shortDescription || 'No description available.' }} />
             </Card.Section>
           </Card.Body>
-          <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+          {!isSmall && (
+            <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+          )}
         </Card>
-        <Row className="my-4 mx-0 px-6 d-flex hero-info course-hero-info">
+        <Row className="my-4 mx-0 px-5 px-md-6 flex-column flex-md-row align-items-start hero-info course-hero-info">
           {dateDisplay && (
             <div className="d-flex align-items-center">
               <Icon src={AccessTimeFilled} className="mr-4 mb-3.5" />
               <div>
-                <p className="mb-1 font-weight-bold">{dateDisplay}</p>
+                <p className="mb-0 font-weight-bold">{dateDisplay}</p>
                 <p className="mb-0 text-muted">Access ends</p>
               </div>
             </div>
@@ -113,7 +118,7 @@ const CourseDetailContent = ({
           <div className="d-flex align-items-center">
             <Icon src={Award} className="mr-4 mb-3.5" />
             <div>
-              <p className="mb-1 font-weight-bold">Certificate</p>
+              <p className="mb-0 font-weight-bold">Certificate</p>
               <p className="mb-0 text-muted">Earn a certificate</p>
             </div>
           </div>
@@ -121,7 +126,7 @@ const CourseDetailContent = ({
             <div className="d-flex align-items-center">
               <Icon src={Calendar} className="mr-4 mb-3.5" />
               <div>
-                <p className="mb-1 font-weight-bold">{duration}</p>
+                <p className="mb-0 font-weight-bold">{duration}</p>
                 <p className="mb-0 text-muted">Approx. duration</p>
               </div>
             </div>
@@ -129,7 +134,7 @@ const CourseDetailContent = ({
           <div className="d-flex align-items-center">
             <Icon src={Person} className="mr-4 mb-3.5" />
             <div>
-              <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
+              <p className="mb-0 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
               <p className="mb-0 text-muted">
                 {selfPaced ? 'Progress at your own speed' : 'Follow the course schedule'}
               </p>
