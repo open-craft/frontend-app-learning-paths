@@ -154,7 +154,13 @@ const LearningPathDetailPage = () => {
               </Link>
             </Card.Section>
             {isSmall && (
-              <Card.ImageCap src={image} logoSrc={orgData.logo} className="mb-4" />
+              <Card.ImageCap
+                src={image}
+                srcAlt={`${displayName} learning path image`}
+                logoSrc={orgData.logo}
+                logoAlt={`${orgData.name} logo`}
+                className="mb-4"
+              />
             )}
             <Card.Section className="px-4 py-4 py-md-3.5">
               <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
@@ -164,7 +170,12 @@ const LearningPathDetailPage = () => {
             </Card.Section>
           </Card.Body>
           {!isSmall && (
-            <Card.ImageCap src={image} logoSrc={orgData.logo} />
+            <Card.ImageCap
+              src={image}
+              srcAlt={`${displayName} learning path image`}
+              logoSrc={orgData.logo}
+              logoAlt={`${orgData.name} logo`}
+            />
           )}
         </Card>
         {isSmall && (

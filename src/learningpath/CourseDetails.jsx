@@ -83,7 +83,13 @@ const CourseDetailContent = ({
         )}
         <Card orientation={isSmall ? 'vertical' : 'horizontal'}>
           {isSmall && (
-            <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} className="mb-4" />
+            <Card.ImageCap
+              src={buildAssetUrl(courseImageAssetPath)}
+              srcAlt={`${name} course image`}
+              logoSrc={orgData.logo}
+              logoAlt={`${orgData.name} logo`}
+              className="mb-4"
+            />
           )}
           <Card.Body>
             {!isModalView && (
@@ -102,7 +108,12 @@ const CourseDetailContent = ({
             </Card.Section>
           </Card.Body>
           {!isSmall && (
-            <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+            <Card.ImageCap
+              src={buildAssetUrl(courseImageAssetPath)}
+              srcAlt={`${name} course image`}
+              logoSrc={orgData.logo}
+              logoAlt={`${orgData.name} logo`}
+            />
           )}
         </Card>
         <Row className="my-4 mx-0 px-5 px-md-6 flex-column flex-md-row align-items-start hero-info course-hero-info">

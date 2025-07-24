@@ -101,7 +101,13 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
 
   return (
     <Card orientation={orientation} className={`lp-card ${orientation}`} onMouseEnter={handleMouseEnter}>
-      <Card.ImageCap src={image} logoSrc={orgData.logo} className={orientation} />
+      <Card.ImageCap
+        src={image}
+        srcAlt={`${displayName} learning path image`}
+        logoSrc={orgData.logo}
+        logoAlt={`${orgData.name} logo`}
+        className={orientation}
+      />
       <Card.Body>
         <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
           <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>

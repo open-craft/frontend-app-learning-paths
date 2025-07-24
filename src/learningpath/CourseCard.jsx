@@ -115,7 +115,12 @@ export const CourseCard = ({
   return (
     <>
       <Card orientation={orientation} className={`course-card ${orientation}`} onMouseEnter={handleMouseEnter}>
-        <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+        <Card.ImageCap
+          src={buildAssetUrl(courseImageAssetPath)}
+          srcAlt={`${name} course image`}
+          logoSrc={orgData.logo}
+          logoAlt={`${orgData.name} logo`}
+        />
         <Card.Body>
           <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
             <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
