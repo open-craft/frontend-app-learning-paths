@@ -649,15 +649,6 @@
     }
   }
 
-  .status-options {
-    display: flex;
-    flex-direction: column;
-
-    .pgn__form-checkbox {
-      margin-bottom: 0.75rem;
-    }
-  }
-
   .filter-actions {
     gap: 2rem;
 

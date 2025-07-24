@@ -1,5 +1,5 @@
 import React, {
-  useState, useMemo, useEffect, useRef,
+  useState, useMemo, useEffect, useRef, useCallback,
 } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -76,11 +76,15 @@ const Dashboard = () => {
   const showFiltersKey = 'lp_dashboard_showFilters';
   const selectedContentTypeKey = 'lp_dashboard_contentType';
   const selectedStatusesKey = 'lp_dashboard_selectedStatuses';
+  const selectedDateStatusesKey = 'lp_dashboard_selectedDateStatuses';
 
   const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) === 'true');
   const [selectedContentType, setSelectedContentType] = useState(() => localStorage.getItem(selectedContentTypeKey) || 'All');
   const [selectedStatuses, setSelectedStatuses] = useState(
     () => JSON.parse(localStorage.getItem(selectedStatusesKey)) || [],
+  );
+  const [selectedDateStatuses, setSelectedDateStatuses] = useState(
+    () => JSON.parse(localStorage.getItem(selectedDateStatusesKey)) || [],
   );
 
   useEffect(() => { localStorage.setItem(showFiltersKey, showFilters.toString()); }, [showFilters]);
@@ -88,6 +92,9 @@ const Dashboard = () => {
     localStorage.setItem(selectedContentTypeKey, selectedContentType.toString());
   }, [selectedContentType]);
   useEffect(() => { localStorage.setItem(selectedStatusesKey, JSON.stringify(selectedStatuses)); }, [selectedStatuses]);
+  useEffect(() => {
+    localStorage.setItem(selectedDateStatusesKey, JSON.stringify(selectedDateStatuses));
+  }, [selectedDateStatuses]);
 
   const handleStatusChange = (status, isChecked) => {
     setSelectedStatuses(prev => {
@@ -98,60 +105,78 @@ const Dashboard = () => {
     });
   };
 
+  const handleDateStatusChange = (dateStatus, isChecked) => {
+    setSelectedDateStatuses(prev => {
+      if (isChecked) {
+        return [...prev, dateStatus];
+      }
+      return prev.filter(s => s !== dateStatus);
+    });
+  };
+
   const handleClearFilters = () => {
     setSelectedContentType('All');
     setSelectedStatuses([]);
+    setSelectedDateStatuses([]);
   };
 
   const activeFiltersCount = useMemo(
-    () => (selectedContentType !== 'All') + selectedStatuses.length,
-    [selectedContentType, selectedStatuses],
+    () => (selectedContentType !== 'All') + selectedStatuses.length + selectedDateStatuses.length,
+    [selectedContentType, selectedStatuses, selectedDateStatuses],
   );
+
+  const getItemDates = (item) => {
+    if (item.type === 'course') {
+      return {
+        startDate: item.startDate ? new Date(item.startDate) : null,
+        endDate: item.endDate ? new Date(item.endDate) : null,
+      };
+    }
+    if (item.type === 'learning_path') {
+      return {
+        startDate: item.minDate ? new Date(item.minDate) : null,
+        endDate: item.maxDate ? new Date(item.maxDate) : null,
+      };
+    }
+    return { startDate: null, endDate: null };
+  };
+
+  const getDateStatus = useCallback((item) => {
+    const currentDate = new Date();
+    const { startDate, endDate } = getItemDates(item);
+
+    if (startDate && startDate > currentDate) {
+      return 'Upcoming';
+    }
+    if (endDate && endDate < currentDate) {
+      return 'Ended';
+    }
+    return 'Open';
+  }, []);
 
   const filteredItems = useMemo(() => items.filter(item => {
     const typeMatch = selectedContentType === 'All'
-        || (selectedContentType === 'course' && item.type === 'course')
-        || (selectedContentType === 'learning_path' && item.type === 'learning_path');
+      || (selectedContentType === 'course' && item.type === 'course')
+      || (selectedContentType === 'learning_path' && item.type === 'learning_path');
     const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(item.status);
+    const dateStatusMatch = selectedDateStatuses.length === 0 || selectedDateStatuses.includes(getDateStatus(item));
     const searchMatch = searchQuery === ''
       || (item.displayName && item.displayName.toLowerCase().includes(searchQuery.toLowerCase()))
       || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    return typeMatch && statusMatch && searchMatch;
-  }), [items, selectedContentType, selectedStatuses, searchQuery]);
+    return typeMatch && statusMatch && dateStatusMatch && searchMatch;
+  }), [items, selectedContentType, selectedStatuses, selectedDateStatuses, searchQuery, getDateStatus]);
 
   const sortedItems = useMemo(() => {
-    const currentDate = new Date();
-
-    const getStartDateCategory = (item) => {
-      let startDate = null;
-      let endDate = null;
-
-      if (item.type === 'course') {
-        startDate = item.startDate ? new Date(item.startDate) : null;
-        endDate = item.endDate ? new Date(item.endDate) : null;
-      } else if (item.type === 'learning_path') {
-        startDate = item.minDate ? new Date(item.minDate) : null;
-        endDate = item.maxDate ? new Date(item.maxDate) : null;
-      }
-
-      if (startDate && startDate > currentDate) {
-        return 1; // Not started.
-      }
-      if (endDate && endDate < currentDate) {
-        return 3; // Ended.
-      }
-      return 2; // Available.
-    };
-
     const statusOrder = { 'not started': 1, 'in progress': 2, completed: 3 };
+    const dateStatusOrder = { Upcoming: 1, Open: 2, Ended: 3 };
 
     return [...filteredItems].sort((a, b) => {
       // 1. Sort by start date category.
-      const startCategoryA = getStartDateCategory(a);
-      const startCategoryB = getStartDateCategory(b);
+      const dateStatusA = dateStatusOrder[getDateStatus(a)] || 999;
+      const dateStatusB = dateStatusOrder[getDateStatus(b)] || 999;
 
-      if (startCategoryA !== startCategoryB) {
-        return startCategoryA - startCategoryB;
+      if (dateStatusA !== dateStatusB) {
+        return dateStatusA - dateStatusB;
       }
 
       // 2. Sort by progress status.
@@ -168,7 +193,7 @@ const Dashboard = () => {
 
       return nameA.localeCompare(nameB);
     });
-  }, [filteredItems]);
+  }, [filteredItems, getDateStatus]);
 
   const PAGE_SIZE = getConfig().DASHBOARD_PAGE_SIZE || 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -189,7 +214,7 @@ const Dashboard = () => {
   // Reset pagination when using filters or search.
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedContentType, selectedStatuses]);
+  }, [searchQuery, selectedContentType, selectedStatuses, selectedDateStatuses]);
 
   return (
     <>
@@ -221,6 +246,8 @@ const Dashboard = () => {
                   onSelectContentType={setSelectedContentType}
                   selectedStatuses={selectedStatuses}
                   onChangeStatus={handleStatusChange}
+                  selectedDateStatuses={selectedDateStatuses}
+                  onChangeDateStatus={handleDateStatusChange}
                   onClose={() => setShowFilters(false)}
                   isSmall={isSmall}
                   onClearAll={handleClearFilters}
