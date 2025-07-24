@@ -96,6 +96,10 @@ export const CourseCard = ({
       // Course has ended.
       accessText = <>Access ended on <b>{endDateStr}</b></>;
       buttonText = 'View';
+      // Remove status, as learners cannot do anything to change it at this point.
+      if (status.toLowerCase() !== 'completed') {
+        statusVariant = '';
+      }
     } else {
       // Course is currently available.
       accessText = <>Access until <b>{endDateStr}</b></>;
@@ -115,12 +119,12 @@ export const CourseCard = ({
         <Card.Body>
           <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
             <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
-            <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+            {!!statusVariant && <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>}
           </Card.Section>
           <Card.Section className="pt-1 pb-1 title"><h3>{name}</h3></Card.Section>
           <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
           <Card.Section className="pt-1 pb-1">
-            {status.toLowerCase() === 'in progress' && (
+            {status.toLowerCase() === 'in progress' && !!statusVariant && (
               orientation === 'vertical' ? (
                 <ProgressBar
                   now={progressBarPercent}
