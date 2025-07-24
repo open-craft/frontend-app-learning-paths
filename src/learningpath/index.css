@@ -659,3 +659,24 @@
     }
   }
 }
+
+.courses-with-progress-list {
+  .course-with-progress {
+    margin-bottom: 2rem;
+    position: relative;
+    display: flex;
+    align-items: start;
+
+    .progress-indicator-wrapper {
+      flex-shrink: 0;
+      width: 36px;
+      position: relative;
+    }
+
+    .course-card-wrapper {
+      flex: 1;
+      margin-left: 1rem;
+      min-height: 100px;
+    }
+  }
+}

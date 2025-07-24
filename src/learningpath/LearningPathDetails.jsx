@@ -14,8 +14,8 @@ import {
 import {
   useLearningPathDetail, useCoursesByIds, useEnrollLearningPath, useOrganizations,
 } from './data/queries';
-import { CourseCardWithEnrollment } from './CourseCard';
 import CourseDetailPage from './CourseDetails';
+import { CoursesWithProgressList } from './progress';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 const LearningPathDetailPage = () => {
@@ -296,16 +296,13 @@ const LearningPathDetailPage = () => {
                     <p>No sub-courses found in this learning path.</p>
                   )}
                   {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                    coursesForPath.map(course => (
-                      <div key={course.id} className="mb-3">
-                        <CourseCardWithEnrollment
-                          course={course}
-                          learningPathId={key}
-                          enrollmentDateInLearningPath={enrollmentDate}
-                          onClick={() => handleCourseViewButton(course.id)}
-                        />
-                      </div>
-                    ))
+                    <CoursesWithProgressList
+                      courses={coursesForPath}
+                      learningPathSteps={detail?.steps}
+                      learningPathId={key}
+                      enrollmentDateInLearningPath={enrollmentDate}
+                      onCourseClick={handleCourseViewButton}
+                    />
                   )}
                 </section>
               </Collapsible>
@@ -344,16 +341,13 @@ const LearningPathDetailPage = () => {
                       <p>No sub-courses found in this learning path.</p>
                     )}
                     {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                      coursesForPath.map(course => (
-                        <div key={course.id} className="mb-3">
-                          <CourseCardWithEnrollment
-                            course={course}
-                            learningPathId={key}
-                            enrollmentDateInLearningPath={enrollmentDate}
-                            onClick={() => handleCourseViewButton(course.id)}
-                          />
-                        </div>
-                      ))
+                      <CoursesWithProgressList
+                        courses={coursesForPath}
+                        learningPathSteps={detail?.steps}
+                        learningPathId={key}
+                        enrollmentDateInLearningPath={enrollmentDate}
+                        onCourseClick={handleCourseViewButton}
+                      />
                     )}
                   </section>
                 </div>
