@@ -212,6 +212,7 @@ export const useLearnerDashboard = () => {
         return {
           ...courseWithLearningPaths,
           type: 'course',
+          org: course.id ? course.id.match(/course-v1:([^+]+)/)?.[1] : null,
           enrollmentDate: course.enrollmentDate ? new Date(course.enrollmentDate) : null,
         };
       });
@@ -255,6 +256,7 @@ export const useCoursesByIds = (courseIds) => {
               ...cachedCourseDetail,
               ...addCompletionStatus(cachedCourseDetail, completionsMap, courseId),
               type: 'course',
+              org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
             };
           }
 
@@ -262,11 +264,13 @@ export const useCoursesByIds = (courseIds) => {
           queryClient.setQueryData(QUERY_KEYS.COURSE_DETAILS(courseId), {
             ...detail,
             type: 'course',
+            org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
           });
 
           return {
             ...addCompletionStatus(detail, completionsMap, courseId),
             type: 'course',
+            org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
           };
         }),
       );
@@ -295,6 +299,7 @@ export const useCourseDetail = (courseKey) => {
       return {
         ...addCompletionStatus(detail, completionsMap, courseKey),
         type: 'course',
+        org: courseKey ? courseKey.match(/course-v1:([^+]+)/)?.[1] : null,
       };
     },
     enabled: !!courseKey,
