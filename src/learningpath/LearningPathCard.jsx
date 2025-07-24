@@ -78,6 +78,10 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
       // Learning path has ended.
       accessText = <>Access ended on <b>{maxDateStr}</b></>;
       buttonText = 'View';
+      // Remove status, as learners cannot do anything to change it at this point.
+      if (status.toLowerCase() !== 'completed') {
+        statusVariant = '';
+      }
     } else {
       // Learning path is currently available.
       accessText = <>Access until <b>{maxDateStr}</b></>;
@@ -101,12 +105,12 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
       <Card.Body>
         <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
           <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>
-          <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+          {!!statusVariant && <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>}
         </Card.Section>
         <Card.Section className="pt-1 pb-1 title"><h3>{displayName}</h3></Card.Section>
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{subtitleLine}</Card.Section>
         <Card.Section className="pt-1 pb-1">
-          {status.toLowerCase() === 'in progress' && (
+          {status.toLowerCase() === 'in progress' && !!statusVariant && (
             orientation === 'vertical' ? (
               <ProgressBar
                 now={progressBarPercent}
