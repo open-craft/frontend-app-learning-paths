@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
-  Card, Button, Col, ProgressBar, Chip,
+  Card, Button, Col, ProgressBar, Chip, PageBanner, Icon,
 } from '@openedx/paragon';
 import {
   LmsBook,
@@ -10,6 +10,7 @@ import {
   CheckCircle,
   LmsCompletionSolid,
   Timelapse,
+  Info,
 } from '@openedx/paragon/icons';
 import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import { buildAssetUrl } from '../util/assetUrl';
@@ -20,7 +21,7 @@ import { buildCourseHomeUrl } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 export const CourseCard = ({
-  course, learningPathNames, onClick, onClickViewButton, isEnrolledInLearningPath, showFilters = false,
+  course, relatedLearningPaths, onClick, onClickViewButton, isEnrolledInLearningPath, showFilters = false,
 }) => {
   const {
     name,
@@ -43,7 +44,7 @@ export const CourseCard = ({
     prefetchCourseDetail();
   };
 
-  const progressBarPercent = useMemo(() => Math.round(percent * 100), [percent]);
+  const progressBarPercent = useMemo(() => +(percent * 100).toFixed(1), [percent]);
 
   const linkTo = buildCourseHomeUrl(course.id);
 
@@ -73,7 +74,8 @@ export const CourseCard = ({
     buttonText = 'Loading...';
   }
 
-  let disableStartButton = checkingEnrollment || isEnrolledInLearningPath === false;
+  const disableStartButton = checkingEnrollment || isEnrolledInLearningPath === false;
+  let showStartButton = true;
 
   let accessText = '';
   const currentDate = new Date();
@@ -87,13 +89,17 @@ export const CourseCard = ({
     const startDateStr = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     accessText = <>Access starts on <b>{startDateStr}</b></>;
     buttonText = 'Start';
-    disableStartButton = disableStartButton || !administrator;
+    showStartButton = administrator;
   } else if (endDateObj) {
     const endDateStr = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     if (currentDate > endDateObj) {
       // Course has ended.
       accessText = <>Access ended on <b>{endDateStr}</b></>;
       buttonText = 'View';
+      // Remove status, as learners cannot do anything to change it at this point.
+      if (status.toLowerCase() !== 'completed') {
+        statusVariant = '';
+      }
     } else {
       // Course is currently available.
       accessText = <>Access until <b>{endDateStr}</b></>;
@@ -107,67 +113,72 @@ export const CourseCard = ({
   }), [organizations, org]);
 
   return (
-    <Card orientation={orientation} className={`course-card ${orientation}`} onMouseEnter={handleMouseEnter}>
-      <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
-      <Card.Body>
-        <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
-          <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
-          <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
-        </Card.Section>
-        <Card.Section className="pt-1 pb-1 title"><h3>{name}</h3></Card.Section>
-        {learningPathNames && (
-          <Card.Section className="pt-1 pb-1 card-subtitle text-muted">
-            {learningPathNames.length === 1 ? (
-              <span>Part of {learningPathNames[0]}</span>
-            ) : (
-              <>
-                <div>Part of:</div>
-                <ul className="pl-4 mb-0 mt-1">
-                  {learningPathNames.map((pathName) => (<li>{pathName}</li>))}
-                </ul>
-              </>
+    <>
+      <Card orientation={orientation} className={`course-card ${orientation}`} onMouseEnter={handleMouseEnter}>
+        <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+        <Card.Body>
+          <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
+            <Chip iconBefore={LmsBook} className="border-0 p-0 course-chip">COURSE</Chip>
+            {!!statusVariant && <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>}
+          </Card.Section>
+          <Card.Section className="pt-1 pb-1 title"><h3>{name}</h3></Card.Section>
+          <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
+          <Card.Section className="pt-1 pb-1">
+            {status.toLowerCase() === 'in progress' && !!statusVariant && (
+              orientation === 'vertical' ? (
+                <ProgressBar
+                  now={progressBarPercent}
+                  label={`${progressBarPercent}%`}
+                  variant="primary"
+                />
+              ) : (
+                <ProgressBar.Annotated
+                  now={progressBarPercent}
+                  label={`${progressBarPercent}%`}
+                  variant="dark"
+                />
+              )
             )}
           </Card.Section>
-        )}
-        <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{orgData.name}</Card.Section>
-        <Card.Section className="pt-1 pb-1">
-          {status.toLowerCase() === 'in progress' && (
-            orientation === 'vertical' ? (
-              <ProgressBar
-                now={progressBarPercent}
-                label={`${progressBarPercent}%`}
-                variant="primary"
-              />
-            ) : (
-              <ProgressBar.Annotated
-                now={progressBarPercent}
-                label={`${progressBarPercent}%`}
-                variant="dark"
-              />
-            )
-          )}
-        </Card.Section>
-        <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
-          <Col className="p-0">
-            {accessText && (
-              <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
+          <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
+            <Col className="p-0">
+              {accessText && (
+                <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
+              )}
+            </Col>
+            {onClickViewButton && (
+              <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2">More Info</Button>
             )}
-          </Col>
-          {onClickViewButton && (
-            <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2">More Info</Button>
-          )}
-          {onClick ? (
-            <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
-              {buttonText}
-            </Button>
-          ) : (
-            <Link to={linkTo}>
-              <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
-            </Link>
-          )}
-        </Card.Footer>
-      </Card.Body>
-    </Card>
+            {showStartButton && (
+              onClick ? (
+                <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
+                  {buttonText}
+                </Button>
+              ) : (
+                <Link to={linkTo}>
+                  <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
+                </Link>
+              )
+            )}
+          </Card.Footer>
+        </Card.Body>
+      </Card>
+      {relatedLearningPaths && relatedLearningPaths.length > 0 && (
+        <PageBanner className="pgn__pageBanner__light rounded-bottom">
+          <div className="d-flex flex-wrap text-left w-100 mt-2 ml-2">
+            <Icon src={Info} className="mr-2" />
+            <p className="mb-0">Related Learning Path{relatedLearningPaths.length > 1 ? 's' : ''}:</p>
+            <ul className="w-100 ml-2">
+              {relatedLearningPaths.map((learningPath) => (
+                <li key={`${course.id}-${learningPath.key}`}>
+                  <Link to={`/learningpath/${learningPath.key}`}>{learningPath.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </PageBanner>
+      )}
+    </>
   );
 };
 
@@ -183,7 +194,10 @@ CourseCard.propTypes = {
     percent: PropTypes.number.isRequired,
     checkingEnrollment: PropTypes.bool,
   }).isRequired,
-  learningPathNames: PropTypes.arrayOf(PropTypes.string),
+  relatedLearningPaths: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    key: PropTypes.string.isRequired,
+  })),
   onClick: PropTypes.func,
   onClickViewButton: PropTypes.func,
   isEnrolledInLearningPath: PropTypes.bool,

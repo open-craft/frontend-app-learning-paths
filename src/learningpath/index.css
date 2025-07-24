@@ -1,6 +1,7 @@
 :root {
   --crimson: #821122;
-  --m-teal: #00a69c
+  --m-teal: #00a69c;
+  --icon-blue: #293352;
 }
 
 #root {
@@ -39,6 +40,12 @@
 
   header.learning-header > div {
     max-width: unset;
+  }
+
+  .pgn__spinner {
+    color: var(--crimson) !important;
+    /* Move the spinner to the center of the screen. */
+    margin-bottom: 66px;
   }
 
   footer {
@@ -103,10 +110,6 @@
       margin-left: 350px;
     }
 
-    &.hidden {
-      display: none;
-    }
-
     button {
       margin-top: 1rem;
       margin-bottom: 20px;
@@ -122,6 +125,10 @@
 
     .dashboard-item {
       max-width: 1000px;
+
+      .pgn__pageBanner-content .pgn__icon {
+        color: var(--icon-blue);
+      }
     }
 
     .pagination {
@@ -377,13 +384,28 @@
     .modal-header {
       /* Match the height of the platform's header. */
       height: 66px;
+
+      .pgn__modal-close-button {
+        height: 40px;
+        width: 40px;
+
+        &:hover {
+          color: white;
+          background-color: var(--crimson);
+        }
+
+        &:active {
+          color: var(--crimson);
+          background-color: transparent;
+        }
+      }
     }
 
     .card {
       border-top: 3px solid #8C8179;
       border-radius: 0;
 
-      .pgn__card-wrapper-image-cap {
+      .pgn__card-wrapper-image-cap.horizontal {
         padding: 1.5rem;
 
         .pgn__card-logo-cap {
@@ -400,7 +422,7 @@
       border-radius: 0;
       box-shadow: none;
 
-      .pgn__card-wrapper-image-cap {
+      .pgn__card-wrapper-image-cap.horizontal {
         flex: 0 0 auto;
         height: 320px;
         min-width: 320px !important;
@@ -446,6 +468,11 @@
       justify-content: space-between;
       align-items: center;
       white-space: nowrap;
+      gap: 0.75rem;
+
+      .text-muted {
+        font-size: 0.8rem;
+      }
 
       &.lp-hero-info svg {
         color: var(--crimson);
@@ -463,6 +490,7 @@
     padding: 0 2rem;
     display: flex;
     align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 
     .nav {
       border-bottom: 0;
@@ -473,6 +501,7 @@
         font-weight: 600;
         padding: 1rem 1.5rem;
         text-decoration: none !important;
+        border: none;
 
         &:focus {
           box-shadow: none !important;
@@ -490,7 +519,7 @@
         }
 
         &:hover::after,
-        &:active::after {
+        &.active::after {
           height: 4px;
           background-color: var(--crimson);
         }
@@ -503,7 +532,7 @@
   }
 
   .lp-info {
-    section {
+    .desktop-content section {
       padding: 5rem 10rem;
 
       h2 {
@@ -512,9 +541,11 @@
       }
     }
 
-    #courses-section-wrapper {
+    .mobile-content .collapsible-card {
       background-color: #FBFAF9;
+    }
 
+    #courses-section-wrapper {
       section {
         max-width: 1320px;
       }
@@ -581,7 +612,7 @@
 
     width: 36px;
     height: 36px;
-    background-color: #293352;
+    background-color: var(--icon-blue);
 
     /* Center the icon inside. */
     display: flex;
@@ -593,22 +624,13 @@
     }
   }
 
-  .status-options {
-    display: flex;
-    flex-direction: column;
-
-    .pgn__form-checkbox {
-      margin-bottom: 0.75rem;
-    }
-  }
-
   .filter-actions {
     gap: 2rem;
 
     .btn {
       /* This is !important to override edges in the middle of the button group. */
       border-radius: 0.25rem !important;
-      border-color: #293352;
+      border-color: var(--icon-blue);
     }
   }
 }

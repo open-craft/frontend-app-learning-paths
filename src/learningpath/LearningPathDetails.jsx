@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  Row, Spinner, Nav, Icon, ModalLayer, Button, Chip, Card,
+  Row, Spinner, Nav, Icon, ModalLayer, Button, Chip, Card, Collapsible,
 } from '@openedx/paragon';
 import {
   Person,
@@ -16,15 +16,22 @@ import {
 } from './data/queries';
 import { CourseCardWithEnrollment } from './CourseCard';
 import CourseDetailPage from './CourseDetails';
+import { useScreenSize } from '../hooks/useScreenSize';
 
 const LearningPathDetailPage = () => {
+  const { isSmall } = useScreenSize();
   const { key } = useParams();
   const [selectedCourseKey, setSelectedCourseKey] = useState(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [openCollapsible, setOpenCollapsible] = useState(null);
 
   const [activeTab, setActiveTab] = useState(null);
   const handleTabSelect = (selectedKey) => {
     setActiveTab(selectedKey);
+  };
+
+  const handleCollapsibleToggle = (collapsibleId) => {
+    setOpenCollapsible(openCollapsible === collapsibleId ? null : collapsibleId);
   };
 
   // Scroll to the top when the component mounts.
@@ -42,7 +49,7 @@ const LearningPathDetailPage = () => {
 
   useEffect(() => {
     if (detail && activeTab === null) {
-      setActiveTab(detail.isEnrolled ? 'courses' : 'about');
+      setActiveTab(detail.enrollmentDate ? 'courses' : 'about');
     }
   }, [detail, activeTab]);
 
@@ -84,7 +91,7 @@ const LearningPathDetailPage = () => {
   };
 
   const handleEnrollClick = async () => {
-    if (detail && !detail.isEnrolled) {
+    if (detail && !detail.enrollmentDate) {
       setEnrolling(true);
       try {
         await enrollMutation.mutateAsync(key);
@@ -128,18 +135,17 @@ const LearningPathDetailPage = () => {
       displayName,
       image,
       subtitle,
-      durationInDays,
+      duration,
+      timeCommitment,
       requiredSkills,
       description,
-      isEnrolled,
+      enrollmentDate,
     } = detail;
-
-    const durationText = durationInDays ? `${durationInDays} days` : null;
 
     // Hero section - same for both full view and enrolled view.
     const heroSection = (
       <div className="hero">
-        <Card orientation="horizontal">
+        <Card orientation={isSmall ? 'vertical' : 'horizontal'} className={isSmall ? 'border-0' : ''}>
           <Card.Body>
             <Card.Section>
               <Link to="/" className="d-flex align-items-center back-link pl-4">
@@ -147,15 +153,39 @@ const LearningPathDetailPage = () => {
                 <span>Go Back</span>
               </Link>
             </Card.Section>
-            <Card.Section className="pl-5 pr-6">
+            {isSmall && (
+              <Card.ImageCap src={image} logoSrc={orgData.logo} className="mb-4" />
+            )}
+            <Card.Section className="px-sm-4 pl-5 pr-6">
               <Chip iconBefore={FormatListBulleted} className="lp-chip">LEARNING PATH</Chip>
               <h1 className="my-3 mt-4.5">{displayName}</h1>
-              <p className="text-muted">{subtitle}</p>
+              <p className="text-muted">
+                {/* eslint-disable-next-line react/no-danger */}
+                <div dangerouslySetInnerHTML={{ __html: subtitle || 'No subtitle available.' }} />
+              </p>
             </Card.Section>
           </Card.Body>
-          <Card.ImageCap src={image} logoSrc={orgData.logo} />
+          {!isSmall && (
+            <Card.ImageCap src={image} logoSrc={orgData.logo} />
+          )}
         </Card>
-        <Row className="mt-4 mx-0 px-6 d-flex hero-info lp-hero-info">
+        {isSmall && (
+          <div className="mx-4">
+            <Button
+              variant={enrollmentDate ? 'secondary' : 'primary'}
+              className="px-3 w-100"
+              onClick={handleEnrollClick}
+              disabled={enrolling || enrollmentDate}
+            >
+              {(() => {
+                if (enrolling) { return 'Enrolling...'; }
+                if (enrollmentDate) { return 'Enrolled'; }
+                return 'Enroll';
+              })()}
+            </Button>
+          </div>
+        )}
+        <Row className="my-4 mx-0 px-sm-4 px-5 px-md-6 flex-column flex-md-row align-items-start hero-info lp-hero-info">
           {accessUntilDate && (
             <div className="d-flex">
               <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
@@ -163,7 +193,7 @@ const LearningPathDetailPage = () => {
                 <p className="mb-0 font-weight-bold">
                   {accessUntilDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
-                <p className="mb-2 text-muted info-subtext">Access ends</p>
+                <p className="mb-2 text-muted">Access ends</p>
               </div>
             </div>
           )}
@@ -171,23 +201,23 @@ const LearningPathDetailPage = () => {
             <Icon src={Award} className="mr-4 mb-4" />
             <div>
               <p className="mb-0 font-weight-bold">Certificate</p>
-              <p className="mb-2 text-muted info-subtext">Earn a certificate</p>
+              <p className="mb-2 text-muted">Courses include certification</p>
             </div>
           </div>
           <div className="d-flex">
             <Icon src={Calendar} className="mr-4 mb-4" />
             <div>
               <p className="mb-0 font-weight-bold">
-                {durationText || 'Duration not available'}
+                {duration || 'Duration not available'}
               </p>
-              <p className="mb-2 text-muted info-subtext">Duration</p>
+              <p className="mb-2 text-muted">{timeCommitment || 'Duration'}</p>
             </div>
           </div>
           <div className="d-flex">
             <Icon src={Person} className="mr-4 mb-4" />
             <div>
               <p className="mb-0 font-weight-bold">Self-paced</p>
-              <p className="mb-2 text-muted info-subtext">Progress at your own speed</p>
+              <p className="mb-2 text-muted">Progress at your own speed</p>
             </div>
           </div>
         </Row>
@@ -197,79 +227,143 @@ const LearningPathDetailPage = () => {
     content = (
       <div className="detail-page learning-path-detail-page">
         {heroSection}
-        <div className="tabs d-flex align-items-center pl-5.5 pr-0">
-          <Nav
-            variant="tabs"
-            onSelect={handleTabSelect}
-            className="border-bottom-0"
-            activeKey={activeTab}
-          >
-            <Nav.Item>
-              <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="courses" className="font-weight-normal">Courses</Nav.Link>
-            </Nav.Item>
-            {requiredSkills && requiredSkills.length > 0 && (
+        {!isSmall && (
+          <div className="tabs d-flex align-items-center pl-5.5 pr-0">
+            <Nav
+              variant="tabs"
+              onSelect={handleTabSelect}
+              className="border-bottom-0"
+              activeKey={activeTab}
+            >
               <Nav.Item>
-                <Nav.Link eventKey="requirements" className="font-weight-normal">Requirements</Nav.Link>
+                <Nav.Link eventKey="about" className="font-weight-normal">About</Nav.Link>
               </Nav.Item>
-            )}
-          </Nav>
-          <Button
-            variant={isEnrolled ? 'secondary' : 'primary'}
-            className="ml-auto rounded-0 px-5.5 align-self-stretch"
-            onClick={handleEnrollClick}
-            disabled={enrolling || isEnrolled}
-          >
-            {(() => {
-              if (enrolling) { return 'Enrolling...'; }
-              if (isEnrolled) { return 'Enrolled'; }
-              return 'Enroll';
-            })()}
-          </Button>
-        </div>
+              <Nav.Item>
+                <Nav.Link eventKey="courses" className="font-weight-normal">Courses</Nav.Link>
+              </Nav.Item>
+              {requiredSkills && requiredSkills.length > 0 && (
+                <Nav.Item>
+                  <Nav.Link eventKey="requirements" className="font-weight-normal">Requirements</Nav.Link>
+                </Nav.Item>
+              )}
+            </Nav>
+            <Button
+              variant={enrollmentDate ? 'secondary' : 'primary'}
+              className="ml-auto rounded-0 px-5.5 align-self-stretch"
+              onClick={handleEnrollClick}
+              disabled={enrolling || enrollmentDate}
+            >
+              {(() => {
+                if (enrolling) { return 'Enrolling...'; }
+                if (enrollmentDate) { return 'Enrolled'; }
+                return 'Enroll';
+              })()}
+            </Button>
+          </div>
+        )}
         <div className="py-3 lp-info">
-          {activeTab === 'about' && (
-            <section id="about">
-              <h2>About</h2>
-              <p>
-                {/* eslint-disable-next-line react/no-danger */}
-                <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
-              </p>
-            </section>
-          )}
-          {activeTab === 'courses' && (
-            <div id="courses-section-wrapper">
-              <section id="courses" className="mx-auto">
-                <h2>Courses</h2>
-                {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
-                  <p>No sub-courses found in this learning path.</p>
-                )}
-                {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
-                  coursesForPath.map(course => (
-                    <div key={course.id} className="mb-3">
-                      <CourseCardWithEnrollment
-                        course={course}
-                        learningPathId={key}
-                        isEnrolledInLearningPath={isEnrolled}
-                        onClick={() => handleCourseViewButton(course.id)}
-                      />
-                    </div>
-                  ))
-                )}
-              </section>
+          {isSmall ? (
+            <div className="mobile-content px-4">
+              <Collapsible
+                title="About"
+                open={openCollapsible === 'about'}
+                onToggle={() => handleCollapsibleToggle('about')}
+                className="mb-3"
+              >
+                <section id="about">
+                  {/* eslint-disable-next-line react/no-danger */}
+                  <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
+                </section>
+              </Collapsible>
+
+              <Collapsible
+                title="Courses"
+                open={openCollapsible === 'courses'}
+                onToggle={() => handleCollapsibleToggle('courses')}
+                className="mb-3"
+              >
+                <div id="courses-section-wrapper">
+                  <section id="courses" className="mx-4">
+                    {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
+                      <p>No sub-courses found in this learning path.</p>
+                    )}
+                    {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
+                      coursesForPath.map(course => (
+                        <div key={course.id} className="mb-3">
+                          <CourseCardWithEnrollment
+                            course={course}
+                            learningPathId={key}
+                            enrollmentDateInLearningPath={enrollmentDate}
+                            onClick={() => handleCourseViewButton(course.id)}
+                          />
+                        </div>
+                      ))
+                    )}
+                  </section>
+                </div>
+              </Collapsible>
+
+              {requiredSkills && requiredSkills.length > 0 && (
+                <Collapsible
+                  title="Requirements"
+                  open={openCollapsible === 'requirements'}
+                  onToggle={() => handleCollapsibleToggle('requirements')}
+                  className="mb-3"
+                >
+                  <section id="requirements">
+                    {requiredSkills.map((skillObj) => (
+                      <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
+                        {skillObj.skill.displayName}
+                      </p>
+                    ))}
+                  </section>
+                </Collapsible>
+              )}
             </div>
-          )}
-          {activeTab === 'requirements' && (
-            <section id="requirements">
-              <h2>Requirements</h2>
-              {requiredSkills.map((skillObj) => (
-                <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
-                  {skillObj.skill.displayName}
-                </p>
-              ))}
-            </section>
+          ) : (
+            <div className="desktop-content">
+              {activeTab === 'about' && (
+                <section id="about">
+                  <h2>About</h2>
+                  <p>
+                    {/* eslint-disable-next-line react/no-danger */}
+                    <div dangerouslySetInnerHTML={{ __html: description || 'No description available.' }} />
+                  </p>
+                </section>
+              )}
+              {activeTab === 'courses' && (
+                <div id="courses-section-wrapper">
+                  <section id="courses" className="mx-auto">
+                    <h2>Courses</h2>
+                    {!loadingCourses && !coursesError && (!coursesForPath || coursesForPath.length === 0) && (
+                      <p>No sub-courses found in this learning path.</p>
+                    )}
+                    {!loadingCourses && !coursesError && coursesForPath && coursesForPath.length > 0 && (
+                      coursesForPath.map(course => (
+                        <div key={course.id} className="mb-3">
+                          <CourseCardWithEnrollment
+                            course={course}
+                            learningPathId={key}
+                            enrollmentDateInLearningPath={enrollmentDate}
+                            onClick={() => handleCourseViewButton(course.id)}
+                          />
+                        </div>
+                      ))
+                    )}
+                  </section>
+                </div>
+              )}
+              {activeTab === 'requirements' && (
+                <section id="requirements">
+                  <h2>Requirements</h2>
+                  {requiredSkills.map((skillObj) => (
+                    <p key={`requirement-${skillObj.skill.displayName.replace(/\s+/g, '-').substring(0, 40)}`}>
+                      {skillObj.skill.displayName}
+                    </p>
+                  ))}
+                </section>
+              )}
+            </div>
           )}
         </div>
       </div>

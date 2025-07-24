@@ -24,6 +24,7 @@ import {
 import { useCourseDetail, useOrganizations } from './data/queries';
 import { buildAssetUrl, replaceStaticAssetReferences } from '../util/assetUrl';
 import { buildCourseHomeUrl } from './utils';
+import { useScreenSize } from '../hooks/useScreenSize';
 
 const CourseDetailContent = ({
   course,
@@ -50,6 +51,7 @@ const CourseDetailContent = ({
     })
     : null;
 
+  const { isSmall } = useScreenSize();
   const navigate = useNavigate();
   const handleClose = onClose || (() => navigate(-1));
   const { courseKey: urlCourseKey } = useParams();
@@ -69,17 +71,20 @@ const CourseDetailContent = ({
       <div className="hero">
         {isModalView && (
           <Row className="p-0 m-0 d-flex align-items-center modal-header">
-            <Col>
-              <h4 className="mb-0 pl-4 text-muted font-weight-normal">
+            <Col xs={10}>
+              <h4 className="mb-0 pl-4 text-muted font-weight-normal text-truncate">
                 <b>Learning Path:</b> {learningPathTitle}
               </h4>
             </Col>
-            <ModalCloseButton variant="tertiary" onClick={handleClose} className="mr-1">
+            <ModalCloseButton variant="tertiary" onClick={handleClose} className="mr-2 rounded-circle">
               <Icon src={Close} />
             </ModalCloseButton>
           </Row>
         )}
-        <Card orientation="horizontal">
+        <Card orientation={isSmall ? 'vertical' : 'horizontal'}>
+          {isSmall && (
+            <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} className="mb-4" />
+          )}
           <Card.Body>
             {!isModalView && (
             <Card.Section>
@@ -91,43 +96,48 @@ const CourseDetailContent = ({
             )}
             <Card.Section className="pl-5 pr-6">
               <Chip iconBefore={LmsBook} className="course-chip">COURSE</Chip>
-              <h1 className="my-3 mt-4.5">{name}</h1>
-              <p className="text-muted">{shortDescription}</p>
+              <h1 className={`my-3 mt-4.5${isSmall ? ' h2' : ''}`}>{name}</h1>
+              <p className="text-muted">
+                {/* eslint-disable-next-line react/no-danger */}
+                <div dangerouslySetInnerHTML={{ __html: shortDescription || 'No description available.' }} />
+              </p>
             </Card.Section>
           </Card.Body>
-          <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+          {!isSmall && (
+            <Card.ImageCap src={buildAssetUrl(courseImageAssetPath)} logoSrc={orgData.logo} />
+          )}
         </Card>
-        <Row className="mt-4 mx-0 px-6 d-flex hero-info course-hero-info">
+        <Row className="my-4 mx-0 px-5 px-md-6 flex-column flex-md-row align-items-start hero-info course-hero-info">
           {dateDisplay && (
             <div className="d-flex align-items-center">
               <Icon src={AccessTimeFilled} className="mr-4 mb-3" />
               <div>
-                <p className="mb-1 font-weight-bold">{dateDisplay}</p>
-                <p className="text-muted">Access ends</p>
+                <p className="mb-0 font-weight-bold">{dateDisplay}</p>
+                <p className="mb-2 text-muted">Access ends</p>
               </div>
             </div>
           )}
           <div className="d-flex align-items-center">
             <Icon src={Award} className="mr-4 mb-4" />
             <div>
-              <p className="mb-1 font-weight-bold">Earn a certificate</p>
-              <p className="text-muted">Courses include certification</p>
+              <p className="mb-0 font-weight-bold">Certificate</p>
+              <p className="mb-2 text-muted">Earn a certificate</p>
             </div>
           </div>
           {duration && (
             <div className="d-flex align-items-center">
               <Icon src={Calendar} className="mr-4 mb-4" />
               <div>
-                <p className="mb-1 font-weight-bold">{duration}</p>
-                <p className="text-muted">Approx. duration</p>
+                <p className="mb-0 font-weight-bold">{duration}</p>
+                <p className="mb-2 text-muted">Approx. duration</p>
               </div>
             </div>
           )}
           <div className="d-flex align-items-center">
             <Icon src={Person} className="mr-4 mb-4" />
             <div>
-              <p className="mb-1 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
-              <p className="text-muted">
+              <p className="mb-0 font-weight-bold">{selfPaced ? 'Self-paced' : 'Instructor-paced'}</p>
+              <p className="mb-2 text-muted">
                 {selfPaced ? 'Progress at your own speed' : 'Follow the course schedule'}
               </p>
             </div>
