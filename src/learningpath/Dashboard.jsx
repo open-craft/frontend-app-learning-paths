@@ -7,7 +7,7 @@ import {
 } from '@openedx/paragon';
 import { getConfig } from '@edx/frontend-platform';
 import { FilterAlt, FilterList, Search } from '@openedx/paragon/icons';
-import { useLearningPaths, useLearnerDashboard } from './data/queries';
+import { useLearningPaths, useLearnerDashboard, useOrganizations } from './data/queries';
 import LearningPathCard from './LearningPathCard';
 import { CourseCard } from './CourseCard';
 import FilterPanel from './FilterPanel';
@@ -29,11 +29,16 @@ const Dashboard = () => {
     error: coursesError,
   } = useLearnerDashboard();
 
+  const {
+    data: organizations,
+    isLoading: isLoadingOrgs,
+  } = useOrganizations();
+
   const courses = learnerDashboardData?.courses;
   const emailConfirmation = learnerDashboardData?.emailConfirmation;
   const enterpriseDashboard = learnerDashboardData?.enterpriseDashboard;
 
-  const isLoading = isLoadingPaths || isLoadingCourses;
+  const isLoading = isLoadingPaths || isLoadingCourses || isLoadingOrgs;
   const error = pathsError || coursesError;
 
   if (error) {
@@ -77,6 +82,7 @@ const Dashboard = () => {
   const selectedContentTypeKey = 'lp_dashboard_contentType';
   const selectedStatusesKey = 'lp_dashboard_selectedStatuses';
   const selectedDateStatusesKey = 'lp_dashboard_selectedDateStatuses';
+  const selectedOrgsKey = 'lp_dashboard_selectedOrgs';
 
   const [showFilters, setShowFilters] = useState(() => localStorage.getItem(showFiltersKey) === 'true');
   const [selectedContentType, setSelectedContentType] = useState(() => localStorage.getItem(selectedContentTypeKey) || 'All');
@@ -85,6 +91,9 @@ const Dashboard = () => {
   );
   const [selectedDateStatuses, setSelectedDateStatuses] = useState(
     () => JSON.parse(localStorage.getItem(selectedDateStatusesKey)) || [],
+  );
+  const [selectedOrgs, setSelectedOrgs] = useState(
+    () => JSON.parse(localStorage.getItem(selectedOrgsKey)) || [],
   );
 
   useEffect(() => { localStorage.setItem(showFiltersKey, showFilters.toString()); }, [showFilters]);
@@ -95,6 +104,8 @@ const Dashboard = () => {
   useEffect(() => {
     localStorage.setItem(selectedDateStatusesKey, JSON.stringify(selectedDateStatuses));
   }, [selectedDateStatuses]);
+  useEffect(() => { localStorage.setItem(selectedOrgsKey, JSON.stringify(selectedOrgs)); }, [selectedOrgs]);
+  useEffect(() => { localStorage.setItem(selectedOrgsKey, JSON.stringify(selectedOrgs)); }, [selectedOrgs]);
 
   const handleStatusChange = (status, isChecked) => {
     setSelectedStatuses(prev => {
@@ -114,15 +125,46 @@ const Dashboard = () => {
     });
   };
 
+  const handleOrgChange = (org, isChecked) => {
+    setSelectedOrgs(prev => {
+      if (isChecked) {
+        return [...prev, org];
+      }
+      return prev.filter(s => s !== org);
+    });
+  };
+
   const handleClearFilters = () => {
     setSelectedContentType('All');
     setSelectedStatuses([]);
     setSelectedDateStatuses([]);
+    setSelectedOrgs([]);
   };
 
+  // Get only the organizations that are present in the user's items.
+  const availableOrganizations = useMemo(() => {
+    if (!organizations || !items.length) { return {}; }
+
+    const availableOrgKeys = new Set();
+    items.forEach(item => {
+      if (item.org) {
+        availableOrgKeys.add(item.org);
+      }
+    });
+
+    const filteredOrgs = {};
+    availableOrgKeys.forEach(orgKey => {
+      if (organizations[orgKey]) {
+        filteredOrgs[orgKey] = organizations[orgKey];
+      }
+    });
+
+    return filteredOrgs;
+  }, [organizations, items]);
+
   const activeFiltersCount = useMemo(
-    () => (selectedContentType !== 'All') + selectedStatuses.length + selectedDateStatuses.length,
-    [selectedContentType, selectedStatuses, selectedDateStatuses],
+    () => (selectedContentType !== 'All') + selectedStatuses.length + selectedDateStatuses.length + selectedOrgs.length,
+    [selectedContentType, selectedStatuses, selectedDateStatuses, selectedOrgs],
   );
 
   const getItemDates = (item) => {
@@ -160,11 +202,12 @@ const Dashboard = () => {
       || (selectedContentType === 'learning_path' && item.type === 'learning_path');
     const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(item.status);
     const dateStatusMatch = selectedDateStatuses.length === 0 || selectedDateStatuses.includes(getDateStatus(item));
+    const orgMatch = selectedOrgs.length === 0 || selectedOrgs.includes(item.org);
     const searchMatch = searchQuery === ''
       || (item.displayName && item.displayName.toLowerCase().includes(searchQuery.toLowerCase()))
       || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    return typeMatch && statusMatch && dateStatusMatch && searchMatch;
-  }), [items, selectedContentType, selectedStatuses, selectedDateStatuses, searchQuery, getDateStatus]);
+    return typeMatch && statusMatch && dateStatusMatch && orgMatch && searchMatch;
+  }), [items, selectedContentType, selectedStatuses, selectedDateStatuses, selectedOrgs, searchQuery, getDateStatus]);
 
   const sortedItems = useMemo(() => {
     const statusOrder = { 'not started': 1, 'in progress': 2, completed: 3 };
@@ -214,7 +257,7 @@ const Dashboard = () => {
   // Reset pagination when using filters or search.
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedContentType, selectedStatuses, selectedDateStatuses]);
+  }, [searchQuery, selectedContentType, selectedStatuses, selectedDateStatuses, selectedOrgs]);
 
   return (
     <>
@@ -248,6 +291,9 @@ const Dashboard = () => {
                   onChangeStatus={handleStatusChange}
                   selectedDateStatuses={selectedDateStatuses}
                   onChangeDateStatus={handleDateStatusChange}
+                  selectedOrgs={selectedOrgs}
+                  onChangeOrg={handleOrgChange}
+                  organizations={availableOrganizations}
                   onClose={() => setShowFilters(false)}
                   isSmall={isSmall}
                   onClearAll={handleClearFilters}

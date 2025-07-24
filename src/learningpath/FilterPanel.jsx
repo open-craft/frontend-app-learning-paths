@@ -12,6 +12,9 @@ const FilterPanel = ({
   onChangeStatus,
   selectedDateStatuses,
   onChangeDateStatus,
+  selectedOrgs,
+  onChangeOrg,
+  organizations,
   onClose,
   isSmall,
   onClearAll,
@@ -90,6 +93,26 @@ const FilterPanel = ({
       </Form.Group>
     </div>
 
+    {/* Organization Checkboxes */}
+    {organizations && Object.keys(organizations).length > 0 && (
+      <div className="my-3">
+        <Form.Group>
+          <Form.Label className="h4 my-3">Program Type</Form.Label>
+          <Form.CheckboxSet
+            name="organization"
+            onChange={e => onChangeOrg(e.target.value, e.target.checked)}
+            value={selectedOrgs}
+          >
+            {Object.entries(organizations).map(([shortName, org]) => (
+              <Form.Checkbox key={shortName} value={shortName} className="font-weight-light">
+                {org.name || shortName}
+              </Form.Checkbox>
+            ))}
+          </Form.CheckboxSet>
+        </Form.Group>
+      </div>
+    )}
+
     {/* Action Buttons */}
     {isSmall && (
       <ButtonGroup className="pb-4 filter-actions">
@@ -107,6 +130,14 @@ FilterPanel.propTypes = {
   onChangeStatus: PropTypes.func.isRequired,
   selectedDateStatuses: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChangeDateStatus: PropTypes.func.isRequired,
+  selectedOrgs: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChangeOrg: PropTypes.func.isRequired,
+  organizations: PropTypes.objectOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      shortName: PropTypes.string,
+    }),
+  ).isRequired,
   onClose: PropTypes.func.isRequired,
   isSmall: PropTypes.bool.isRequired,
   onClearAll: PropTypes.func.isRequired,
