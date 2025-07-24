@@ -157,7 +157,7 @@ You can also run this MFE locally without mounting it in Tutor:
 
       cd frontend-app-learning-paths
       npm install
-      npm start --local
+      npm run start:local
 
 Getting Help
 ============
