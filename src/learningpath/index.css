@@ -248,7 +248,7 @@
     .pgn__card-footer {
       flex-direction: column;
 
-      a:has(.btn) {
+      div:has(.btn) {
         align-self: flex-end;
         padding: 1rem 0.5rem 1rem 0;
 

@@ -151,20 +151,22 @@ export const CourseCard = ({
                 <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
               )}
             </Col>
-            {onClickViewButton && (
-              <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2">More Info</Button>
-            )}
-            {showStartButton && (
-              onClick ? (
-                <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
-                  {buttonText}
-                </Button>
-              ) : (
-                <Link to={linkTo}>
-                  <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
-                </Link>
-              )
-            )}
+            <div className="d-flex align-self-end ml-auto">
+              {onClickViewButton && (
+                <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2 text-nowrap">More Info</Button>
+              )}
+              {showStartButton && (
+                onClick ? (
+                  <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
+                    {buttonText}
+                  </Button>
+                ) : (
+                  <Link to={linkTo}>
+                    <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
+                  </Link>
+                )
+              )}
+            </div>
           </Card.Footer>
         </Card.Body>
       </Card>
