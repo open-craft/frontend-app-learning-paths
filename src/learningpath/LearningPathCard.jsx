@@ -108,28 +108,20 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
         logoAlt={`${orgData.name} logo`}
         className={orientation}
       />
-      <Card.Body>
-        <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
+      <Card.Body className="d-flex flex-column">
+        <Card.Section className="pb-2.5 d-flex flex-grow-0 justify-content-between chip-section">
           <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>
           {!!statusVariant && <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>}
         </Card.Section>
-        <Card.Section className="pt-1 pb-1 title"><h3>{displayName}</h3></Card.Section>
+        <Card.Section className="pt-4 pt-md-1 pb-1"><h3>{displayName}</h3></Card.Section>
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{subtitleLine}</Card.Section>
         <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && !!statusVariant && (
-            orientation === 'vertical' ? (
-              <ProgressBar
-                now={progressBarPercent}
-                label={`${progressBarPercent}%`}
-                variant="primary"
-              />
-            ) : (
-              <ProgressBar.Annotated
-                now={progressBarPercent}
-                label={`${progressBarPercent}%`}
-                variant="dark"
-              />
-            )
+            <ProgressBar
+              now={progressBarPercent}
+              label={`${progressBarPercent}%`}
+              variant="primary"
+            />
           )}
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">

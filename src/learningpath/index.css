@@ -141,6 +141,8 @@
 }
 
 .pgn__card {
+  min-height: 240px;
+
   &.horizontal {
     &.course-card .pgn__card-body {
       border-top: 5px solid #8C8179 !important;
@@ -159,38 +161,6 @@
       .pgn__card-logo-cap {
         top: 1rem;
         left: 1rem !important;
-      }
-    }
-
-    .pgn__progress-annotated {
-      padding-bottom: 0;
-      padding-top: 30px;
-
-      .pgn__annotation {
-        display: flex;
-        align-items: center;
-        height: 20px;
-        font-size: 12px;
-
-        padding: 0.75rem 0.5rem;
-
-        filter: none;
-
-        background-color: #E0E0E0;
-        color: black;
-
-        &::after {
-          border-top-color: #E0E0E0;
-        }
-      }
-
-      .progress {
-        background-color: #E0E0E0;
-
-        /* Hide the progress dot. */
-        .progress-bar::after {
-          display: none;
-        }
       }
     }
   }
@@ -239,10 +209,6 @@
           }
         }
       }
-
-      .title {
-        padding-top: 2rem !important;
-      }
     }
 
     .pgn__card-footer {
@@ -258,22 +224,23 @@
       }
     }
 
-    .progress {
-      background-color: #E0E0E0;
-      border: none;
-
-      .progress-bar {
-        &[aria-valuenow="0"],
-        &[aria-valuenow="1"],
-        &[aria-valuenow="2"],
-        &[aria-valuenow="3"],
-        &[aria-valuenow="4"],
-        &[aria-valuenow="5"],
-        &[aria-valuenow="6"] {
-          color: black;
-          text-indent: 150%;
-          overflow: unset;
-        }
+    .progress .progress-bar {
+      &[aria-valuenow="7"],
+      &[aria-valuenow^="7."],
+      &[aria-valuenow="8"],
+      &[aria-valuenow^="8."],
+      &[aria-valuenow="9"],
+      &[aria-valuenow^="9."],
+      &[aria-valuenow="10"],
+      &[aria-valuenow^="10."],
+      &[aria-valuenow="11"],
+      &[aria-valuenow^="11."],
+      &[aria-valuenow="12"],
+      &[aria-valuenow^="12."] {
+        color: black;
+        text-indent: 140%;
+        overflow: unset;
+        padding-right: 0;
       }
     }
   }
@@ -305,6 +272,11 @@
 
   .pgn__card-body {
     border-top-right-radius: 0.4rem;
+
+    .progress {
+      background-color: #E0E0E0;
+      border: none;
+    }
   }
 
   .pgn__card-footer {
@@ -323,6 +295,53 @@
     button {
       margin: 0;
     }
+  }
+}
+
+.progress {
+  background-color: #E0E0E0;
+  border: none;
+
+  .progress-bar {
+    &[aria-valuenow="0"],
+    &[aria-valuenow^="0."],
+    &[aria-valuenow="1"],
+    &[aria-valuenow^="1."],
+    &[aria-valuenow="2"],
+    &[aria-valuenow^="2."],
+    &[aria-valuenow="3"],
+    &[aria-valuenow^="3."],
+    &[aria-valuenow="4"],
+    &[aria-valuenow^="4."],
+    &[aria-valuenow="5"],
+    &[aria-valuenow^="5."],
+    &[aria-valuenow="6"],
+    &[aria-valuenow^="6."] {
+      color: black;
+      text-indent: 150%;
+      overflow: unset;
+      padding-right: 0;
+    }
+
+    &[aria-valuenow="0"],
+    &[aria-valuenow^="0."] {
+      text-indent: 0.75rem;
+    }
+
+    &[aria-valuenow="1"],
+    &[aria-valuenow^="1."] {
+      text-indent: 200%;
+    }
+
+    &[aria-valuenow="5"],
+    &[aria-valuenow^="5."],
+    &[aria-valuenow="6"],
+    &[aria-valuenow^="6."] {
+      text-indent: 120%;
+    }
+
+    text-align: end;
+    padding-right: 0.5rem;
   }
 }
 
