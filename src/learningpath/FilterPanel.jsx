@@ -28,9 +28,18 @@ const FilterPanel = ({
       <IconButton
         src={isSmall ? Close : FilterList}
         iconAs={Icon}
-        variant="link"
         onClick={onClose}
-        className="filter-close-button"
+        className="position-absolute"
+        alt="Close filter"
+        isActive
+        style={{
+          top: '2.3rem',
+          right: isSmall ? '1rem' : '-18px',
+          zIndex: 1000,
+          width: '36px',
+          height: '36px',
+          backgroundColor: isSmall ? 'transparent' : 'var(--icon-blue)',
+        }}
       />
     </div>
 

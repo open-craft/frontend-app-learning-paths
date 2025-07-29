@@ -598,15 +598,6 @@
     .btn-group {
       width: 100%;
     }
-
-    .filter-close-button {
-      right: 1rem;
-      background-color: transparent;
-
-      svg {
-        color: black;
-      }
-    }
   }
 
   .filter-clear-link {
@@ -624,27 +615,6 @@
 
     &.active {
       background-color: var(--crimson);
-      color: white;
-    }
-  }
-
-  .filter-close-button {
-    /* Position the button on the side of the panel. */
-    position: absolute;
-    top: 2.3rem;
-    right: -18px;
-    z-index: 1000;
-
-    width: 36px;
-    height: 36px;
-    background-color: var(--icon-blue);
-
-    /* Center the icon inside. */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
       color: white;
     }
   }
