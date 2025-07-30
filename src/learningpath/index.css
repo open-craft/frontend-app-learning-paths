@@ -462,23 +462,29 @@
       border-radius: 0;
       box-shadow: none;
 
-      .pgn__card-wrapper-image-cap.horizontal {
-        flex: 0 0 auto;
-        height: 320px;
-        min-width: 320px !important;
-        max-width: unset !important;
+      .pgn__card-wrapper-image-cap {
+        &.horizontal {
+          flex: 0 0 auto;
+          height: 320px;
+          min-width: 320px !important;
+          max-width: unset !important;
 
-        .pgn__card-image-cap {
-          border-radius: 0.375rem !important;
+          .pgn__card-image-cap {
+            border-radius: 0.375rem;
 
-          /* The default (`auto`) value does not work in Safari. */
-          width: 100% !important;
+            /* The default (`auto`) value does not work in Safari. */
+            width: 100% !important;
+          }
+
+          .pgn__card-logo-cap {
+            top: 1rem;
+            left: unset !important;
+            right: 1rem;
+          }
         }
 
-        .pgn__card-logo-cap {
-          top: 1rem;
-          left: unset !important;
-          right: 1rem;
+        &.vertical .pgn__card-image-cap {
+          border-radius: 0;
         }
       }
     }
