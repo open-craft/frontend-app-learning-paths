@@ -419,7 +419,11 @@
     overflow-y: auto;
 
     background-color: white;
-    max-width: 90rem;
+
+    /* Display the modal at full width on mobile. */
+    &:has(.card.horizontal) {
+      width: min(90vw, 1108px);
+    }
 
     .modal-header {
       /* Match the height of the platform's header. */
