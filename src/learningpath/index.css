@@ -460,6 +460,10 @@
     }
   }
 
+  &.learning-path-detail-page .hero .pgn__card-image-cap {
+    border-radius: 0 !important;
+  }
+
   .hero {
     .card {
       border-bottom: 2px solid rgba(0, 0, 0, 0.1);
