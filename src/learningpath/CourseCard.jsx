@@ -74,7 +74,7 @@ export const CourseCard = ({
     buttonText = 'Loading...';
   }
 
-  const disableStartButton = checkingEnrollment || isEnrolledInLearningPath === false;
+  const disableStartButton = !administrator && (checkingEnrollment || isEnrolledInLearningPath === false);
   let showStartButton = true;
 
   let accessText = '';
@@ -221,7 +221,9 @@ export const CourseCardWithEnrollment = ({
   const courseHomeUrl = buildCourseHomeUrl(course.id);
 
   const handleCourseAction = async () => {
-    if (courseWithEnrollment.isEnrolledInCourse) {
+    const { administrator } = getAuthenticatedUser();
+
+    if (courseWithEnrollment.isEnrolledInCourse || administrator) {
       window.location.href = courseHomeUrl;
       return;
     }
