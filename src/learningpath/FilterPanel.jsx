@@ -39,6 +39,7 @@ const FilterPanel = ({
           width: '36px',
           height: '36px',
           backgroundColor: isSmall ? 'transparent' : 'var(--icon-blue)',
+          color: isSmall ? 'black' : 'white',
         }}
       />
     </div>
