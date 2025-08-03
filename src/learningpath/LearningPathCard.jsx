@@ -125,12 +125,12 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
           )}
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
-          <Card.Section className="p-0">
+          <Card.Section className="d-flex p-0 flex-column-reverse flex-md-row align-items-start w-100 w-md-auto">
             {numCourses && (
-              <Chip iconBefore={FormatListBulleted} className="border-0 pb-3 pb-md-0 p-0">{numCourses} courses</Chip>
+              <Chip iconBefore={FormatListBulleted} className="border-0 pb-1 pb-md-0 p-0">{numCourses} courses</Chip>
             )}
             {accessText && (
-              <Chip iconBefore={AccessTime} className="border-0 pb-3 pb-md-0 p-0">{accessText}</Chip>
+              <Chip iconBefore={AccessTime} className="border-0 pb-1 pb-md-0 p-0">{accessText}</Chip>
             )}
           </Card.Section>
           <Link to={`/learningpath/${key}`}>

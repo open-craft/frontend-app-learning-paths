@@ -137,9 +137,9 @@ export const CourseCard = ({
             )}
           </Card.Section>
           <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
-            <Col className="p-0">
+            <Col className="d-flex p-0 flex-column-reverse flex-md-row align-items-start w-100 w-md-auto">
               {accessText && (
-                <Chip iconBefore={AccessTime} className="border-0 pb-3 pb-md-0 p-0">{accessText}</Chip>
+                <Chip iconBefore={AccessTime} className="border-0 pb-1 pb-md-0 p-0">{accessText}</Chip>
               )}
             </Col>
             <div className="d-flex align-self-end ml-auto">

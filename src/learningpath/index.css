@@ -185,12 +185,7 @@
       border-radius: 0.25rem;
 
       .chip-section {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        right: 1rem;
-
-        padding: 0;
+        padding-top: 1.75rem;
 
         .pgn__chip {
           &:not(.status-chip) {
