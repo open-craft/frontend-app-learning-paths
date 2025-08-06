@@ -19,6 +19,7 @@ import LearningPathDetailPage from './learningpath/LearningPathDetails';
 import CourseDetailPage from './learningpath/CourseDetails';
 
 import './index.scss';
+import './setupConsoleOverride';
 
 subscribe(APP_READY, () => {
   const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import * as api from './api';
 import {
   addCompletionStatus,
-  addLearningPathNames,
+  addLearningPaths,
   createCompletionsMap,
   createCourseToLearningPathsMap,
 } from './dataUtils';
@@ -208,10 +208,11 @@ export const useLearnerDashboard = () => {
       const dashboardData = await api.fetchLearnerDashboard();
       const processedCourses = dashboardData.courses.map(course => {
         const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
-        const courseWithLearningPaths = addLearningPathNames(courseWithCompletion, courseToLearningPathMap);
+        const courseWithLearningPaths = addLearningPaths(courseWithCompletion, courseToLearningPathMap);
         return {
           ...courseWithLearningPaths,
           type: 'course',
+          org: course.id ? course.id.match(/course-v1:([^+]+)/)?.[1] : null,
           enrollmentDate: course.enrollmentDate ? new Date(course.enrollmentDate) : null,
         };
       });
@@ -255,6 +256,7 @@ export const useCoursesByIds = (courseIds) => {
               ...cachedCourseDetail,
               ...addCompletionStatus(cachedCourseDetail, completionsMap, courseId),
               type: 'course',
+              org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
             };
           }
 
@@ -262,11 +264,13 @@ export const useCoursesByIds = (courseIds) => {
           queryClient.setQueryData(QUERY_KEYS.COURSE_DETAILS(courseId), {
             ...detail,
             type: 'course',
+            org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
           });
 
           return {
             ...addCompletionStatus(detail, completionsMap, courseId),
             type: 'course',
+            org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
           };
         }),
       );
@@ -295,6 +299,7 @@ export const useCourseDetail = (courseKey) => {
       return {
         ...addCompletionStatus(detail, completionsMap, courseKey),
         type: 'course',
+        org: courseKey ? courseKey.match(/course-v1:([^+]+)/)?.[1] : null,
       };
     },
     enabled: !!courseKey,
@@ -349,7 +354,7 @@ export const useEnrollLearningPath = () => {
           if (oldData) {
             return {
               ...oldData,
-              isEnrolled: true,
+              enrollmentDate: Date.now(),
             };
           }
           return oldData;
@@ -361,7 +366,7 @@ export const useEnrollLearningPath = () => {
         (oldData) => {
           if (!oldData) { return oldData; }
           return oldData.map(path => (path.key === learningPathId
-            ? { ...path, isEnrolled: true }
+            ? { ...path, enrollmentDate: Date.now() }
             : path));
         },
       );

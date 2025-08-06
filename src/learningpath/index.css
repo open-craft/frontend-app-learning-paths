@@ -1,6 +1,7 @@
 :root {
   --crimson: #821122;
-  --m-teal: #00a69c
+  --m-teal: #00a69c;
+  --icon-blue: #293352;
 }
 
 #root {
@@ -39,6 +40,12 @@
 
   header.learning-header > div {
     max-width: unset;
+  }
+
+  .pgn__spinner {
+    color: var(--crimson) !important;
+    /* Move the spinner to the center of the screen. */
+    margin-bottom: 200px;
   }
 
   footer {
@@ -103,10 +110,6 @@
       margin-left: 350px;
     }
 
-    &.hidden {
-      display: none;
-    }
-
     button {
       margin-top: 1rem;
       margin-bottom: 20px;
@@ -138,6 +141,8 @@
 }
 
 .pgn__card {
+  min-height: 240px;
+
   &.horizontal {
     &.course-card .pgn__card-body {
       border-top: 5px solid #8C8179 !important;
@@ -158,49 +163,17 @@
         left: 1rem !important;
       }
     }
-
-    .pgn__progress-annotated {
-      padding-bottom: 0;
-      padding-top: 30px;
-
-      .pgn__annotation {
-        display: flex;
-        align-items: center;
-        height: 20px;
-        font-size: 12px;
-
-        padding: 0.75rem 0.5rem;
-
-        filter: none;
-
-        background-color: #E0E0E0;
-        color: black;
-
-        &::after {
-          border-top-color: #E0E0E0;
-        }
-      }
-
-      .progress {
-        background-color: #E0E0E0;
-
-        /* Hide the progress dot. */
-        .progress-bar::after {
-          display: none;
-        }
-      }
-    }
   }
 
   &.vertical {
     box-shadow: 0 8px 16px -4px rgba(0,0,0,0.25);
 
     &.course-card .pgn__card-body {
-      border-bottom: 5px solid #8C8179 !important;
+      border-bottom: 5px solid #8C8179;
     }
 
     &.lp-card .pgn__card-body {
-        border-bottom: 5px solid var(--crimson) !important;
+        border-bottom: 5px solid var(--crimson);
     }
 
     .pgn__card-wrapper-image-cap {
@@ -212,12 +185,7 @@
       border-radius: 0.25rem;
 
       .chip-section {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        right: 1rem;
-
-        padding: 0;
+        padding-top: 1.75rem;
 
         .pgn__chip {
           &:not(.status-chip) {
@@ -236,16 +204,12 @@
           }
         }
       }
-
-      .title {
-        padding-top: 2rem !important;
-      }
     }
 
     .pgn__card-footer {
       flex-direction: column;
 
-      a:has(.btn) {
+      div:has(.btn) {
         align-self: flex-end;
         padding: 1rem 0.5rem 1rem 0;
 
@@ -255,28 +219,59 @@
       }
     }
 
-    .progress {
-      background-color: #E0E0E0;
-      border: none;
-
-      .progress-bar {
-        &[aria-valuenow="0"],
-        &[aria-valuenow="1"],
-        &[aria-valuenow="2"],
-        &[aria-valuenow="3"],
-        &[aria-valuenow="4"],
-        &[aria-valuenow="5"],
-        &[aria-valuenow="6"] {
-          color: black;
-          text-indent: 150%;
-          overflow: unset;
-        }
+    .progress .progress-bar {
+      &[aria-valuenow="7"],
+      &[aria-valuenow^="7."],
+      &[aria-valuenow="8"],
+      &[aria-valuenow^="8."],
+      &[aria-valuenow="9"],
+      &[aria-valuenow^="9."],
+      &[aria-valuenow="10"],
+      &[aria-valuenow^="10."],
+      &[aria-valuenow="11"],
+      &[aria-valuenow^="11."],
+      &[aria-valuenow="12"],
+      &[aria-valuenow^="12."] {
+        color: black;
+        text-indent: 140%;
+        overflow: unset;
+        padding-right: 0;
       }
+    }
+  }
+
+  /* Adjust box shadow and turn off the border radius for the bottom corners when there is an alert below the card. */
+  &:has(+ [role="alert"]) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 0 0.125rem #00000026, 0 0 0.25rem #00000026;
+
+    .pgn__card-body {
+      border-bottom: 0 !important;
+    }
+
+    img.pgn__card-image-cap {
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+
+  /* Style the alert below the card. */
+  &+ [role="alert"] {
+    background-color: #F2F0EF;
+    box-shadow: 0 0.0625rem 0.125rem #00000026, 0 0.0625rem 0.25rem #00000026;
+
+    .pgn__pageBanner-content .pgn__icon {
+      color: var(--icon-blue);
     }
   }
 
   .pgn__card-body {
     border-top-right-radius: 0.4rem;
+
+    .progress {
+      background-color: #E0E0E0;
+      border: none;
+    }
   }
 
   .pgn__card-footer {
@@ -295,6 +290,53 @@
     button {
       margin: 0;
     }
+  }
+}
+
+.progress {
+  background-color: #E0E0E0;
+  border: none;
+
+  .progress-bar {
+    &[aria-valuenow="0"],
+    &[aria-valuenow^="0."],
+    &[aria-valuenow="1"],
+    &[aria-valuenow^="1."],
+    &[aria-valuenow="2"],
+    &[aria-valuenow^="2."],
+    &[aria-valuenow="3"],
+    &[aria-valuenow^="3."],
+    &[aria-valuenow="4"],
+    &[aria-valuenow^="4."],
+    &[aria-valuenow="5"],
+    &[aria-valuenow^="5."],
+    &[aria-valuenow="6"],
+    &[aria-valuenow^="6."] {
+      color: black;
+      text-indent: 150%;
+      overflow: unset;
+      padding-right: 0;
+    }
+
+    &[aria-valuenow="0"],
+    &[aria-valuenow^="0."] {
+      text-indent: 0.75rem;
+    }
+
+    &[aria-valuenow="1"],
+    &[aria-valuenow^="1."] {
+      text-indent: 200%;
+    }
+
+    &[aria-valuenow="5"],
+    &[aria-valuenow^="5."],
+    &[aria-valuenow="6"],
+    &[aria-valuenow^="6."] {
+      text-indent: 120%;
+    }
+
+    text-align: end;
+    padding-right: 0.5rem;
   }
 }
 
@@ -372,18 +414,37 @@
     overflow-y: auto;
 
     background-color: white;
-    max-width: 90rem;
+
+    /* Display the modal at full width on mobile. */
+    &:has(.card.horizontal) {
+      width: min(90vw, 1108px);
+    }
 
     .modal-header {
       /* Match the height of the platform's header. */
       height: 66px;
+
+      .pgn__modal-close-button {
+        height: 40px;
+        width: 40px;
+
+        &:hover {
+          color: white;
+          background-color: var(--crimson);
+        }
+
+        &:active {
+          color: var(--crimson);
+          background-color: transparent;
+        }
+      }
     }
 
     .card {
       border-top: 3px solid #8C8179;
       border-radius: 0;
 
-      .pgn__card-wrapper-image-cap {
+      .pgn__card-wrapper-image-cap.horizontal {
         padding: 1.5rem;
 
         .pgn__card-logo-cap {
@@ -394,6 +455,10 @@
     }
   }
 
+  &.learning-path-detail-page .hero .pgn__card-image-cap {
+    border-radius: 0 !important;
+  }
+
   .hero {
     .card {
       border-bottom: 2px solid rgba(0, 0, 0, 0.1);
@@ -401,22 +466,28 @@
       box-shadow: none;
 
       .pgn__card-wrapper-image-cap {
-        flex: 0 0 auto;
-        height: 320px;
-        min-width: 320px !important;
-        max-width: unset !important;
+        &.horizontal {
+          flex: 0 0 auto;
+          height: 320px;
+          min-width: 320px !important;
+          max-width: unset !important;
 
-        .pgn__card-image-cap {
-          border-radius: 0.375rem !important;
+          .pgn__card-image-cap {
+            border-radius: 0.375rem;
 
-          /* The default (`auto`) value does not work in Safari. */
-          width: 100% !important;
+            /* The default (`auto`) value does not work in Safari. */
+            width: 100% !important;
+          }
+
+          .pgn__card-logo-cap {
+            top: 1rem;
+            left: unset !important;
+            right: 1rem;
+          }
         }
 
-        .pgn__card-logo-cap {
-          top: 1rem;
-          left: unset !important;
-          right: 1rem;
+        &.vertical .pgn__card-image-cap {
+          border-radius: 0;
         }
       }
     }
@@ -446,6 +517,11 @@
       justify-content: space-between;
       align-items: center;
       white-space: nowrap;
+      gap: 0.75rem;
+
+      .text-muted {
+        font-size: 0.8rem;
+      }
 
       &.lp-hero-info svg {
         color: var(--crimson);
@@ -463,6 +539,7 @@
     padding: 0 2rem;
     display: flex;
     align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 
     .nav {
       border-bottom: 0;
@@ -473,6 +550,7 @@
         font-weight: 600;
         padding: 1rem 1.5rem;
         text-decoration: none !important;
+        border: none;
 
         &:focus {
           box-shadow: none !important;
@@ -490,7 +568,7 @@
         }
 
         &:hover::after,
-        &:active::after {
+        &.active::after {
           height: 4px;
           background-color: var(--crimson);
         }
@@ -503,7 +581,7 @@
   }
 
   .lp-info {
-    section {
+    .desktop-content section {
       padding: 5rem 10rem;
 
       h2 {
@@ -512,9 +590,15 @@
       }
     }
 
-    #courses-section-wrapper {
+    .mobile-content .collapsible-card {
       background-color: #FBFAF9;
 
+      .collapsible-body {
+        padding: 1rem;
+      }
+    }
+
+    #courses-section-wrapper {
       section {
         max-width: 1320px;
       }
@@ -542,15 +626,6 @@
     .btn-group {
       width: 100%;
     }
-
-    .filter-close-button {
-      right: 1rem;
-      background-color: transparent;
-
-      svg {
-        color: black;
-      }
-    }
   }
 
   .filter-clear-link {
@@ -572,43 +647,34 @@
     }
   }
 
-  .filter-close-button {
-    /* Position the button on the side of the panel. */
-    position: absolute;
-    top: 2.3rem;
-    right: -18px;
-    z-index: 1000;
-
-    width: 36px;
-    height: 36px;
-    background-color: #293352;
-
-    /* Center the icon inside. */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-      color: white;
-    }
-  }
-
-  .status-options {
-    display: flex;
-    flex-direction: column;
-
-    .pgn__form-checkbox {
-      margin-bottom: 0.75rem;
-    }
-  }
-
   .filter-actions {
     gap: 2rem;
 
     .btn {
       /* This is !important to override edges in the middle of the button group. */
       border-radius: 0.25rem !important;
-      border-color: #293352;
+      border-color: var(--icon-blue);
+    }
+  }
+}
+
+.courses-with-progress-list {
+  .course-with-progress {
+    margin-bottom: 2rem;
+    position: relative;
+    display: flex;
+    align-items: start;
+
+    .progress-indicator-wrapper {
+      flex-shrink: 0;
+      width: 36px;
+      position: relative;
+    }
+
+    .course-card-wrapper {
+      flex: 1;
+      margin-left: 1rem;
+      min-height: 100px;
     }
   }
 }

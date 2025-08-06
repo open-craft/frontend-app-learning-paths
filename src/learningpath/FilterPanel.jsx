@@ -10,6 +10,11 @@ const FilterPanel = ({
   onSelectContentType,
   selectedStatuses,
   onChangeStatus,
+  selectedDateStatuses,
+  onChangeDateStatus,
+  selectedOrgs,
+  onChangeOrg,
+  organizations,
   onClose,
   isSmall,
   onClearAll,
@@ -23,9 +28,19 @@ const FilterPanel = ({
       <IconButton
         src={isSmall ? Close : FilterList}
         iconAs={Icon}
-        variant="link"
         onClick={onClose}
-        className="filter-close-button"
+        className="position-absolute"
+        alt="Close filter"
+        isActive
+        style={{
+          top: '2.3rem',
+          right: isSmall ? '1rem' : '-18px',
+          zIndex: 1000,
+          width: '36px',
+          height: '36px',
+          backgroundColor: isSmall ? 'transparent' : 'var(--icon-blue)',
+          color: isSmall ? 'black' : 'white',
+        }}
       />
     </div>
 
@@ -58,46 +73,61 @@ const FilterPanel = ({
 
     {/* Status Checkboxes */}
     <div className="my-3">
-      <h4 className="mt-4.5 mb-3">My Progress</h4>
-      <Form>
-        <div className="status-options">
-          <Form.Checkbox
-            value="In progress"
-            checked={selectedStatuses.includes('In progress')}
-            onChange={e => onChangeStatus('In progress', e.target.checked)}
-            className="font-weight-light"
-          >
-            In progress
-          </Form.Checkbox>
-          <Form.Checkbox
-            value="Not started"
-            checked={selectedStatuses.includes('Not started')}
-            onChange={e => onChangeStatus('Not started', e.target.checked)}
-            className="font-weight-light"
-          >
-            Not started
-          </Form.Checkbox>
-          <Form.Checkbox
-            value="Completed"
-            checked={selectedStatuses.includes('Completed')}
-            onChange={e => onChangeStatus('Completed', e.target.checked)}
-            className="font-weight-light"
-          >
-            Completed
-          </Form.Checkbox>
-        </div>
-      </Form>
+      <Form.Group>
+        <Form.Label className="h4 my-3">My Progress</Form.Label>
+        <Form.CheckboxSet
+          name="progress-status"
+          onChange={e => onChangeStatus(e.target.value, e.target.checked)}
+          value={selectedStatuses}
+        >
+          <Form.Checkbox value="In progress" className="font-weight-light">In progress</Form.Checkbox>
+          <Form.Checkbox value="Not started" className="font-weight-light">Not started</Form.Checkbox>
+          <Form.Checkbox value="Completed" className="font-weight-light">Completed</Form.Checkbox>
+        </Form.CheckboxSet>
+      </Form.Group>
     </div>
+
+    {/* Date Status Checkboxes */}
+    <div className="my-3">
+      <Form.Group>
+        <Form.Label className="h4 my-3">Course / Learning Path Status</Form.Label>
+        <Form.CheckboxSet
+          name="date-status"
+          onChange={e => onChangeDateStatus(e.target.value, e.target.checked)}
+          value={selectedDateStatuses}
+        >
+          <Form.Checkbox value="Open" className="font-weight-light">Open</Form.Checkbox>
+          <Form.Checkbox value="Upcoming" className="font-weight-light">Upcoming</Form.Checkbox>
+          <Form.Checkbox value="Ended" className="font-weight-light">Ended</Form.Checkbox>
+        </Form.CheckboxSet>
+      </Form.Group>
+    </div>
+
+    {/* Organization Checkboxes */}
+    {organizations && Object.keys(organizations).length > 0 && (
+      <div className="my-3">
+        <Form.Group>
+          <Form.Label className="h4 my-3">Program Type</Form.Label>
+          <Form.CheckboxSet
+            name="organization"
+            onChange={e => onChangeOrg(e.target.value, e.target.checked)}
+            value={selectedOrgs}
+          >
+            {Object.entries(organizations).map(([shortName, org]) => (
+              <Form.Checkbox key={shortName} value={shortName} className="font-weight-light">
+                {org.name || shortName}
+              </Form.Checkbox>
+            ))}
+          </Form.CheckboxSet>
+        </Form.Group>
+      </div>
+    )}
 
     {/* Action Buttons */}
     {isSmall && (
       <ButtonGroup className="pb-4 filter-actions">
-        <Button variant="outline-secondary" onClick={onClearAll}>
-          Clear all
-        </Button>
-        <Button variant="primary" onClick={onClose} className="pl-3">
-          Apply
-        </Button>
+        <Button variant="outline-secondary" onClick={onClearAll}>Clear all</Button>
+        <Button variant="primary" onClick={onClose} className="pl-3">Apply</Button>
       </ButtonGroup>
     )}
   </div>
@@ -108,6 +138,16 @@ FilterPanel.propTypes = {
   onSelectContentType: PropTypes.func.isRequired,
   selectedStatuses: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChangeStatus: PropTypes.func.isRequired,
+  selectedDateStatuses: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChangeDateStatus: PropTypes.func.isRequired,
+  selectedOrgs: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChangeOrg: PropTypes.func.isRequired,
+  organizations: PropTypes.objectOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      shortName: PropTypes.string,
+    }),
+  ).isRequired,
   onClose: PropTypes.func.isRequired,
   isSmall: PropTypes.bool.isRequired,
   onClearAll: PropTypes.func.isRequired,

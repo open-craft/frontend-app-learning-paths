@@ -78,6 +78,10 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
       // Learning path has ended.
       accessText = <>Access ended on <b>{maxDateStr}</b></>;
       buttonText = 'View';
+      // Remove status, as learners cannot do anything to change it at this point.
+      if (status.toLowerCase() !== 'completed') {
+        statusVariant = '';
+      }
     } else {
       // Learning path is currently available.
       accessText = <>Access until <b>{maxDateStr}</b></>;
@@ -93,45 +97,47 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
     logo: organizations[org]?.logo,
   }), [organizations, org]);
 
+  const progressBarPercent = percent ? +percent.toFixed(1) : '0.0';
+
   return (
     <Card orientation={orientation} className={`lp-card ${orientation}`} onMouseEnter={handleMouseEnter}>
-      <Card.ImageCap src={image} logoSrc={orgData.logo} className={orientation} />
-      <Card.Body>
-        <Card.Section className="pb-2.5 d-flex justify-content-between chip-section">
+      <Card.ImageCap
+        src={image}
+        srcAlt={`${displayName} learning path image`}
+        logoSrc={orgData.logo}
+        logoAlt={`${orgData.name} logo`}
+        className={orientation}
+      />
+      <Card.Body className="d-flex flex-column">
+        <Card.Section className="pb-2.5 d-flex flex-grow-0 justify-content-between chip-section">
           <Chip iconBefore={FormatListBulleted} className="border-0 p-0 lp-chip">LEARNING PATH</Chip>
-          <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>
+          {!!statusVariant && <Chip iconBefore={statusIcon} className={`pl-1 status-chip status-${statusVariant}`}>{status.toUpperCase()}</Chip>}
         </Card.Section>
-        <Card.Section className="pt-1 pb-1 title"><h3>{displayName}</h3></Card.Section>
+        <Card.Section className="pt-4 pt-md-1 pb-1"><h3>{displayName}</h3></Card.Section>
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{subtitleLine}</Card.Section>
         <Card.Section className="pt-1 pb-1">
-          {status.toLowerCase() === 'in progress' && (
-            orientation === 'vertical' ? (
-              <ProgressBar
-                now={Math.round(percent)}
-                label={`${Math.round(percent)}%`}
-                variant="primary"
-              />
-            ) : (
-              <ProgressBar.Annotated
-                now={Math.round(percent)}
-                label={`${Math.round(percent)}%`}
-                variant="dark"
-              />
-            )
+          {status.toLowerCase() === 'in progress' && !!statusVariant && (
+            <ProgressBar
+              now={progressBarPercent}
+              label={`${progressBarPercent}%`}
+              variant="primary"
+            />
           )}
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
-          <Card.Section className="p-0">
+          <Card.Section className="d-flex p-0 flex-column-reverse flex-md-row align-items-start w-100 w-md-auto">
             {numCourses && (
-              <Chip iconBefore={FormatListBulleted} className="border-0 p-0">{numCourses} courses</Chip>
+              <Chip iconBefore={FormatListBulleted} className="border-0 pb-1 pb-md-0 p-0">{numCourses} courses</Chip>
             )}
             {accessText && (
-              <Chip iconBefore={AccessTime} className="border-0 p-0">{accessText}</Chip>
+              <Chip iconBefore={AccessTime} className="border-0 pb-1 pb-md-0 p-0">{accessText}</Chip>
             )}
           </Card.Section>
-          <Link to={`/learningpath/${key}`}>
-            <Button variant="outline-primary">{buttonText}</Button>
-          </Link>
+          <div className="d-flex align-self-end ml-auto">
+            <Link to={`/learningpath/${key}`}>
+              <Button variant="outline-primary">{buttonText}</Button>
+            </Link>
+          </div>
         </Card.Footer>
       </Card.Body>
     </Card>
