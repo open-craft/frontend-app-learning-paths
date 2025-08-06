@@ -133,9 +133,11 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
               <Chip iconBefore={AccessTime} className="border-0 pb-1 pb-md-0 p-0">{accessText}</Chip>
             )}
           </Card.Section>
-          <Link to={`/learningpath/${key}`}>
-            <Button variant="outline-primary">{buttonText}</Button>
-          </Link>
+          <div className="d-flex align-self-end ml-auto">
+            <Link to={`/learningpath/${key}`}>
+              <Button variant="outline-primary">{buttonText}</Button>
+            </Link>
+          </div>
         </Card.Footer>
       </Card.Body>
     </Card>
