@@ -4,6 +4,7 @@ import * as api from './api';
 import {
   addCompletionStatus,
   addLearningPaths,
+  calculateCompletionStatus,
   createCompletionsMap,
   createCourseToLearningPathsMap,
 } from './dataUtils';
@@ -72,22 +73,8 @@ export const useLearningPaths = () => {
           return sum + (completion?.percent ?? 0);
         }, 0);
 
-        const progress = totalCompletion / totalCourses;
-        const requiredCompletion = lp.requiredCompletion || 0;
-
-        let status = 'In progress';
-        if (progress === 0) {
-          status = 'Not started';
-        } else if (progress >= requiredCompletion) {
-          status = 'Completed';
-        }
-
-        let percent = 0;
-        if (requiredCompletion > 0) {
-          percent = Math.round((progress / requiredCompletion) * 100);
-        } else {
-          percent = Math.round(progress * 100);
-        }
+        const percent = totalCompletion / totalCourses;
+        const { status } = calculateCompletionStatus(percent);
 
         let minDate = null;
         let maxDate = null;
