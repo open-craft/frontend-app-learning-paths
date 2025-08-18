@@ -97,7 +97,7 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
     logo: organizations[org]?.logo,
   }), [organizations, org]);
 
-  const progressBarPercent = percent ? +percent.toFixed(1) : '0.0';
+  const progressBarPercent = useMemo(() => +(percent * 100).toFixed(1), [percent]);
 
   return (
     <Card orientation={orientation} className={`lp-card ${orientation}`} onMouseEnter={handleMouseEnter}>
