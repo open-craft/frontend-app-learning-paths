@@ -117,11 +117,14 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
         <Card.Section className="pt-1 pb-1 card-subtitle text-muted">{subtitleLine}</Card.Section>
         <Card.Section className="pt-1 pb-1">
           {status.toLowerCase() === 'in progress' && !!statusVariant && (
-            <ProgressBar
-              now={progressBarPercent}
-              label={`${progressBarPercent}%`}
-              variant="primary"
-            />
+            <>
+              <ProgressBar
+                now={progressBarPercent}
+                label={`${progressBarPercent}%`}
+                variant="primary"
+              />
+              <div className="x-small text-right pt-1">content completed</div>
+            </>
           )}
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
