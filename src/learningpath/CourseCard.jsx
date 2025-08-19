@@ -135,7 +135,7 @@ export const CourseCard = ({
                   label={`${progressBarPercent}%`}
                   variant="primary"
                 />
-                <div className="x-small text-right">content completed</div>
+                <div className="x-small text-right pt-1">content completed</div>
               </>
             )}
           </Card.Section>
