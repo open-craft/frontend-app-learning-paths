@@ -104,7 +104,7 @@ const FilterPanel = ({
     </div>
 
     {/* Organization Checkboxes */}
-    {organizations && Object.keys(organizations).length > 0 && (
+    {organizations && organizations.length > 0 && (
       <div className="my-3">
         <Form.Group>
           <Form.Label className="h4 my-3">Program Type</Form.Label>
@@ -113,9 +113,9 @@ const FilterPanel = ({
             onChange={e => onChangeOrg(e.target.value, e.target.checked)}
             value={selectedOrgs}
           >
-            {Object.entries(organizations).map(([shortName, org]) => (
-              <Form.Checkbox key={shortName} value={shortName} className="font-weight-light">
-                {org.name || shortName}
+            {organizations.map(org => (
+              <Form.Checkbox key={org.shortName} value={org.shortName} className="font-weight-light">
+                {org.name || org.shortName}
               </Form.Checkbox>
             ))}
           </Form.CheckboxSet>
@@ -142,10 +142,10 @@ FilterPanel.propTypes = {
   onChangeDateStatus: PropTypes.func.isRequired,
   selectedOrgs: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChangeOrg: PropTypes.func.isRequired,
-  organizations: PropTypes.objectOf(
+  organizations: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string,
-      shortName: PropTypes.string,
+      name: PropTypes.string.isRequired,
+      shortName: PropTypes.string.isRequired,
     }),
   ).isRequired,
   onClose: PropTypes.func.isRequired,
