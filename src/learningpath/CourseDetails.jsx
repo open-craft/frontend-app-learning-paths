@@ -21,7 +21,7 @@ import {
   Close,
   ChevronLeft,
 } from '@openedx/paragon/icons';
-import { useCourseDetail, useOrganizations } from './data/queries';
+import { useCourseDetail, useOrganizations, useCredentialConfiguration } from './data/queries';
 import { buildAssetUrl, replaceStaticAssetReferences } from '../util/assetUrl';
 import { buildCourseHomeUrl } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
@@ -65,6 +65,9 @@ const CourseDetailContent = ({
     name: organizations[org]?.name || org,
     logo: organizations[org]?.logo,
   }), [organizations, org]);
+
+  const { data: credentialConfig } = useCredentialConfiguration(activeCourseKey);
+  const hasCertificate = credentialConfig?.hasCredentials;
 
   return (
     <>
@@ -126,13 +129,15 @@ const CourseDetailContent = ({
               </div>
             </div>
           )}
-          <div className="d-flex align-items-center">
-            <Icon src={Award} className="mr-4 mb-3.5" />
-            <div>
-              <p className="mb-0 font-weight-bold">Certificate</p>
-              <p className="mb-0 text-muted">Earn a certificate</p>
+          {hasCertificate && (
+            <div className="d-flex align-items-center">
+              <Icon src={Award} className="mr-4 mb-3.5" />
+              <div>
+                <p className="mb-0 font-weight-bold">Certificate</p>
+                <p className="mb-0 text-muted">Earn a certificate</p>
+              </div>
             </div>
-          </div>
+          )}
           {duration && (
             <div className="d-flex align-items-center">
               <Icon src={Calendar} className="mr-4 mb-3.5" />
