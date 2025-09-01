@@ -20,6 +20,7 @@ export const QUERY_KEYS = {
   COURSE_COMPLETION: (courseId) => ['courseCompletion', courseId],
   COURSE_ENROLLMENT_STATUS: (courseId) => ['courseEnrollmentStatus', courseId],
   ORGANIZATIONS: ['organizations'],
+  CREDENTIAL_CONFIGURATION: (learningContextKey) => ['credentialConfiguration', learningContextKey],
 };
 
 // Stale time configurations
@@ -34,6 +35,7 @@ export const STALE_TIMES = {
   COMPLETIONS: 60 * 1000, // 1 minute
 
   ORGANIZATIONS: 60 * 60 * 1000, // 1 hour
+  CREDENTIALS: 5 * 60 * 1000, // 5 minutes
 };
 
 // Learning Paths Queries
@@ -279,6 +281,12 @@ export const useCourseDetail = (courseKey) => {
         queryFn: api.fetchAllCourseCompletions,
       });
 
+      queryClient.prefetchQuery({
+        queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(courseKey),
+        queryFn: () => api.fetchCredentialConfiguration(courseKey),
+        staleTime: STALE_TIMES.CREDENTIALS,
+      });
+
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
@@ -310,6 +318,12 @@ export const usePrefetchCourseDetail = (courseId) => {
           queryKey: QUERY_KEYS.COURSE_COMPLETION(courseId),
           queryFn: () => api.fetchCourseCompletion(courseId),
           staleTime: STALE_TIMES.COMPLETIONS,
+        });
+
+        queryClient.prefetchQuery({
+          queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(courseId),
+          queryFn: () => api.fetchCredentialConfiguration(courseId),
+          staleTime: STALE_TIMES.CREDENTIALS,
         });
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -385,4 +399,11 @@ export const useOrganizations = () => useQuery({
     return organizationsMap;
   },
   staleTime: STALE_TIMES.ORGANIZATIONS,
+});
+
+export const useCredentialConfiguration = (learningContextKey) => useQuery({
+  queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(learningContextKey),
+  queryFn: () => api.fetchCredentialConfiguration(learningContextKey),
+  enabled: !!learningContextKey,
+  staleTime: STALE_TIMES.CREDENTIALS,
 });

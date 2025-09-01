@@ -210,7 +210,7 @@ const LearningPathDetailPage = () => {
             <Icon src={Award} className="mr-4 mb-3.5" />
             <div>
               <p className="mb-0 font-weight-bold">Certificate</p>
-              <p className="mb-0 text-muted">Courses include certification</p>
+              <p className="mb-0 text-muted">Awarded upon completing the learning path</p>
             </div>
           </div>
           <div className="d-flex">
