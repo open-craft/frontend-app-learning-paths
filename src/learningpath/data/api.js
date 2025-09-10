@@ -183,3 +183,18 @@ export async function fetchOrganizations() {
     logo: org.logo,
   })));
 }
+
+export async function fetchCredentialConfiguration(learningContextKey) {
+  const client = getAuthenticatedHttpClient();
+  try {
+    const response = await client.get(
+      `${getConfig().LMS_BASE_URL}/api/learning_credentials/v1/configured/${encodeURIComponent(learningContextKey)}/`,
+    );
+    return camelCaseObject(response.data);
+  } catch (error) {
+    return {
+      hasCredentials: false,
+      credentialCount: 0,
+    };
+  }
+}
