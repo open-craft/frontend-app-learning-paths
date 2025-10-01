@@ -153,6 +153,10 @@
     }
 
     .pgn__card-wrapper-image-cap {
+      /* Enforce vertical logos to be square.
+      The `height` is overridden in the hero - that's why we're not using `max-height` here. */
+      height: 240px;
+
       .pgn__card-image-cap {
         /* The default (`auto`) value does not work in Safari. */
         width: 240px !important;
