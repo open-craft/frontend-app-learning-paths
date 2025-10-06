@@ -4,6 +4,7 @@ import * as api from './api';
 import {
   addCompletionStatus,
   addLearningPaths,
+  calculateCompletionStatus,
   createCompletionsMap,
   createCourseToLearningPathsMap,
 } from './dataUtils';
@@ -19,6 +20,7 @@ export const QUERY_KEYS = {
   COURSE_COMPLETION: (courseId) => ['courseCompletion', courseId],
   COURSE_ENROLLMENT_STATUS: (courseId) => ['courseEnrollmentStatus', courseId],
   ORGANIZATIONS: ['organizations'],
+  CREDENTIAL_CONFIGURATION: (learningContextKey) => ['credentialConfiguration', learningContextKey],
 };
 
 // Stale time configurations
@@ -33,6 +35,7 @@ export const STALE_TIMES = {
   COMPLETIONS: 60 * 1000, // 1 minute
 
   ORGANIZATIONS: 60 * 60 * 1000, // 1 hour
+  CREDENTIALS: 5 * 60 * 1000, // 5 minutes
 };
 
 // Learning Paths Queries
@@ -72,22 +75,8 @@ export const useLearningPaths = () => {
           return sum + (completion?.percent ?? 0);
         }, 0);
 
-        const progress = totalCompletion / totalCourses;
-        const requiredCompletion = lp.requiredCompletion || 0;
-
-        let status = 'In progress';
-        if (progress === 0) {
-          status = 'Not started';
-        } else if (progress >= requiredCompletion) {
-          status = 'Completed';
-        }
-
-        let percent = 0;
-        if (requiredCompletion > 0) {
-          percent = Math.round((progress / requiredCompletion) * 100);
-        } else {
-          percent = Math.round(progress * 100);
-        }
+        const percent = totalCompletion / totalCourses;
+        const { status } = calculateCompletionStatus(percent);
 
         let minDate = null;
         let maxDate = null;
@@ -292,6 +281,12 @@ export const useCourseDetail = (courseKey) => {
         queryFn: api.fetchAllCourseCompletions,
       });
 
+      queryClient.prefetchQuery({
+        queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(courseKey),
+        queryFn: () => api.fetchCredentialConfiguration(courseKey),
+        staleTime: STALE_TIMES.CREDENTIALS,
+      });
+
       const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
@@ -323,6 +318,12 @@ export const usePrefetchCourseDetail = (courseId) => {
           queryKey: QUERY_KEYS.COURSE_COMPLETION(courseId),
           queryFn: () => api.fetchCourseCompletion(courseId),
           staleTime: STALE_TIMES.COMPLETIONS,
+        });
+
+        queryClient.prefetchQuery({
+          queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(courseId),
+          queryFn: () => api.fetchCredentialConfiguration(courseId),
+          staleTime: STALE_TIMES.CREDENTIALS,
         });
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -398,4 +399,11 @@ export const useOrganizations = () => useQuery({
     return organizationsMap;
   },
   staleTime: STALE_TIMES.ORGANIZATIONS,
+});
+
+export const useCredentialConfiguration = (learningContextKey) => useQuery({
+  queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(learningContextKey),
+  queryFn: () => api.fetchCredentialConfiguration(learningContextKey),
+  enabled: !!learningContextKey,
+  staleTime: STALE_TIMES.CREDENTIALS,
 });
