@@ -143,7 +143,7 @@ const Dashboard = () => {
 
   // Get only the organizations that are present in the user's items.
   const availableOrganizations = useMemo(() => {
-    if (!organizations || !items.length) { return {}; }
+    if (!organizations || !items.length) { return []; }
 
     const availableOrgKeys = new Set();
     items.forEach(item => {
@@ -152,14 +152,9 @@ const Dashboard = () => {
       }
     });
 
-    const filteredOrgs = {};
-    availableOrgKeys.forEach(orgKey => {
-      if (organizations[orgKey]) {
-        filteredOrgs[orgKey] = organizations[orgKey];
-      }
-    });
-
-    return filteredOrgs;
+    return Array.from(availableOrgKeys, orgKey => organizations[orgKey])
+      .filter(Boolean)
+      .sort((a, b) => (a.name || a.shortName).localeCompare(b.name || b.shortName));
   }, [organizations, items]);
 
   const activeFiltersCount = useMemo(
