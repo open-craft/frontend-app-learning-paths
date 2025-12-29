@@ -263,11 +263,11 @@ const Dashboard = () => {
         </Alert>
       )}
       {!emailConfirmation?.isNeeded && enterpriseDashboard?.isLearnerPortalEnabled && (
-        <Alert className="enterprise-dashboard m-0 p-2 rounded-0 text-center">
-          You have access to the <b>{enterpriseDashboard.label}</b> dashboard. To access the courses available to you through {enterpriseDashboard.label}, visit the{' '}
-          <Link to={`${enterpriseDashboard.url}?utm_source=lms_dashboard_banner`}>
-            {enterpriseDashboard.label} dashboard
-          </Link>.
+        <Alert className="enterprise-dashboard m-0 p-2 rounded-0 text-center" style={{ lineHeight: '5rem', fontSize: '1.1rem' }}>
+          Your affiliation with <b>{enterpriseDashboard?.label || 'enterprise'}</b> provides access to additional courses. Check the {' '}
+          <Link to={`${enterpriseDashboard?.url}?utm_source=lms_dashboard_banner`}>
+            Course Finder
+          </Link> to discover them.
         </Alert>
       )}
       <div className="dashboard m-4.5">
