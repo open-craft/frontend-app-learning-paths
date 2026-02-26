@@ -10,15 +10,15 @@ import { Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import { LearningHeader as Header } from '@edx/frontend-component-header';
-import FooterSlot from '@openedx/frontend-slot-footer';
+import Header from '@edx/frontend-component-header';
+import { FooterSlot } from '@edx/frontend-component-footer';
 import messages from './i18n';
 import queryClient from './queryClient';
 import Dashboard from './learningpath/Dashboard';
 import LearningPathDetailPage from './learningpath/LearningPathDetails';
 import CourseDetailPage from './learningpath/CourseDetails';
 
-import './index.scss';
+import './index.css';
 import './setupConsoleOverride';
 
 subscribe(APP_READY, () => {
