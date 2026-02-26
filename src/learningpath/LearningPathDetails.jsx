@@ -257,7 +257,7 @@ const LearningPathDetailPage = () => {
               )}
             </Nav>
             <Button
-              variant={enrollmentDate ? 'secondary' : 'primary'}
+              variant="brand"
               className="ml-auto rounded-0 px-5.5 align-self-stretch"
               onClick={handleEnrollClick}
               disabled={enrolling || !!enrollmentDate}

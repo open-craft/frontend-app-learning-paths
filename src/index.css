@@ -4,6 +4,50 @@
   --icon-blue: #293352;
 }
 
+button {
+  &.btn-primary {
+    background-color: var(--crimson) !important;
+    border-color: var(--crimson) !important;
+    color: white !important;
+  }
+
+  &.btn-tertiary {
+    color: #373737 !important;
+    background-color: transparent !important;
+
+    &:hover {
+      background-color: #f4f4f4 !important;
+      color: unset !important;
+    }
+  }
+
+  &.btn-secondary {
+    background-color: transparent !important;
+    border-color: #0a3055 !important;
+    color: #0a3055 !important;
+
+    &:hover {
+      background-color: #f4f4f4 !important;
+    }
+  }
+
+  &.btn-brand {
+    background-color: #0a3055 !important;
+    border-color: #0a3055 !important;
+    color: white !important;
+
+    &:hover:not(:disabled) {
+      background-color: #082644 !important;
+      border-color: #082644 !important;
+    }
+
+    &:disabled {
+      background-color: #454545 !important;
+      border-color: #454545 !important;
+    }
+  }
+}
+
 #root {
   /* Make the footer stick to the bottom when there is not enough content. */
   height: 100%;
@@ -114,10 +158,6 @@
       margin-top: 1rem;
       margin-bottom: 20px;
 
-      &.filter-button, &.filter-button:hover, &.filter-button:active, &.page-link.btn-primary {
-        background-color: var(--crimson) !important;
-      }
-
       &.page-link {
         border-radius: 0;
       }
@@ -130,11 +170,6 @@
     .pagination {
       .dropdown-toggle {
         padding-right: 8px;
-      }
-
-      .page-item > .btn-icon-primary:hover {
-        color: unset;
-        background-color: #E1DDDB;
       }
     }
   }
@@ -616,7 +651,7 @@
 }
 
 .filter-panel.sidebar {
-  top: 4.3rem;
+  top: 4rem;
   left: -350px;
   width: 350px;
   background-color: white;
@@ -649,11 +684,6 @@
 
   .filter-content-buttons .btn {
     border-color: #E0E0E0;
-
-    &.active {
-      background-color: var(--crimson);
-      color: white;
-    }
   }
 
   .filter-actions {
@@ -662,7 +692,6 @@
     .btn {
       /* This is !important to override edges in the middle of the button group. */
       border-radius: 0.25rem !important;
-      border-color: var(--icon-blue);
     }
   }
 }

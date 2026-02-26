@@ -48,21 +48,21 @@ const FilterPanel = ({
     <div className="my-3">
       <ButtonGroup className="filter-content-buttons">
         <Button
-          variant={selectedContentType === 'All' ? 'primary' : 'outline-secondary'}
+          variant={selectedContentType === 'All' ? 'primary' : 'tertiary'}
           onClick={() => onSelectContentType('All')}
           active={selectedContentType === 'All'}
         >
           All
         </Button>
         <Button
-          variant={selectedContentType === 'course' ? 'primary' : 'outline-secondary'}
+          variant={selectedContentType === 'course' ? 'primary' : 'tertiary'}
           onClick={() => onSelectContentType('course')}
           active={selectedContentType === 'course'}
         >
           Courses
         </Button>
         <Button
-          variant={selectedContentType === 'learning_path' ? 'primary' : 'outline-secondary'}
+          variant={selectedContentType === 'learning_path' ? 'primary' : 'tertiary'}
           onClick={() => onSelectContentType('learning_path')}
           active={selectedContentType === 'learning_path'}
         >
@@ -80,9 +80,9 @@ const FilterPanel = ({
           onChange={e => onChangeStatus(e.target.value, e.target.checked)}
           value={selectedStatuses}
         >
-          <Form.Checkbox value="In progress" className="font-weight-light">In progress</Form.Checkbox>
-          <Form.Checkbox value="Not started" className="font-weight-light">Not started</Form.Checkbox>
-          <Form.Checkbox value="Completed" className="font-weight-light">Completed</Form.Checkbox>
+          <Form.Checkbox value="In progress" className="text-muted">In progress</Form.Checkbox>
+          <Form.Checkbox value="Not started" className="text-muted">Not started</Form.Checkbox>
+          <Form.Checkbox value="Completed" className="text-muted">Completed</Form.Checkbox>
         </Form.CheckboxSet>
       </Form.Group>
     </div>
@@ -96,9 +96,9 @@ const FilterPanel = ({
           onChange={e => onChangeDateStatus(e.target.value, e.target.checked)}
           value={selectedDateStatuses}
         >
-          <Form.Checkbox value="Open" className="font-weight-light">Open</Form.Checkbox>
-          <Form.Checkbox value="Upcoming" className="font-weight-light">Upcoming</Form.Checkbox>
-          <Form.Checkbox value="Ended" className="font-weight-light">Ended</Form.Checkbox>
+          <Form.Checkbox value="Open" className="text-muted">Open</Form.Checkbox>
+          <Form.Checkbox value="Upcoming" className="text-muted">Upcoming</Form.Checkbox>
+          <Form.Checkbox value="Ended" className="text-muted">Ended</Form.Checkbox>
         </Form.CheckboxSet>
       </Form.Group>
     </div>
@@ -114,7 +114,7 @@ const FilterPanel = ({
             value={selectedOrgs}
           >
             {organizations.map(org => (
-              <Form.Checkbox key={org.shortName} value={org.shortName} className="font-weight-light">
+              <Form.Checkbox key={org.shortName} value={org.shortName} className="text-muted">
                 {org.name || org.shortName}
               </Form.Checkbox>
             ))}

@@ -332,7 +332,7 @@ const Dashboard = () => {
               )}
               <div className="d-flex justify-content-between align-items-center">
                 {!showFilters && !isSmall && (
-                  <Button onClick={() => setShowFilters(true)} variant="secondary" className="filter-button border-0">
+                  <Button onClick={() => setShowFilters(true)} variant="primary" className="filter-button border-0">
                     <Icon src={FilterAlt} /> Filter
                   </Button>
                 )}
