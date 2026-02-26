@@ -147,16 +147,16 @@ export const CourseCard = ({
             </Col>
             <div className="d-flex align-self-end ml-auto">
               {onClickViewButton && (
-                <Button variant="outline-primary" onClick={onClickViewButton} className="mr-2 text-nowrap">More Info</Button>
+                <Button variant="secondary" onClick={onClickViewButton} className="mr-2 text-nowrap">More Info</Button>
               )}
               {showStartButton && (
                 onClick ? (
-                  <Button variant="outline-primary" onClick={onClick} disabled={disableStartButton}>
+                  <Button variant="secondary" onClick={onClick} disabled={disableStartButton}>
                     {buttonText}
                   </Button>
                 ) : (
                   <Link to={linkTo}>
-                    <Button variant="outline-primary" disabled={disableStartButton}>{buttonText}</Button>
+                    <Button variant="secondary" disabled={disableStartButton}>{buttonText}</Button>
                   </Link>
                 )
               )}
