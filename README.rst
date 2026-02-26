@@ -63,6 +63,12 @@ Follow these steps to set up the Learning Paths MFE with Tutor:
 
       tutor plugins enable learning_paths
 
+#. Build the Learning Paths image:
+
+   .. code-block:: bash
+
+      tutor images build learning-paths-dev
+
 #. Build the MFE image:
 
    .. code-block:: bash
@@ -120,6 +126,12 @@ After completing the Tutor setup, prepare the repository for local development:
       tutor dev stop mfe && tutor dev start -d
 
 #. Make changes to the code and see them reflected in real-time.
+
+#. If you want to use footer slots defined in tutor plugins, use the following command (change the image tag if needed):
+
+   .. code-block:: bash
+
+      docker run --rm overhangio/openedx-learning-paths-dev:21.0.0 cat env.config.jsx > env.config.js
 
 Local Development
 -----------------

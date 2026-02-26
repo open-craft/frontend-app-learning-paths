@@ -73,7 +73,7 @@ const CourseDetailContent = ({
     <>
       <div className="hero">
         {isModalView && (
-          <Row className="p-0 m-0 d-flex align-items-center modal-header">
+          <Row className="p-0 m-0 d-flex align-items-center modal-header justify-content-between">
             <Col xs={10}>
               <h4 className="mb-0 pl-4 text-muted font-weight-normal text-truncate">
                 <b>Learning Path:</b> {learningPathTitle}
