@@ -74,7 +74,7 @@ export async function fetchAllCourseCompletions() {
   const client = getAuthenticatedHttpClient();
 
   let allResults = [];
-  let nextUrl = `${getConfig().LMS_BASE_URL}/completion-aggregator/v1/course/?username=${username}&page_size=10000`;
+  let nextUrl = `${getConfig().LMS_BASE_URL}/completion-aggregator/v1/course/?username=${username}&page_size=10000&include_optional=true`;
 
   while (nextUrl) {
     // eslint-disable-next-line no-await-in-loop
@@ -89,6 +89,7 @@ export async function fetchAllCourseCompletions() {
   return camelCaseObject(allResults.map(item => ({
     course_key: item.course_key,
     completion: item.completion,
+    optional_completion: item.optional_completion,
   })));
 }
 

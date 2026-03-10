@@ -69,9 +69,19 @@ export const useLearningPaths = () => {
           };
         }
 
+        let hasOptionalCompletion = false;
+        let hasUnearnedOptionalCompletion = false;
         const totalCompletion = lp.steps.reduce((sum, step) => {
-          const completion = completionsMap[step.courseKey];
-          return sum + (completion?.percent ?? 0);
+          const completionData = completionsMap[step.courseKey];
+          const optionalPossible = completionData?.optionalCompletion?.possible ?? 0;
+          const optionalEarned = completionData?.optionalCompletion?.earned ?? 0;
+          if (optionalPossible > 0) {
+            hasOptionalCompletion = true;
+            if (optionalPossible > optionalEarned) {
+              hasUnearnedOptionalCompletion = true;
+            }
+          }
+          return sum + (completionData?.completion?.percent ?? 0);
         }, 0);
 
         const percent = totalCompletion / totalCourses;
@@ -103,6 +113,8 @@ export const useLearningPaths = () => {
           minDate,
           maxDate,
           percent,
+          hasOptionalCompletion,
+          hasUnearnedOptionalCompletion,
           type: 'learning_path',
           org: lp.key.match(/path-v1:([^+]+)/)[1],
           enrollmentDate: lp.enrollmentDate ? new Date(lp.enrollmentDate) : null,

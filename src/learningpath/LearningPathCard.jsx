@@ -29,6 +29,8 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
     minDate,
     maxDate,
     percent,
+    hasOptionalCompletion,
+    hasUnearnedOptionalCompletion,
     org,
   } = learningPath;
 
@@ -123,8 +125,13 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
                 label={`${progressBarPercent}%`}
                 variant="primary"
               />
-              <div className="x-small text-right pt-1">content completed</div>
+              <div className="x-small text-right pt-1">
+                {hasOptionalCompletion ? 'Required content completed' : 'content completed'}
+              </div>
             </>
+          )}
+          {status.toLowerCase() === 'completed' && hasUnearnedOptionalCompletion && (
+            <div className="small">You&apos;ve completed all required content. Remaining content is optional.</div>
           )}
         </Card.Section>
         <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
@@ -159,6 +166,8 @@ LearningPathCard.propTypes = {
     minDate: PropTypes.instanceOf(Date),
     maxDate: PropTypes.instanceOf(Date),
     percent: PropTypes.number,
+    hasOptionalCompletion: PropTypes.bool,
+    hasUnearnedOptionalCompletion: PropTypes.bool,
     org: PropTypes.string,
   }).isRequired,
   showFilters: PropTypes.bool,

@@ -22,12 +22,19 @@ export const calculateCompletionStatus = (completion) => {
  * @returns {Object} Course object with completion status
  */
 export const addCompletionStatus = (course, completionsMap, courseId) => {
-  const completion = completionsMap[courseId]?.percent || 0;
+  const completionData = completionsMap[courseId];
+  const completion = completionData?.completion?.percent || 0;
   const { status, percent } = calculateCompletionStatus(completion);
+  const optionalPossible = completionData?.optionalCompletion?.possible ?? 0;
+  const optionalEarned = completionData?.optionalCompletion?.earned ?? 0;
+  const hasOptionalCompletion = optionalPossible > 0;
+  const hasUnearnedOptionalCompletion = optionalPossible > optionalEarned;
   return {
     ...course,
     status,
     percent,
+    hasOptionalCompletion,
+    hasUnearnedOptionalCompletion,
   };
 };
 
@@ -39,7 +46,10 @@ export const addCompletionStatus = (course, completionsMap, courseId) => {
 export const createCompletionsMap = (completions) => {
   const completionsMap = {};
   completions?.forEach?.(item => {
-    completionsMap[item.courseKey] = item.completion;
+    completionsMap[item.courseKey] = {
+      completion: item.completion,
+      optionalCompletion: item.optionalCompletion,
+    };
   });
   return completionsMap;
 };
