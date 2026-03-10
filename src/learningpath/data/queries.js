@@ -17,7 +17,6 @@ export const QUERY_KEYS = {
   LEARNER_DASHBOARD: ['learnerDashboard'],
   COURSE_DETAILS: (courseId) => ['course', courseId],
   COURSE_COMPLETIONS: ['courseCompletions'],
-  COURSE_COMPLETION: (courseId) => ['courseCompletion', courseId],
   COURSE_ENROLLMENT_STATUS: (courseId) => ['courseEnrollmentStatus', courseId],
   ORGANIZATIONS: ['organizations'],
   CREDENTIAL_CONFIGURATION: (learningContextKey) => ['credentialConfiguration', learningContextKey],
@@ -312,12 +311,6 @@ export const usePrefetchCourseDetail = (courseId) => {
           queryKey: QUERY_KEYS.COURSE_DETAILS(courseId),
           queryFn: () => api.fetchCourseDetails(courseId),
           staleTime: STALE_TIMES.COURSE_DETAIL,
-        });
-
-        queryClient.fetchQuery({
-          queryKey: QUERY_KEYS.COURSE_COMPLETION(courseId),
-          queryFn: () => api.fetchCourseCompletion(courseId),
-          staleTime: STALE_TIMES.COMPLETIONS,
         });
 
         queryClient.prefetchQuery({
