@@ -214,12 +214,6 @@ export const useLearnerDashboard = () => {
   });
 };
 
-export const useCourseCompletions = () => useQuery({
-  queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
-  queryFn: api.fetchAllCourseCompletions,
-  staleTime: STALE_TIMES.COMPLETIONS,
-});
-
 export const useCoursesByIds = (courseIds) => {
   const queryClient = useQueryClient();
 
