@@ -31,6 +31,8 @@ export const CourseCard = ({
     endDate,
     status,
     percent,
+    hasOptionalCompletion,
+    hasUnearnedOptionalCompletion,
     checkingEnrollment,
   } = course;
 
@@ -135,8 +137,13 @@ export const CourseCard = ({
                   label={`${progressBarPercent}%`}
                   variant="primary"
                 />
-                <div className="x-small text-right pt-1">content completed</div>
+                <div className="x-small text-right pt-1">
+                  {hasOptionalCompletion ? 'Required content completed' : 'content completed'}
+                </div>
               </>
+            )}
+            {status.toLowerCase() === 'completed' && hasUnearnedOptionalCompletion && (
+              <div className="small">You&apos;ve completed all required content. Remaining content is optional.</div>
             )}
           </Card.Section>
           <Card.Footer orientation="horizontal" className="pt-3 pb-3 justify-content-between">
@@ -195,6 +202,8 @@ CourseCard.propTypes = {
     endDate: PropTypes.string,
     status: PropTypes.string.isRequired,
     percent: PropTypes.number.isRequired,
+    hasOptionalCompletion: PropTypes.bool,
+    hasUnearnedOptionalCompletion: PropTypes.bool,
     checkingEnrollment: PropTypes.bool,
   }).isRequired,
   relatedLearningPaths: PropTypes.arrayOf(PropTypes.shape({
