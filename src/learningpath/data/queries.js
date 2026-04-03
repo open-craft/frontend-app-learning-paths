@@ -255,6 +255,9 @@ export const useCoursesByIds = (courseIds) => {
           }
 
           const detail = await api.fetchCourseDetails(courseId);
+          if (!detail) {
+            return null;
+          }
           queryClient.setQueryData(QUERY_KEYS.COURSE_DETAILS(courseId), {
             ...detail,
             type: 'course',
@@ -269,7 +272,7 @@ export const useCoursesByIds = (courseIds) => {
         }),
       );
 
-      return results;
+      return results.filter(Boolean);
     },
     enabled: courseIds && courseIds.length > 0,
   });
@@ -296,6 +299,9 @@ export const useCourseDetail = (courseKey) => {
       const completionsMap = createCompletionsMap(completions);
 
       const detail = await api.fetchCourseDetails(courseKey);
+      if (!detail) {
+        return null;
+      }
       return {
         ...addCompletionStatus(detail, completionsMap, courseKey),
         type: 'course',

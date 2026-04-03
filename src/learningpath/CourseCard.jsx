@@ -34,6 +34,7 @@ export const CourseCard = ({
     hasOptionalCompletion,
     hasUnearnedOptionalCompletion,
     checkingEnrollment,
+    access,
   } = course;
 
   const { administrator } = getAuthenticatedUser();
@@ -76,7 +77,8 @@ export const CourseCard = ({
     buttonText = 'Loading...';
   }
 
-  const disableStartButton = !administrator && (checkingEnrollment || isEnrolledInLearningPath === false);
+  const hasStaffAccess = administrator || access?.isStaff;
+  const disableStartButton = !hasStaffAccess && (checkingEnrollment || isEnrolledInLearningPath === false);
   let showStartButton = true;
 
   let accessText = '';
@@ -93,7 +95,7 @@ export const CourseCard = ({
     });
     accessText = <>Access starts on <b>{startDateStr}</b></>;
     buttonText = 'Start';
-    showStartButton = administrator;
+    showStartButton = !course.access?.isTooEarly || hasStaffAccess;
   } else if (endDateObj) {
     const endDateStr = endDateObj.toLocaleString(undefined, {
       month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
@@ -209,6 +211,10 @@ CourseCard.propTypes = {
     hasOptionalCompletion: PropTypes.bool,
     hasUnearnedOptionalCompletion: PropTypes.bool,
     checkingEnrollment: PropTypes.bool,
+    access: PropTypes.shape({
+      isStaff: PropTypes.bool.isRequired,
+      isTooEarly: PropTypes.bool.isRequired,
+    }),
   }).isRequired,
   relatedLearningPaths: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
