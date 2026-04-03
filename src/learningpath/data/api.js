@@ -37,6 +37,10 @@ export async function fetchLearnerDashboard() {
       isStarted: courseRun.isStarted,
       isArchived: courseRun.isArchived,
       enrollmentDate: enrollment?.lastEnrolled || null,
+      access: {
+        isStaff: enrollment?.coursewareAccess?.isStaff || false,
+        isTooEarly: enrollment?.coursewareAccess?.isTooEarly || false,
+      },
     };
   }));
 
@@ -48,25 +52,33 @@ export async function fetchLearnerDashboard() {
 }
 
 export async function fetchCourseDetails(courseId) {
-  const response = await getAuthenticatedHttpClient().get(
-    `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/`,
-  );
-  const { data } = response;
+  try {
+    const { username } = getAuthenticatedUser();
+    const response = await getAuthenticatedHttpClient().get(
+      `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/?username=${username}`,
+    );
+    const { data } = response;
 
-  return camelCaseObject({
-    id: data.course_id,
-    number: data.number,
-    org: data.org,
-    run: data.id.split(':')[1].split('+')[2],
-    name: data.name,
-    shortDescription: data.short_description,
-    endDate: data.end,
-    startDate: data.start,
-    courseImageAssetPath: data.media.course_image.uri,
-    description: data.overview,
-    selfPaced: data.pacing === 'self',
-    duration: data.effort,
-  });
+    return camelCaseObject({
+      id: data.course_id,
+      number: data.number,
+      org: data.org,
+      run: data.id.split(':')[1].split('+')[2],
+      name: data.name,
+      shortDescription: data.short_description,
+      endDate: data.end,
+      startDate: data.start,
+      courseImageAssetPath: data.media.course_image.uri,
+      description: data.overview,
+      selfPaced: data.pacing === 'self',
+      duration: data.effort,
+    });
+  } catch (error) {
+    if (error.response?.status === 404 || error.response?.status === 403) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function fetchAllCourseCompletions() {
