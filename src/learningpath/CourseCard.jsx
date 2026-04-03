@@ -88,12 +88,16 @@ export const CourseCard = ({
   // Determine access text and override button text based on access dates.
   if (startDateObj && startDateObj > currentDate) {
     // Course will start in the future.
-    const startDateStr = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const startDateStr = startDateObj.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
     accessText = <>Access starts on <b>{startDateStr}</b></>;
     buttonText = 'Start';
     showStartButton = administrator;
   } else if (endDateObj) {
-    const endDateStr = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const endDateStr = endDateObj.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
     if (currentDate > endDateObj) {
       // Course has ended.
       accessText = <>Access ended on <b>{endDateStr}</b></>;

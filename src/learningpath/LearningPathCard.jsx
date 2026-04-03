@@ -71,11 +71,15 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
   // Determine access text and override button text based on access dates.
   if (minDate && minDate > currentDate) {
     // Learning path will start in the future.
-    const minDateStr = minDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const minDateStr = minDate.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
     accessText = <>Access starts on <b>{minDateStr}</b></>;
     buttonText = 'View';
   } else if (maxDate) {
-    const maxDateStr = maxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const maxDateStr = maxDate.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
     if (currentDate > maxDate) {
       // Learning path has ended.
       accessText = <>Access ended on <b>{maxDateStr}</b></>;
