@@ -34,6 +34,7 @@ export const CourseCard = ({
     hasOptionalCompletion,
     hasUnearnedOptionalCompletion,
     checkingEnrollment,
+    access,
   } = course;
 
   const { administrator } = getAuthenticatedUser();
@@ -76,7 +77,8 @@ export const CourseCard = ({
     buttonText = 'Loading...';
   }
 
-  const disableStartButton = !administrator && (checkingEnrollment || isEnrolledInLearningPath === false);
+  const hasStaffAccess = administrator || access?.isStaff;
+  const disableStartButton = !hasStaffAccess && (checkingEnrollment || isEnrolledInLearningPath === false);
   let showStartButton = true;
 
   let accessText = '';
@@ -88,12 +90,16 @@ export const CourseCard = ({
   // Determine access text and override button text based on access dates.
   if (startDateObj && startDateObj > currentDate) {
     // Course will start in the future.
-    const startDateStr = startDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const startDateStr = startDateObj.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
     accessText = <>Access starts on <b>{startDateStr}</b></>;
     buttonText = 'Start';
-    showStartButton = administrator;
+    showStartButton = !course.access?.isTooEarly || hasStaffAccess;
   } else if (endDateObj) {
-    const endDateStr = endDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const endDateStr = endDateObj.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
     if (currentDate > endDateObj) {
       // Course has ended.
       accessText = <>Access ended on <b>{endDateStr}</b></>;
@@ -205,6 +211,10 @@ CourseCard.propTypes = {
     hasOptionalCompletion: PropTypes.bool,
     hasUnearnedOptionalCompletion: PropTypes.bool,
     checkingEnrollment: PropTypes.bool,
+    access: PropTypes.shape({
+      isStaff: PropTypes.bool.isRequired,
+      isTooEarly: PropTypes.bool.isRequired,
+    }),
   }).isRequired,
   relatedLearningPaths: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
