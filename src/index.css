@@ -324,6 +324,7 @@ button {
         font-size: 0.9rem !important;
         color: #454545;
         font-weight: 400;
+        text-wrap: auto;
       }
 
       .pgn__icon {
