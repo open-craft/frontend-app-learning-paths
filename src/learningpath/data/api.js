@@ -5,6 +5,17 @@ import { redirectToLogin } from '../utils';
 const getBrowseClient = () => (getAuthenticatedUser() ? getAuthenticatedHttpClient() : getHttpClient());
 const pendingEnrollments = new Map();
 
+function privatePaginationOwner(user) {
+  // Snapshot values: the native service may replace or mutate its user object.
+  const { username, userId } = user;
+  return () => {
+    const current = getAuthenticatedUser();
+    if (!current || current.username !== username || current.userId !== userId) {
+      throw new Error('Learning Paths identity changed; retry under the current identity.');
+    }
+  };
+}
+
 function enrollOnce(pathSegments) {
   const user = getAuthenticatedUser();
   if (!user) {
@@ -110,6 +121,7 @@ export async function fetchCourseDetails(courseId) {
 export async function fetchAllCourseCompletions() {
   const user = getAuthenticatedUser();
   if (!user) { return []; }
+  const requireOwner = privatePaginationOwner(user);
   const { username } = user;
   const client = getAuthenticatedHttpClient();
 
@@ -117,6 +129,7 @@ export async function fetchAllCourseCompletions() {
   let nextUrl = `${getConfig().LMS_BASE_URL}/completion-aggregator/v1/course/?username=${encodeURIComponent(username)}&page_size=10000&include_optional=true`;
 
   while (nextUrl) {
+    requireOwner();
     // eslint-disable-next-line no-await-in-loop
     const response = await client.get(nextUrl);
     const results = response.data.results || [];
@@ -162,13 +175,16 @@ export async function fetchCourseEnrollmentStatus(courseId) {
 }
 
 export async function fetchOrganizations() {
-  if (!getAuthenticatedUser()) { return []; }
+  const user = getAuthenticatedUser();
+  if (!user) { return []; }
+  const requireOwner = privatePaginationOwner(user);
   const client = getAuthenticatedHttpClient();
 
   let allResults = [];
   let nextUrl = `${getConfig().LMS_BASE_URL}/api/organizations/v0/organizations/?page_size=100`;
 
   while (nextUrl) {
+    requireOwner();
     // eslint-disable-next-line no-await-in-loop
     const response = await client.get(nextUrl);
     const results = response.data.results || [];
