@@ -148,7 +148,7 @@ const LearningPathCard = ({ learningPath, showFilters = false }) => {
             )}
           </Card.Section>
           <div className="d-flex align-self-end ml-auto">
-            <Link to={`/learningpath/${key}`}>
+            <Link to={`/learningpath/${encodeURIComponent(key)}`}>
               <Button variant="secondary">{buttonText}</Button>
             </Link>
           </div>

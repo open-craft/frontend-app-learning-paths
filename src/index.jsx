@@ -57,7 +57,8 @@ subscribe(APP_INIT_ERROR, (error) => {
 
 initialize({
   messages,
-  requireAuthenticatedUser: true,
+  requireAuthenticatedUser: false,
+  hydrateAuthenticatedUser: true,
   handlers: {
     config: () => {
       mergeConfig({

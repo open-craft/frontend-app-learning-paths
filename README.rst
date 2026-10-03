@@ -202,6 +202,21 @@ noted.
 
 Please see `LICENSE <LICENSE>`_ for details.
 
+Public browsing and enrollment
+==============================
+
+The application initializes without requiring a signed-in user and hydrates
+existing sessions through frontend-platform. Visitors can browse the Learning
+Paths list, details and public course metadata permitted by the LMS API.
+Private learner-dashboard, completion, organization, credential and enrollment
+requests remain signed-in operations. Anonymous Enroll and Start actions use
+the native login redirect, retaining the current page as the return target.
+
+Queries are partitioned by the current user. Pending operations retain their
+original identity, and overlapping enrollment requests for the same user and
+path/course share one POST. Only a successful enrollment response updates the
+enrollment state; a failed request can be retried.
+
 Contributing
 ============
 

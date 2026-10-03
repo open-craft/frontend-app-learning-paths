@@ -1,8 +1,30 @@
-import { getAuthenticatedHttpClient, getAuthenticatedUser } from '@edx/frontend-platform/auth';
+import { getHttpClient, getAuthenticatedHttpClient, getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import { getConfig, camelCaseObject } from '@edx/frontend-platform';
+import { redirectToLogin } from '../utils';
+
+const getBrowseClient = () => (getAuthenticatedUser() ? getAuthenticatedHttpClient() : getHttpClient());
+const pendingEnrollments = new Map();
+
+function enrollOnce(pathSegments) {
+  const user = getAuthenticatedUser();
+  if (!user) {
+    redirectToLogin();
+    return Promise.resolve({ success: false, requiresAuthentication: true });
+  }
+  const key = JSON.stringify([user.username, ...pathSegments]);
+  if (!pendingEnrollments.has(key)) {
+    const url = `${getConfig().LMS_BASE_URL}/api/learning_paths/v1/${encodeURIComponent(pathSegments[0])}/enrollments/${pathSegments.length > 1 ? `${encodeURIComponent(pathSegments[1])}/` : ''}`;
+    const request = getAuthenticatedHttpClient().post(url)
+      .then(response => ({ success: true, status: response.status }))
+      .catch(error => ({ success: false, status: error.response?.status, error }))
+      .finally(() => pendingEnrollments.delete(key));
+    pendingEnrollments.set(key, request);
+  }
+  return pendingEnrollments.get(key);
+}
 
 export async function fetchLearningPaths() {
-  const client = getAuthenticatedHttpClient();
+  const client = getBrowseClient();
   // FIXME: This API has pagination.
   const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/learning-paths/`);
   const data = response.data.results || response.data;
@@ -10,12 +32,15 @@ export async function fetchLearningPaths() {
 }
 
 export async function fetchLearningPathDetail(key) {
-  const client = getAuthenticatedHttpClient();
-  const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/learning-paths/${key}/`);
+  const client = getBrowseClient();
+  const response = await client.get(`${getConfig().LMS_BASE_URL}/api/learning_paths/v1/learning-paths/${encodeURIComponent(key)}/`);
   return camelCaseObject(response.data);
 }
 
 export async function fetchLearnerDashboard() {
+  if (!getAuthenticatedUser()) {
+    return { courses: [], emailConfirmation: {}, enterpriseDashboard: {} };
+  }
   const response = await getAuthenticatedHttpClient().get(`${getConfig().LMS_BASE_URL}/api/learner_home/init/`);
   const courses = response.data.courses || [];
   const emailConfirmation = response.data.emailConfirmation || {};
@@ -53,9 +78,10 @@ export async function fetchLearnerDashboard() {
 
 export async function fetchCourseDetails(courseId) {
   try {
-    const { username } = getAuthenticatedUser();
-    const response = await getAuthenticatedHttpClient().get(
-      `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/?username=${username}`,
+    const user = getAuthenticatedUser();
+    const query = user ? `?username=${encodeURIComponent(user.username)}` : '';
+    const response = await getBrowseClient().get(
+      `${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${encodeURIComponent(courseId)}/${query}`,
     );
     const { data } = response;
 
@@ -82,11 +108,13 @@ export async function fetchCourseDetails(courseId) {
 }
 
 export async function fetchAllCourseCompletions() {
-  const { username } = getAuthenticatedUser();
+  const user = getAuthenticatedUser();
+  if (!user) { return []; }
+  const { username } = user;
   const client = getAuthenticatedHttpClient();
 
   let allResults = [];
-  let nextUrl = `${getConfig().LMS_BASE_URL}/completion-aggregator/v1/course/?username=${username}&page_size=10000&include_optional=true`;
+  let nextUrl = `${getConfig().LMS_BASE_URL}/completion-aggregator/v1/course/?username=${encodeURIComponent(username)}&page_size=10000&include_optional=true`;
 
   while (nextUrl) {
     // eslint-disable-next-line no-await-in-loop
@@ -105,49 +133,20 @@ export async function fetchAllCourseCompletions() {
   })));
 }
 
-export async function enrollInLearningPath(learningPathId) {
-  const client = getAuthenticatedHttpClient();
-  try {
-    const response = await client.post(
-      `${getConfig().LMS_BASE_URL}/api/learning_paths/v1/${learningPathId}/enrollments/`,
-    );
-    return {
-      success: true,
-      status: response.status,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      status: error.response?.status,
-      error,
-    };
-  }
+export function enrollInLearningPath(learningPathId) {
+  return enrollOnce([learningPathId]);
 }
 
-export async function enrollInCourse(learningPathId, courseId) {
-  const client = getAuthenticatedHttpClient();
-  try {
-    const response = await client.post(
-      `${getConfig().LMS_BASE_URL}/api/learning_paths/v1/${learningPathId}/enrollments/${courseId}/`,
-    );
-    return {
-      success: true,
-      status: response.status,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      status: error.response?.status,
-      error,
-    };
-  }
+export function enrollInCourse(learningPathId, courseId) {
+  return enrollOnce([learningPathId, courseId]);
 }
 
 export async function fetchCourseEnrollmentStatus(courseId) {
+  if (!getAuthenticatedUser()) { return { isEnrolled: false }; }
   const client = getAuthenticatedHttpClient();
   try {
     const response = await client.get(
-      `${getConfig().LMS_BASE_URL}/api/enrollment/v1/enrollment/${courseId}`,
+      `${getConfig().LMS_BASE_URL}/api/enrollment/v1/enrollment/${encodeURIComponent(courseId)}`,
     );
     return {
       isEnrolled: response.data?.is_active === true,
@@ -163,6 +162,7 @@ export async function fetchCourseEnrollmentStatus(courseId) {
 }
 
 export async function fetchOrganizations() {
+  if (!getAuthenticatedUser()) { return []; }
   const client = getAuthenticatedHttpClient();
 
   let allResults = [];
@@ -184,6 +184,7 @@ export async function fetchOrganizations() {
 }
 
 export async function fetchCredentialConfiguration(learningContextKey) {
+  if (!getAuthenticatedUser()) { return { hasCredentials: false, credentialCount: 0 }; }
   const client = getAuthenticatedHttpClient();
   try {
     const response = await client.get(

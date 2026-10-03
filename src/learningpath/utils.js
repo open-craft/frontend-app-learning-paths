@@ -1,3 +1,4 @@
+import { redirectToLogin as platformRedirectToLogin } from '@edx/frontend-platform/auth';
 import { getConfig } from '@edx/frontend-platform';
 
 /**
@@ -13,3 +14,6 @@ export const buildCourseHomeUrl = (courseId) => {
     : `${trimmedBase}/learning`;
   return `${sanitizedBase}/course/${courseId}/home`;
 };
+
+/** Use the native auth redirect and retain the current LP page as the return target. */
+export const redirectToLogin = () => platformRedirectToLogin(window.location.href);

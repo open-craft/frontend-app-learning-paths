@@ -94,12 +94,12 @@ const LearningPathDetailPage = () => {
     if (detail && !detail.enrollmentDate) {
       setEnrolling(true);
       try {
-        await enrollMutation.mutateAsync(key);
+        const result = await enrollMutation.mutateAsync(key);
+        if (result.success) { setActiveTab('courses'); }
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Enrollment failed:', error);
       } finally {
-        setActiveTab('courses');
         setEnrolling(false);
       }
     }

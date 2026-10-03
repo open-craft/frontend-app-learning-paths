@@ -1,5 +1,7 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
+import { AppContext } from '@edx/frontend-platform/react';
+import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import * as api from './api';
 import {
   addCompletionStatus,
@@ -10,17 +12,33 @@ import {
 } from './dataUtils';
 
 // Query keys
-export const QUERY_KEYS = {
-  ALL_LEARNING_PATHS: ['learningPaths'],
-  LEARNING_PATH_DETAIL: (key) => ['learningPath', key],
-  LEARNING_PATH_PROGRESS: (key) => ['learningPathProgress', key],
-  LEARNER_DASHBOARD: ['learnerDashboard'],
-  COURSE_DETAILS: (courseId) => ['course', courseId],
-  COURSE_COMPLETIONS: ['courseCompletions'],
-  COURSE_ENROLLMENT_STATUS: (courseId) => ['courseEnrollmentStatus', courseId],
-  ORGANIZATIONS: ['organizations'],
-  CREDENTIAL_CONFIGURATION: (learningContextKey) => ['credentialConfiguration', learningContextKey],
+export const getQueryKeys = (scope = getAuthenticatedUser()?.username || null) => {
+  const scoped = (...key) => ['learningPathsUser', scope, ...key];
+  return {
+    IS_AUTHENTICATED: scope !== null,
+    API: Object.fromEntries(Object.entries(api).map(([name, operation]) => [name, (...args) => {
+      if ((getAuthenticatedUser()?.username || null) !== scope) {
+        return Promise.reject(new Error('Learning Paths identity changed; retry under the current identity.'));
+      }
+      return operation(...args);
+    }])),
+    ALL_LEARNING_PATHS: scoped('learningPaths'),
+    LEARNING_PATH_DETAIL: (key) => scoped('learningPath', key),
+    LEARNING_PATH_PROGRESS: (key) => scoped('learningPathProgress', key),
+    LEARNER_DASHBOARD: scoped('learnerDashboard'),
+    COURSE_DETAILS: (courseId) => scoped('course', courseId),
+    COURSE_COMPLETIONS: scoped('courseCompletions'),
+    COURSE_ENROLLMENT_STATUS: (courseId) => scoped('courseEnrollmentStatus', courseId),
+    ORGANIZATIONS: scoped('organizations'),
+    CREDENTIAL_CONFIGURATION: (learningContextKey) => scoped('credentialConfiguration', learningContextKey),
+  };
 };
+
+// Subscribe to native identity changes and keep pending/cache data in its original principal scope.
+function useScopedQueryKeys() {
+  const { authenticatedUser } = useContext(AppContext);
+  return useMemo(() => getQueryKeys(authenticatedUser?.username || null), [authenticatedUser?.username]);
+}
 
 // Stale time configurations
 export const STALE_TIMES = {
@@ -40,19 +58,20 @@ export const STALE_TIMES = {
 // Learning Paths Queries
 export const useLearningPaths = () => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
   return useQuery({
-    queryKey: QUERY_KEYS.ALL_LEARNING_PATHS,
+    queryKey: queryKeys.ALL_LEARNING_PATHS,
     queryFn: async () => {
       await queryClient.prefetchQuery({
-        queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
-        queryFn: api.fetchAllCourseCompletions,
+        queryKey: queryKeys.COURSE_COMPLETIONS,
+        queryFn: queryKeys.API.fetchAllCourseCompletions,
       });
 
-      const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
+      const completions = queryClient.getQueryData(queryKeys.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
-      const learningPathList = await api.fetchLearningPaths();
+      const learningPathList = await queryKeys.API.fetchLearningPaths();
 
       return learningPathList.map(lp => {
         // Calculate progress based on course completions
@@ -124,15 +143,19 @@ export const useLearningPaths = () => {
   });
 };
 
-export const useLearningPathDetail = (key) => useQuery({
-  queryKey: QUERY_KEYS.LEARNING_PATH_DETAIL(key),
-  queryFn: () => api.fetchLearningPathDetail(key),
-  enabled: !!key,
-});
+export const useLearningPathDetail = (key) => {
+  const queryKeys = useScopedQueryKeys();
+  return useQuery({
+    queryKey: queryKeys.LEARNING_PATH_DETAIL(key),
+    queryFn: () => queryKeys.API.fetchLearningPathDetail(key),
+    enabled: !!key,
+  });
+};
 
 // Hook for prefetching learning path details and all related data
 export const usePrefetchLearningPathDetail = () => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
   return (key) => {
     if (!key) {
@@ -140,8 +163,8 @@ export const usePrefetchLearningPathDetail = () => {
     }
 
     queryClient.fetchQuery({
-      queryKey: QUERY_KEYS.LEARNING_PATH_DETAIL(key),
-      queryFn: () => api.fetchLearningPathDetail(key),
+      queryKey: queryKeys.LEARNING_PATH_DETAIL(key),
+      queryFn: () => queryKeys.API.fetchLearningPathDetail(key),
       staleTime: STALE_TIMES.LEARNING_PATH_DETAIL,
     })
       .then(learningPathData => {
@@ -152,8 +175,8 @@ export const usePrefetchLearningPathDetail = () => {
         const courseIds = learningPathData.steps.map(step => step.courseKey);
 
         queryClient.fetchQuery({
-          queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
-          queryFn: api.fetchAllCourseCompletions,
+          queryKey: queryKeys.COURSE_COMPLETIONS,
+          queryFn: queryKeys.API.fetchAllCourseCompletions,
           staleTime: STALE_TIMES.COMPLETIONS,
         })
           .then(completionsData => {
@@ -164,8 +187,8 @@ export const usePrefetchLearningPathDetail = () => {
 
             courseIds.forEach(courseId => {
               queryClient.fetchQuery({
-                queryKey: QUERY_KEYS.COURSE_DETAILS(courseId),
-                queryFn: () => api.fetchCourseDetails(courseId),
+                queryKey: queryKeys.COURSE_DETAILS(courseId),
+                queryFn: () => queryKeys.API.fetchCourseDetails(courseId),
                 staleTime: STALE_TIMES.COURSE_DETAIL,
               });
             });
@@ -185,27 +208,29 @@ export const usePrefetchLearningPathDetail = () => {
 // Course Queries
 export const useLearnerDashboard = () => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
   return useQuery({
-    queryKey: QUERY_KEYS.LEARNER_DASHBOARD,
+    queryKey: queryKeys.LEARNER_DASHBOARD,
+    enabled: queryKeys.IS_AUTHENTICATED,
     queryFn: async () => {
       await queryClient.prefetchQuery({
-        queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
-        queryFn: api.fetchAllCourseCompletions,
+        queryKey: queryKeys.COURSE_COMPLETIONS,
+        queryFn: queryKeys.API.fetchAllCourseCompletions,
       });
 
-      const learningPaths = queryClient.getQueryData(QUERY_KEYS.ALL_LEARNING_PATHS)
+      const learningPaths = queryClient.getQueryData(queryKeys.ALL_LEARNING_PATHS)
         || await queryClient.fetchQuery({
-          queryKey: QUERY_KEYS.ALL_LEARNING_PATHS,
-          queryFn: api.fetchLearningPaths,
+          queryKey: queryKeys.ALL_LEARNING_PATHS,
+          queryFn: queryKeys.API.fetchLearningPaths,
         });
 
-      const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
+      const completions = queryClient.getQueryData(queryKeys.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
       const courseToLearningPathMap = createCourseToLearningPathsMap(learningPaths);
 
-      const dashboardData = await api.fetchLearnerDashboard();
+      const dashboardData = await queryKeys.API.fetchLearnerDashboard();
       const processedCourses = dashboardData.courses.map(course => {
         const courseWithCompletion = addCompletionStatus(course, completionsMap, course.id);
         const courseWithLearningPaths = addLearningPaths(courseWithCompletion, courseToLearningPathMap);
@@ -228,15 +253,16 @@ export const useLearnerDashboard = () => {
 
 export const useCoursesByIds = (courseIds) => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
   return useQuery({
-    queryKey: ['coursesByIds', ...(courseIds || [])],
+    queryKey: [...queryKeys.COURSE_COMPLETIONS, 'coursesByIds', ...(courseIds || [])],
     queryFn: async () => {
-      let completionsData = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS);
+      let completionsData = queryClient.getQueryData(queryKeys.COURSE_COMPLETIONS);
       if (!completionsData) {
         completionsData = await queryClient.fetchQuery({
-          queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
-          queryFn: api.fetchAllCourseCompletions,
+          queryKey: queryKeys.COURSE_COMPLETIONS,
+          queryFn: queryKeys.API.fetchAllCourseCompletions,
         });
       }
 
@@ -244,7 +270,7 @@ export const useCoursesByIds = (courseIds) => {
 
       const results = await Promise.all(
         courseIds.map(async (courseId) => {
-          const cachedCourseDetail = queryClient.getQueryData(QUERY_KEYS.COURSE_DETAILS(courseId));
+          const cachedCourseDetail = queryClient.getQueryData(queryKeys.COURSE_DETAILS(courseId));
           if (cachedCourseDetail) {
             return {
               ...cachedCourseDetail,
@@ -254,11 +280,11 @@ export const useCoursesByIds = (courseIds) => {
             };
           }
 
-          const detail = await api.fetchCourseDetails(courseId);
+          const detail = await queryKeys.API.fetchCourseDetails(courseId);
           if (!detail) {
             return null;
           }
-          queryClient.setQueryData(QUERY_KEYS.COURSE_DETAILS(courseId), {
+          queryClient.setQueryData(queryKeys.COURSE_DETAILS(courseId), {
             ...detail,
             type: 'course',
             org: courseId ? courseId.match(/course-v1:([^+]+)/)?.[1] : null,
@@ -280,25 +306,26 @@ export const useCoursesByIds = (courseIds) => {
 
 export const useCourseDetail = (courseKey) => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
   return useQuery({
-    queryKey: QUERY_KEYS.COURSE_DETAILS(courseKey),
+    queryKey: queryKeys.COURSE_DETAILS(courseKey),
     queryFn: async () => {
       await queryClient.prefetchQuery({
-        queryKey: QUERY_KEYS.COURSE_COMPLETIONS,
-        queryFn: api.fetchAllCourseCompletions,
+        queryKey: queryKeys.COURSE_COMPLETIONS,
+        queryFn: queryKeys.API.fetchAllCourseCompletions,
       });
 
       queryClient.prefetchQuery({
-        queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(courseKey),
-        queryFn: () => api.fetchCredentialConfiguration(courseKey),
+        queryKey: queryKeys.CREDENTIAL_CONFIGURATION(courseKey),
+        queryFn: () => queryKeys.API.fetchCredentialConfiguration(courseKey),
         staleTime: STALE_TIMES.CREDENTIALS,
       });
 
-      const completions = queryClient.getQueryData(QUERY_KEYS.COURSE_COMPLETIONS) || {};
+      const completions = queryClient.getQueryData(queryKeys.COURSE_COMPLETIONS) || {};
       const completionsMap = createCompletionsMap(completions);
 
-      const detail = await api.fetchCourseDetails(courseKey);
+      const detail = await queryKeys.API.fetchCourseDetails(courseKey);
       if (!detail) {
         return null;
       }
@@ -315,19 +342,20 @@ export const useCourseDetail = (courseKey) => {
 // Hook to prefetch course details when hovering
 export const usePrefetchCourseDetail = (courseId) => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
   const prefetchCourse = useCallback(() => {
     if (courseId) {
       try {
         queryClient.fetchQuery({
-          queryKey: QUERY_KEYS.COURSE_DETAILS(courseId),
-          queryFn: () => api.fetchCourseDetails(courseId),
+          queryKey: queryKeys.COURSE_DETAILS(courseId),
+          queryFn: () => queryKeys.API.fetchCourseDetails(courseId),
           staleTime: STALE_TIMES.COURSE_DETAIL,
         });
 
         queryClient.prefetchQuery({
-          queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(courseId),
-          queryFn: () => api.fetchCredentialConfiguration(courseId),
+          queryKey: queryKeys.CREDENTIAL_CONFIGURATION(courseId),
+          queryFn: () => queryKeys.API.fetchCredentialConfiguration(courseId),
           staleTime: STALE_TIMES.CREDENTIALS,
         });
       } catch (error) {
@@ -335,80 +363,96 @@ export const usePrefetchCourseDetail = (courseId) => {
         console.error('Error prefetching course data:', error);
       }
     }
-  }, [courseId, queryClient]);
+  }, [courseId, queryClient, queryKeys]);
 
   return prefetchCourse;
 };
 
-export const useCourseEnrollmentStatus = (courseId) => useQuery({
-  queryKey: QUERY_KEYS.COURSE_ENROLLMENT_STATUS(courseId),
-  queryFn: () => api.fetchCourseEnrollmentStatus(courseId),
-  enabled: !!courseId,
-  staleTime: STALE_TIMES.COURSE_ENROLLMENTS,
-  refetchOnWindowFocus: false,
-});
+export const useCourseEnrollmentStatus = (courseId) => {
+  const queryKeys = useScopedQueryKeys();
+  return useQuery({
+    queryKey: queryKeys.COURSE_ENROLLMENT_STATUS(courseId),
+    queryFn: () => queryKeys.API.fetchCourseEnrollmentStatus(courseId),
+    enabled: !!courseId && queryKeys.IS_AUTHENTICATED,
+    staleTime: STALE_TIMES.COURSE_ENROLLMENTS,
+    refetchOnWindowFocus: false,
+  });
+};
 
 export const useEnrollLearningPath = () => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
-  return useMutation({
-    mutationFn: api.enrollInLearningPath,
-    onSuccess: (_, learningPathId) => {
+  const mutation = useMutation({
+    mutationFn: ({ learningPathId, keys }) => keys.API.enrollInLearningPath(learningPathId),
+    onSuccess: (result, { learningPathId, keys }) => {
+      if (!result.success) { return; }
       queryClient.setQueryData(
-        QUERY_KEYS.LEARNING_PATH_DETAIL(learningPathId),
-        (oldData) => {
-          if (oldData) {
-            return {
-              ...oldData,
-              enrollmentDate: Date.now(),
-            };
-          }
-          return oldData;
-        },
+        keys.LEARNING_PATH_DETAIL(learningPathId),
+        (oldData) => (oldData ? { ...oldData, enrollmentDate: Date.now() } : oldData),
       );
-
       queryClient.setQueryData(
-        QUERY_KEYS.ALL_LEARNING_PATHS,
-        (oldData) => {
-          if (!oldData) { return oldData; }
-          return oldData.map(path => (path.key === learningPathId
-            ? { ...path, enrollmentDate: Date.now() }
-            : path));
-        },
+        keys.ALL_LEARNING_PATHS,
+        (oldData) => oldData?.map(path => (path.key === learningPathId
+          ? { ...path, enrollmentDate: Date.now() }
+          : path)),
       );
     },
   });
+
+  return {
+    ...mutation,
+    mutate: (learningPathId, options) => mutation.mutate({ learningPathId, keys: queryKeys }, options),
+    mutateAsync: (learningPathId, options) => mutation.mutateAsync({ learningPathId, keys: queryKeys }, options),
+  };
 };
 
 export const useEnrollCourse = (learningPathId) => {
   const queryClient = useQueryClient();
+  const queryKeys = useScopedQueryKeys();
 
-  return useMutation({
-    mutationFn: (courseId) => api.enrollInCourse(learningPathId, courseId),
-    onSuccess: (_, courseId) => {
-      queryClient.invalidateQueries(QUERY_KEYS.COURSE_ENROLLMENT_STATUS(courseId));
+  const mutation = useMutation({
+    mutationFn: ({ courseId, pathId, keys }) => keys.API.enrollInCourse(pathId, courseId),
+    onSuccess: (result, { courseId, keys }) => {
+      if (!result.success) { return; }
+      queryClient.invalidateQueries(keys.COURSE_ENROLLMENT_STATUS(courseId));
     },
+  });
+
+  return {
+    ...mutation,
+    mutate: (courseId, options) => mutation.mutate({ courseId, pathId: learningPathId, keys: queryKeys }, options),
+    mutateAsync: (courseId, options) => mutation.mutateAsync({
+      courseId, pathId: learningPathId, keys: queryKeys,
+    }, options),
+  };
+};
+
+export const useOrganizations = () => {
+  const queryKeys = useScopedQueryKeys();
+  return useQuery({
+    queryKey: queryKeys.ORGANIZATIONS,
+    queryFn: async () => {
+      const organizations = await queryKeys.API.fetchOrganizations();
+
+      const organizationsMap = {};
+      organizations.forEach(org => {
+        organizationsMap[org.shortName] = org;
+      });
+
+      return organizationsMap;
+    },
+    enabled: queryKeys.IS_AUTHENTICATED,
+    staleTime: STALE_TIMES.ORGANIZATIONS,
   });
 };
 
-export const useOrganizations = () => useQuery({
-  queryKey: QUERY_KEYS.ORGANIZATIONS,
-  queryFn: async () => {
-    const organizations = await api.fetchOrganizations();
-
-    const organizationsMap = {};
-    organizations.forEach(org => {
-      organizationsMap[org.shortName] = org;
-    });
-
-    return organizationsMap;
-  },
-  staleTime: STALE_TIMES.ORGANIZATIONS,
-});
-
-export const useCredentialConfiguration = (learningContextKey) => useQuery({
-  queryKey: QUERY_KEYS.CREDENTIAL_CONFIGURATION(learningContextKey),
-  queryFn: () => api.fetchCredentialConfiguration(learningContextKey),
-  enabled: !!learningContextKey,
-  staleTime: STALE_TIMES.CREDENTIALS,
-});
+export const useCredentialConfiguration = (learningContextKey) => {
+  const queryKeys = useScopedQueryKeys();
+  return useQuery({
+    queryKey: queryKeys.CREDENTIAL_CONFIGURATION(learningContextKey),
+    queryFn: () => queryKeys.API.fetchCredentialConfiguration(learningContextKey),
+    enabled: !!learningContextKey && queryKeys.IS_AUTHENTICATED,
+    staleTime: STALE_TIMES.CREDENTIALS,
+  });
+};

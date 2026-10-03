@@ -17,7 +17,7 @@ import { buildAssetUrl } from '../util/assetUrl';
 import {
   usePrefetchCourseDetail, useCourseEnrollmentStatus, useEnrollCourse, useOrganizations,
 } from './data/queries';
-import { buildCourseHomeUrl } from './utils';
+import { buildCourseHomeUrl, redirectToLogin } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 export const CourseCard = ({
@@ -37,7 +37,7 @@ export const CourseCard = ({
     access,
   } = course;
 
-  const { administrator } = getAuthenticatedUser();
+  const { administrator } = getAuthenticatedUser() || {};
   const { isSmall, isMedium } = useScreenSize();
   const orientation = (showFilters && (isSmall || isMedium)) || (!showFilters && isSmall) ? 'vertical' : 'horizontal';
 
@@ -78,7 +78,8 @@ export const CourseCard = ({
   }
 
   const hasStaffAccess = administrator || access?.isStaff;
-  const disableStartButton = !hasStaffAccess && (checkingEnrollment || isEnrolledInLearningPath === false);
+  const disableStartButton = !!getAuthenticatedUser() && !hasStaffAccess
+    && (checkingEnrollment || isEnrolledInLearningPath === false);
   let showStartButton = true;
 
   let accessText = '';
@@ -186,8 +187,8 @@ export const CourseCard = ({
             </div>
             <ul className="w-100 ml-2 mb-2">
               {relatedLearningPaths.map((learningPath) => (
-                <li key={`${course.id}-${learningPath.key}`}>
-                  <Link to={`/learningpath/${learningPath.key}`} target="_blank" rel="noopener noreferrer">{learningPath.name}</Link>
+                <li key={`${course.id}-${encodeURIComponent(learningPath.key)}`}>
+                  <Link to={`/learningpath/${encodeURIComponent(learningPath.key)}`} target="_blank" rel="noopener noreferrer">{learningPath.name}</Link>
                 </li>
               ))}
             </ul>
@@ -243,7 +244,11 @@ export const CourseCardWithEnrollment = ({
   const courseHomeUrl = buildCourseHomeUrl(course.id);
 
   const handleCourseAction = async () => {
-    const { administrator } = getAuthenticatedUser();
+    if (!getAuthenticatedUser()) {
+      redirectToLogin();
+      return;
+    }
+    const { administrator } = getAuthenticatedUser() || {};
 
     if (courseWithEnrollment.isEnrolledInCourse || administrator) {
       window.location.href = courseHomeUrl;

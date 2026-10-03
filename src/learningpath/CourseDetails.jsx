@@ -21,9 +21,10 @@ import {
   Close,
   ChevronLeft,
 } from '@openedx/paragon/icons';
+import { getAuthenticatedUser } from '@edx/frontend-platform/auth';
 import { useCourseDetail, useOrganizations, useCredentialConfiguration } from './data/queries';
 import { buildAssetUrl, replaceStaticAssetReferences } from '../util/assetUrl';
-import { buildCourseHomeUrl } from './utils';
+import { buildCourseHomeUrl, redirectToLogin } from './utils';
 import { useScreenSize } from '../hooks/useScreenSize';
 
 const CourseDetailContent = ({
@@ -57,6 +58,10 @@ const CourseDetailContent = ({
   const { courseKey: urlCourseKey } = useParams();
   const activeCourseKey = course.id || urlCourseKey;
   const handleViewClick = () => {
+    if (!getAuthenticatedUser()) {
+      redirectToLogin();
+      return;
+    }
     window.location.href = buildCourseHomeUrl(activeCourseKey);
   };
 
