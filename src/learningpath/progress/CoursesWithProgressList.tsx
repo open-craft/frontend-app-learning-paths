@@ -2,6 +2,7 @@ import React from 'react';
 import CourseWithProgress from './CourseWithProgress';
 import ProgressIndicator from './ProgressIndicator';
 import { Course } from './types';
+import './CoursesWithProgressList.scss';
 
 interface CompletionMessageProps {
   completed: 'Completed' | 'Not started';

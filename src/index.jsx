@@ -9,8 +9,8 @@ import ReactDOM from 'react-dom/client';
 import { Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Container } from '@openedx/paragon';
 
-import Header from '@edx/frontend-component-header';
 import { FooterSlot } from '@edx/frontend-component-footer';
 import messages from './i18n';
 import queryClient from './queryClient';
@@ -19,8 +19,9 @@ import LearningPathDetailPage from './learningpath/LearningPathDetails';
 import CourseDetailPage from './learningpath/CourseDetails';
 import CreateLearningPathPage from './learningpath/CreateLearningPath';
 import EditLearningPathPage from './learningpath/EditLearningPath';
+import HeaderSlot from './plugin-slots/HeaderSlot';
 
-import './index.css';
+import './index.scss';
 import './setupConsoleOverride';
 
 subscribe(APP_READY, () => {
@@ -28,30 +29,17 @@ subscribe(APP_READY, () => {
   root.render(
     <AppProvider store={null}>
       <QueryClientProvider client={queryClient}>
-        <Header />
+        <HeaderSlot />
         <main id="main-content">
-          <Routes>
-            <Route
-              path="/"
-              element={<Dashboard />}
-            />
-            <Route
-              path="/create"
-              element={<CreateLearningPathPage />}
-            />
-            <Route
-              path="/edit/:key"
-              element={<EditLearningPathPage />}
-            />
-            <Route
-              path="/learningpath/:key/*"
-              element={<LearningPathDetailPage />}
-            />
-            <Route
-              path="/course/:courseKey"
-              element={<CourseDetailPage />}
-            />
-          </Routes>
+          <Container fluid size="xl">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/create" element={<CreateLearningPathPage />} />
+              <Route path="/edit/:key" element={<EditLearningPathPage />} />
+              <Route path="/learningpath/:key/*" element={<LearningPathDetailPage />} />
+              <Route path="/course/:courseKey" element={<CourseDetailPage />} />
+            </Routes>
+          </Container>
         </main>
         <FooterSlot />
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}

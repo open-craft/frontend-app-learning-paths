@@ -5,6 +5,7 @@ import {
 } from '@openedx/paragon';
 import { Add, Check, Search } from '@openedx/paragon/icons';
 import { useCourseSearch } from '../data/queries';
+import './CourseSearchPicker.scss';
 
 const CourseSearchPicker = ({ onAddCourse, disabledCourseIds }) => {
   const [inputValue, setInputValue] = useState('');

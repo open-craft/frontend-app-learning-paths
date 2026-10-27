@@ -7,6 +7,7 @@ import {
 import { ChevronLeft } from '@openedx/paragon/icons';
 import CourseSearchPicker from './CourseSearchPicker';
 import StepsDragList from './StepsDragList';
+import './LearningPathForm.scss';
 
 const LEVEL_CHOICES = [
   { value: '', label: 'Select a level' },

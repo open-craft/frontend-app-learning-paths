@@ -332,15 +332,15 @@ const Dashboard = () => {
                   />
                 </div>
               )}
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex justify-content-between align-items-center my-4">
                 <div className="d-flex align-items-center" style={{ gap: '0.5rem' }}>
                   {!showFilters && !isSmall && (
-                    <Button onClick={() => setShowFilters(true)} variant="primary" className="filter-button border-0">
+                    <Button onClick={() => setShowFilters(true)} variant="danger">
                       <Icon src={FilterAlt} /> Filter
                     </Button>
                   )}
                   {administrator && (
-                    <Button as={Link} to="/create" variant="primary" className="border-0">
+                    <Button as={Link} to="/create" variant="primary">
                       Create
                     </Button>
                   )}
@@ -361,7 +361,7 @@ const Dashboard = () => {
               ) : (
                 <>
                   {paginatedItems.map(item => (
-                    <Col xs={12} lg={11} xl={10} key={item.id || item.key} className={`dashboard-item p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
+                    <Col xs={12} key={item.id || item.key} className={`dashboard-item p-0 mb-4 ${showFilters ? '' : 'mr-auto mx-auto'}`}>
                       {item.type === 'course'
                         ? (
                           <CourseCard

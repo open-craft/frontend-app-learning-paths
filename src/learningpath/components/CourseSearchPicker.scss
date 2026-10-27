@@ -1,0 +1,54 @@
+.course-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.course-picker-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  text-align: left;
+  background: var(--pgn-color-bg-base);
+  border: var(--pgn-size-border-width) solid var(--pgn-color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pgn-color-primary-base);
+    box-shadow: var(--pgn-elevation-box-shadow-down-2-2-offset-x)
+      var(--pgn-elevation-box-shadow-down-2-2-offset-y)
+      var(--pgn-elevation-box-shadow-down-2-2-blur)
+      var(--pgn-elevation-box-shadow-down-2-2-color);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.added {
+    background: var(--pgn-color-success-100);
+    border-color: var(--pgn-color-success-300);
+  }
+
+  .course-picker-card-body {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .course-picker-card-title {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .course-picker-card-id {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

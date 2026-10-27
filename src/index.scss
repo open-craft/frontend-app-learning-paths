@@ -1,52 +1,12 @@
-:root {
-  --crimson: #821122;
-  --m-teal: #00a69c;
-  --icon-blue: #293352;
-}
+@use "@openedx/paragon/styles/css/core/custom-media-breakpoints" as
+  paragonCustomMediaBreakpoints;
 
-button {
-  &.btn-primary {
-    background-color: var(--crimson) !important;
-    border-color: var(--crimson) !important;
-    color: white !important;
-  }
+@import "~@edx/frontend-component-header/dist/index";
+@import "~@edx/frontend-component-footer/dist/_footer";
 
-  &.btn-tertiary {
-    color: #373737 !important;
-    background-color: transparent !important;
-
-    &:hover {
-      background-color: #f4f4f4 !important;
-      color: unset !important;
-    }
-  }
-
-  &.btn-secondary {
-    background-color: transparent !important;
-    border-color: #0a3055 !important;
-    color: #0a3055 !important;
-
-    &:hover {
-      background-color: #f4f4f4 !important;
-    }
-  }
-
-  &.btn-brand {
-    background-color: #0a3055 !important;
-    border-color: #0a3055 !important;
-    color: white !important;
-
-    &:hover:not(:disabled) {
-      background-color: #082644 !important;
-      border-color: #082644 !important;
-    }
-
-    &:disabled {
-      background-color: #454545 !important;
-      border-color: #454545 !important;
-    }
-  }
-}
+@import "../../brand-openedx/dist/core.min.css";
+@import "../../brand-openedx/dist/light.min.css";
+@import "../../brand-openedx/paragon/custom-ui/header/index.scss";
 
 #root {
   /* Make the footer stick to the bottom when there is not enough content. */
@@ -90,88 +50,6 @@ button {
     color: var(--crimson) !important;
     /* Move the spinner to the center of the screen. */
     margin-bottom: 200px;
-  }
-
-  footer {
-    flex-shrink: 0;
-  }
-}
-
-.dashboard {
-  /* Desktop version of the search field. */
-  .dashboard-header .pgn__searchfield {
-    width: 20%;
-  }
-
-  /* Prevent the mobile search field from changing the height of the container. */
-  .mobile-search .pgn__searchfield .pgn__searchfield__iconbutton-submit {
-    visibility: hidden
-  }
-
-  .pgn__searchfield {
-    height: 3rem;
-    border-width: 2px;
-    border-radius: 0.3rem;
-    /* Avoid cutting corners with the border radius. */
-    overflow: hidden;
-
-    &.has-focus {
-      border-color: black;
-    }
-
-    /* Hide the extra border when the search field is focused. */
-    &:after {
-      display: none;
-    }
-
-    button {
-      &:hover {
-        background-color: transparent;
-        color: unset;
-      }
-
-      &.pgn__searchfield__iconbutton-submit {
-        color: black;
-      }
-
-      &.pgn__searchfield__iconbutton-reset {
-        color: var(--crimson);
-      }
-    }
-  }
-
-  /* Notification bubble with the number of active filters on mobile. */
-  .pgn__bubble {
-    min-width: 1rem;
-    min-height: 1rem;
-    background-color: var(--m-teal) !important;
-  }
-
-  .dashboard-content {
-    transition: margin-left 0.3s ease;
-
-    &.shifted {
-      margin-left: 350px;
-    }
-
-    button {
-      margin-top: 1rem;
-      margin-bottom: 20px;
-
-      &.page-link {
-        border-radius: 0;
-      }
-    }
-
-    .dashboard-item {
-      max-width: 1000px;
-    }
-
-    .pagination {
-      .dropdown-toggle {
-        padding-right: 8px;
-      }
-    }
   }
 }
 
@@ -693,103 +571,5 @@ button {
       /* This is !important to override edges in the middle of the button group. */
       border-radius: 0.25rem !important;
     }
-  }
-}
-
-.courses-with-progress-list {
-  .course-with-progress {
-    margin-bottom: 2rem;
-    position: relative;
-    display: flex;
-    align-items: start;
-
-    .progress-indicator-wrapper {
-      flex-shrink: 0;
-      width: 36px;
-      position: relative;
-    }
-
-    .course-card-wrapper {
-      flex: 1;
-      margin-left: 1rem;
-      min-height: 100px;
-    }
-  }
-}
-
-.course-split-screen {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.course-split-pane {
-  border: 1px solid #d0d5dd;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  background: #f9fafb;
-  max-height: 520px;
-  overflow-y: auto;
-
-  .course-split-pane-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-  }
-}
-
-.course-picker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.75rem;
-}
-
-.course-picker-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  text-align: left;
-  background: #fff;
-  border: 1px solid #d0d5dd;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
-
-  &:hover:not(:disabled) {
-    border-color: #0a3055;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
-
-  &:disabled {
-    cursor: default;
-  }
-
-  &.added {
-    background: #f0fdf4;
-    border-color: #86efac;
-  }
-
-  .course-picker-card-body {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .course-picker-card-title {
-    font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .course-picker-card-id {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
