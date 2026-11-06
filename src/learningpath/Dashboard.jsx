@@ -297,7 +297,7 @@ const Dashboard = () => {
             )}
             <div className={`dashboard-content ${showFilters ? 'shifted' : ''} ${showFilters && isSmall ? 'd-none' : ''}`}>
               <div className="dashboard-header d-flex justify-content-between align-items-center">
-                <h2>My Learning</h2>
+                <h1>My Learning</h1>
                 {!isSmall ? (
                   <SearchField
                     onClear={() => setSearchQuery('')}
